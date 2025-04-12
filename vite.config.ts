@@ -11,7 +11,7 @@ export default defineConfig({
   ],
   base: './',
   build: {
-    outDir: 'www',
+    outDir: 'cordova/www',
     emptyOutDir: true
   },
 });
