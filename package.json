@@ -6,7 +6,7 @@
   "scripts": {
     "init": "concurrently \"npm i\" \"cd cordova && npm i\"",
     "dev": "vite",
-    "dev:desktop": "concurrently \"vite --input-type='module'\" \"cd cordova && run electron --nobuild\"",
+    "dev:desktop": "concurrently \"vite\" \"cd cordova && cordova run electron --nobuild\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -19,6 +19,7 @@
     "path": "^0.12.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.5.2",
     "react-router": "^7.5.0"
   },
   "devDependencies": {
