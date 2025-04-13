@@ -14,4 +14,8 @@ export default defineConfig({
     outDir: 'cordova/www',
     emptyOutDir: true
   },
+  server: {
+    port: 3000,
+    host: "0.0.0.0"
+  }
 });

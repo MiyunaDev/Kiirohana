@@ -1,14 +1,13 @@
-import './App.css'
+"use client";
 
-function App() {
+const App = () => {
 
   return (
-    <>
-      <div className="flex">
-        
-      </div>
-    </>
-  )
-}
+    <div>
+      <p>Test</p>
+    </div>
+  );
+};
 
-export default App
+export default App;
+

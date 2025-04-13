@@ -15,7 +15,7 @@ export default class ExtensionManager {
         this.basePath = basePath
     }
 
-    async getExtension(id: string): Promise<ExtensionMetadataType | null | { functions: any } | undefined>{
+    async getExtension(id: string): Promise<ExtensionMetadataType | null | undefined>{
         const extensionType = Object.values(ExtensionTypeEnum)
         const languages = Object.values(LanguageEnum)
         for(const etype in extensionType) {
