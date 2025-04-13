@@ -4,8 +4,10 @@ import { Outlet } from "react-router"
 import ChangelogModal from "../components/ChangelogModal"
 
 import { version } from "./../../package.json";
+import toast from "react-hot-toast";
 
 const AppLayout = () => {
+    const [isOffline, setIsOffline] = useState(false)
 
     const [showChangelog, setShowChangelog] = useState(false);
     const [changelogContent, setChangelogContent] = useState("");
@@ -24,6 +26,22 @@ const AppLayout = () => {
                     if (err) console.error(err)
                 })
         }
+
+        const handleOffline = () => {
+            toast("Your connection is lost. Make sure your connection is connected again", {
+                icon: "🌍"
+            })
+            setIsOffline(true)
+        }
+
+        const handleOnline = () => {
+            toast.success("Your connection is back!!")
+            window.location.reload()
+            setIsOffline(false)
+        }
+
+        window.addEventListener("offline", handleOffline)
+        window.addEventListener("online", handleOnline)
     }, []);
 
     useEffect(() => {
@@ -35,7 +53,9 @@ const AppLayout = () => {
             {showChangelog && (
                 <ChangelogModal content={changelogContent} onClose={() => setShowChangelog(false)} />
             )}
-            <Outlet />
+            {isOffline ? <div className="w-full h-full flex items-center justify-center">
+                <div className="flex flex-col gap-2"><a className="text-3xl">-_-</a><a>You disconnected</a></div>
+            </div> : <Outlet />}
         </div>
     )
 }
