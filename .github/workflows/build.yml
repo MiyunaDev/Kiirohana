@@ -1,0 +1,119 @@
+name: Build Cordova Android & Electron
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Cordova
+        run: npm install -g cordova
+
+      - name: Open cordova
+        run: cd cordova
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Add Android platform
+        run: cordova platform add android
+
+      - name: Build Android APK
+        run: cordova build android --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-apk
+          path: platforms/android/app/build/outputs/apk/release/*.apk
+
+  build-electron-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Cordova
+        run: npm install -g cordova
+
+      - name: Open cordova
+        run: cd cordova
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Add Electron platform
+        run: cordova platform add electron
+
+      - name: Build Electron for Linux
+        run: cordova build electron --release
+
+      - name: Package Electron App
+        run: |
+          sudo apt update
+          sudo apt install -y snapcraft
+          npx electron-builder --linux deb AppImage snap
+
+      - name: Upload Linux Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: electron-linux
+          path: |
+            dist/*.deb
+            dist/*.AppImage
+            dist/*.snap
+
+  build-electron-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Cordova
+        run: npm install -g 
+
+      - name: Open cordova
+        run: cd cordova
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Add Electron platform
+        run: cordova platform add electron
+
+      - name: Build Electron for Windows
+        run: cordova build electron --release
+
+      - name: Package Electron App
+        run: npx electron-builder --win
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: electron-windows
+          path: |
+            dist/*.exe
+            dist/*.msi
