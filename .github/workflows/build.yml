@@ -25,26 +25,25 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Open cordova directory
-        run: cd cordova
-
-      - name: Check now directory
-        run: pwd
-        
       - name: Install Cordova
         run: npm install -g cordova
+        working-directory: ./cordova
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./cordova
 
       - name: Add Android platform
         run: cordova platform add android
+        working-directory: ./cordova
 
       - name: Build Android APK
         run: cordova build android --release
+        working-directory: ./cordova
 
       - name: Upload APK
         uses: actions/upload-artifact@v4.6.2
+        working-directory: ./cordova
         with:
           name: android-apk
           path: platforms/android/app/build/outputs/apk/release/*.apk
@@ -62,17 +61,22 @@ jobs:
 
       - name: Install Cordova
         run: npm install -g cordova
+        working-directory: ./cordova
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./cordova
 
       - name: Add Electron platform
         run: cordova platform add electron
+        working-directory: ./cordova
 
       - name: Build Electron for Linux
         run: cordova build electron --release
+        working-directory: ./cordova
 
       - name: Package Electron App
+        working-directory: ./cordova
         run: |
           sudo apt update
           sudo apt install -y snapcraft
@@ -80,6 +84,7 @@ jobs:
 
       - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v4.6.2
+        working-directory: ./cordova
         with:
           name: electron-linux
           path: |
@@ -100,21 +105,27 @@ jobs:
 
       - name: Install Cordova
         run: npm install -g 
+        working-directory: ./cordova
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./cordova
 
       - name: Add Electron platform
         run: cordova platform add electron
+        working-directory: ./cordova
 
       - name: Build Electron for Windows
         run: cordova build electron --release
+        working-directory: ./cordova
 
       - name: Package Electron App
         run: npx electron-builder --win
+        working-directory: ./cordova
 
       - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v4.6.2
+        working-directory: ./cordova
         with:
           name: electron-windows
           path: |
