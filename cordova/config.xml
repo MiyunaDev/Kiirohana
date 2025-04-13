@@ -20,4 +20,12 @@
     <config-file target="AndroidManifest.xml" parent="/*" xmlns:android="http://schemas.android.com/apk/res/android">
         <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
     </config-file>
+    <icon src="res/playstore.png" />
+    <platform name="android">
+        <icon src="res/android/mipmap-mdpi/icon.png" density="mdpi" />
+        <icon src="res/android/mipmap-hdpi/icon.png" density="hdpi" />
+        <icon src="res/android/mipmap-xhdpi/icon.png" density="xhdpi" />
+        <icon src="res/android/mipmap-xxhdpi/icon.png" density="xxhdpi" />
+        <icon src="res/android/mipmap-xxxhdpi/icon.png" density="xxxhdpi" />
+    </platform>
 </widget>
