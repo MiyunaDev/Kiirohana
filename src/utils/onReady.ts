@@ -1,6 +1,6 @@
 import ExtensionManager from "../extensions/manager";
 
-declare var extensionManager: ExtensionManager
+var extensionManager: ExtensionManager | null
 
 function onReady() {
     document.addEventListener("deviceready", () => {

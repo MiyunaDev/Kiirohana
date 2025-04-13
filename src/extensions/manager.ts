@@ -60,6 +60,8 @@ export default class ExtensionManager {
         })
     }
 
+    async installRepository() {}
+
     private async evaluateScript(script: string): Promise<Record<string, any>> {
         const exports = {}
         const module = { exports }

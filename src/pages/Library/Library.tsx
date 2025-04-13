@@ -1,0 +1,25 @@
+import Flag from 'react-world-flags'
+
+
+
+const Library = () => {
+    return (
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-2 gap-y-4">
+            <div className='w-full'>
+                <p className='rounded-t-2xl text-xs p-1 text-center bg-amber-400'>Anime</p>
+                <div className="relative w-full">
+                    <Flag code={"ID"} className="absolute w-1/4 top-1 left-1 z-10" />
+                    <p className='absolute text-xs top-1 right-1 rounded-3xl bg-amber-400 p-1'>12</p>
+                    <img
+                        className="w-full aspect-[2/3] bg-gray-500 z-0"
+                        src="https://media.discordapp.net/attachments/847678573040631818/1070984388612993024/Gochuumon_wa_Usagi_desu_ka_.jpg?ex=67fcc770&is=67fb75f0&hm=51487e03e5cd821102ff0db72648be149cd714b774aed5daf25ec53766703f2a&=&format=webp&width=663&height=940"
+                    />
+                </div>
+                <a className='text-xs sm:text-base font-semibold line-clamp-2 text-center py-2'>Gochumon wa usagi desuga. Season 2</a>
+
+            </div>
+        </div>
+    )
+}
+
+export default Library
