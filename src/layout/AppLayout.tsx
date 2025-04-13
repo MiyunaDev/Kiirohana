@@ -5,7 +5,6 @@ import ChangelogModal from "../components/ChangelogModal"
 
 import { version } from "./../../package.json";
 
-
 const AppLayout = () => {
 
     const [showChangelog, setShowChangelog] = useState(false);
@@ -14,15 +13,16 @@ const AppLayout = () => {
     useEffect(() => {
         const lastSeenVersion = localStorage.getItem("last_seen_version");
 
-        if (!lastSeenVersion || lastSeenVersion !== version) {
-            fetch("/CHANGELOGS.md")
+        if (!lastSeenVersion || lastSeenVersion == version) {
+            fetch("https://raw.githubusercontent.com/MiyunaDev/Kiirohana/refs/heads/main/public/CHANGELOGS.md")
                 .then(res => res.text())
                 .then(md => {
-                    console.log(md)
                     setChangelogContent(md);
                     setShowChangelog(true);
                     localStorage.setItem("last_seen_version", version);
-                });
+                }).catch(async err => {
+                    if (err) console.error(err)
+                })
         }
     }, []);
 

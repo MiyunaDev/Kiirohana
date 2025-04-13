@@ -44,7 +44,7 @@ const Library = () => {
                                 src={detail.cover}
                             />
                         </div>
-                        <a className='w-full text-xs md:text-base font-semibold line-clamp-2 text-ellipsis overflow-hidden text-center py-2'>{detail.title}</a>
+                        <a className='w-full text-xs font-semibold line-clamp-2 text-ellipsis text-center py-2'>{detail.title}</a>
                     </div>
                 )
             })}
