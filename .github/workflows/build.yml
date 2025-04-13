@@ -22,9 +22,6 @@ jobs:
       - name: Install Cordova
         run: npm install -g cordova
 
-      - name: Open cordova
-        run: cd cordova
-
       - name: Install dependencies
         run: npm install
 
@@ -53,9 +50,6 @@ jobs:
 
       - name: Install Cordova
         run: npm install -g cordova
-
-      - name: Open cordova
-        run: cd cordova
 
       - name: Install dependencies
         run: npm install
@@ -94,9 +88,6 @@ jobs:
 
       - name: Install Cordova
         run: npm install -g 
-
-      - name: Open cordova
-        run: cd cordova
 
       - name: Install dependencies
         run: npm install
