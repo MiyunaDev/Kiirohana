@@ -13,12 +13,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: 'temurin'
+          java-version: '21'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4.3.0
         with:
           node-version: '18'
 
+      - name: Open cordova directory
+        run: cd cordova
+
+      - name: Check now directory
+        run: pwd
+        
       - name: Install Cordova
         run: npm install -g cordova
 
