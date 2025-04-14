@@ -64,8 +64,14 @@ jobs:
         with:
           python-version: '3.13' 
       
+      - name: Add repository
+        run: sudo add-apt-repository universe && sudo apt update
+      
       - name: Setup environment
-        run: sudo apt install -y build-essential fakeroot dpkg rpm snapcraft libarchive-tools libgconf-2-4 libgtk-3-dev libnss3 libxss1 libasound2 libxtst6 libx11-dev libxkbfile-dev gcc g++ make zlib1g-dev  liblzma-dev binutils
+        run: sudo apt install -y build-essential fakeroot dpkg rpm snapd libarchive-tools libgconf-2-4 libgtk-3-dev libnss3 libxss1 libasound2 libxtst6 libx11-dev libxkbfile-dev gcc g++ make zlib1g-dev  liblzma-dev binutils
+
+      - name: Setup environment (Snapcraft)
+        run : sudo snap install snapcraft --classic
 
       - name: Install Cordova
         run: npm install -g cordova
@@ -111,7 +117,7 @@ jobs:
           node-version: '18'
 
       - name: Install Cordova
-        run: npm install -g 
+        run: npm install -g cordova
         working-directory: ./cordova
 
       - name: Install dependencies
