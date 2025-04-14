@@ -24,17 +24,19 @@ jobs:
         uses: actions/setup-node@v4.3.0
         with:
           node-version: '18'
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3.2.2
 
       - name: Install Cordova
         run: npm install -g cordova
+      
+      - name: Add Android platform
+        run: cordova platform add android@latest
         working-directory: ./cordova
 
       - name: Install dependencies
         run: npm install
-        working-directory: ./cordova
-
-      - name: Add Android platform
-        run: cordova platform add android
         working-directory: ./cordova
 
       - name: Build Android APK
@@ -58,6 +60,13 @@ jobs:
         uses: actions/setup-node@v4.3.0
         with:
           node-version: '18'
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13' 
+      
+      - name: Setup environment
+        run: sudo apt install -y build-essential fakeroot dpkg rpm snapcraft libarchive-tools libgconf-2-4 libgtk-3-dev libnss3 libxss1 libasound2 libxtst6 libx11-dev libxkbfile-dev gcc g++ make zlib1g-dev  liblzma-dev binutils
 
       - name: Install Cordova
         run: npm install -g cordova
@@ -76,11 +85,8 @@ jobs:
         working-directory: ./cordova
 
       - name: Package Electron App
+        run: npx electron-builder --linux deb AppImage snap rpm pacman tar.gz
         working-directory: ./cordova
-        run: |
-          sudo apt update
-          sudo apt install -y snapcraft
-          npx electron-builder --linux deb AppImage snap
 
       - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v4.6.2
@@ -91,6 +97,9 @@ jobs:
             dist/*.deb
             dist/*.AppImage
             dist/*.snap
+            dist/*.rpm
+            dist/*.pacman
+            dist/*.tar.gz
 
   build-electron-windows:
     runs-on: windows-latest

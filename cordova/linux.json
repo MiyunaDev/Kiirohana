@@ -1,0 +1,40 @@
+{
+    "appId": "com.miyunadev.kiirohana",
+    "productName": "Kiirohana",
+    "directories": {
+        "output": "build"
+    },
+    "files": [
+        "**/*"
+    ],
+    "electron": {
+        "linux": {
+            "package": [
+                "snap",
+                "deb",
+                "AppImage",
+                "rpm",
+                "pacman"
+            ],
+            "arch": [
+                "x64",
+                "ia32",
+                "arm64",
+                "armv7l"
+            ]
+        },
+        "windows": {
+            "package": [
+                "nsis",
+                "msi",
+                "portable"
+            ],
+            "arch": [
+                "x64",
+                "ia32",
+                "arm64",
+                "armv7l"
+            ]
+        }
+    }
+}
