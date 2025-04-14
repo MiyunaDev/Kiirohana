@@ -34,7 +34,7 @@ const Library = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4">
             {library.map((detail, index) => (
                 <div key={index} className="flex flex-col w-full">
-                    <p className="rounded-t-2xl text-xs p-1 text-center bg-[#C667F7]">Anime</p>
+                    <p className="rounded-t-2xl p-1 text-center bg-[#C667F7]">Anime</p>
 
                     <div className="relative w-full">
                         <Flag
@@ -51,7 +51,7 @@ const Library = () => {
                         />
                     </div>
 
-                    <a className="w-full text-xs font-semibold text-center py-2 px-1 line-clamp-2">
+                    <a className="w-full font-semibold text-center py-2 px-1 line-clamp-2">
                         {detail.title}
                     </a>
                 </div>
