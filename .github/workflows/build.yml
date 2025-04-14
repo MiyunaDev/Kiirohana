@@ -68,7 +68,7 @@ jobs:
         run: sudo add-apt-repository universe && sudo apt update
       
       - name: Setup environment
-        run: sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm bsdtar snapd
+        run: sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm libarchive-tools snapd
 
       - name: Setup environment (Snapcraft)
         run: |
@@ -88,7 +88,7 @@ jobs:
         working-directory: ./cordova
 
       - name: Build Electron for Linux
-        run: cordova build electron --release
+        run: npm run build
         working-directory: ./cordova
 
       - name: Upload Linux Artifacts
@@ -127,7 +127,7 @@ jobs:
         working-directory: ./cordova
 
       - name: Build Electron for Windows
-        run: cordova build electron --release
+        run: npm run build
         working-directory: ./cordova
 
       - name: Upload Windows Artifacts
