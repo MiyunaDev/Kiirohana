@@ -13,32 +13,51 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: 'temurin'
+          java-version: '21'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4.3.0
         with:
           node-version: '18'
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3.2.2
 
       - name: Install Cordova
         run: npm install -g cordova
-
-      - name: Open cordova
-        run: cd cordova
+      
+      - name: Add Android platform
+        run: cordova platform add android@latest
+        working-directory: ./cordova
 
       - name: Install dependencies
         run: npm install
-
-      - name: Add Android platform
-        run: cordova platform add android
+        working-directory: ./cordova
 
       - name: Build Android APK
+        run: cordova build android
+        working-directory: ./cordova
+      
+      - name: Build Android AAB
         run: cordova build android --release
+        working-directory: ./cordova
 
       - name: Upload APK
         uses: actions/upload-artifact@v4.6.2
         with:
           name: android-apk
-          path: platforms/android/app/build/outputs/apk/release/*.apk
+          path: cordova/platforms/android/app/build/outputs/apk/release/*.apk
+      
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: android-apk
+          path: cordova/platforms/android/app/build/outputs/bundle/release/*.apk
 
   build-electron-linux:
     runs-on: ubuntu-latest
@@ -50,36 +69,49 @@ jobs:
         uses: actions/setup-node@v4.3.0
         with:
           node-version: '18'
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13' 
+      
+      - name: Add repository
+        run: sudo add-apt-repository universe && sudo apt update
+      
+      - name: Setup environment
+        run: sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm libarchive-tools snapd
+
+      - name: Setup environment (Snapcraft)
+        run: |
+          sudo snap install snapcraft --classic
+          sudo snap install multipass --beta --classic
 
       - name: Install Cordova
         run: npm install -g cordova
-
-      - name: Open cordova
-        run: cd cordova
+        working-directory: ./cordova
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./cordova
 
       - name: Add Electron platform
         run: cordova platform add electron
+        working-directory: ./cordova
 
       - name: Build Electron for Linux
-        run: cordova build electron --release
-
-      - name: Package Electron App
-        run: |
-          sudo apt update
-          sudo apt install -y snapcraft
-          npx electron-builder --linux deb AppImage snap
+        run: npm run build
+        working-directory: ./cordova
 
       - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v4.6.2
         with:
           name: electron-linux
           path: |
-            dist/*.deb
-            dist/*.AppImage
-            dist/*.snap
+            cordova/platforms/electron/build/*.deb
+            cordova/platforms/electron/build/*.AppImage
+            cordova/platforms/electron/build/*.snap
+            cordova/platforms/electron/build/*.rpm
+            cordova/platforms/electron/build/*.pacman
+            cordova/platforms/electron/build/*.tar.gz
 
   build-electron-windows:
     runs-on: windows-latest
@@ -93,27 +125,25 @@ jobs:
           node-version: '18'
 
       - name: Install Cordova
-        run: npm install -g 
-
-      - name: Open cordova
-        run: cd cordova
+        run: npm install -g cordova
+        working-directory: ./cordova
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./cordova
 
       - name: Add Electron platform
         run: cordova platform add electron
+        working-directory: ./cordova
 
       - name: Build Electron for Windows
-        run: cordova build electron --release
-
-      - name: Package Electron App
-        run: npx electron-builder --win
+        run: npm run build
+        working-directory: ./cordova
 
       - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v4.6.2
         with:
           name: electron-windows
           path: |
-            dist/*.exe
-            dist/*.msi
+            cordova/platforms/electron/build/*.exe
+            cordova/platforms/electron/build/*.msi
