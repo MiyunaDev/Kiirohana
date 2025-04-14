@@ -45,10 +45,9 @@ jobs:
 
       - name: Upload APK
         uses: actions/upload-artifact@v4.6.2
-        working-directory: ./cordova
         with:
           name: android-apk
-          path: platforms/android/app/build/outputs/apk/release/*.apk
+          path: cordova/platforms/android/app/build/outputs/apk/release/*.apk
 
   build-electron-linux:
     runs-on: ubuntu-latest
@@ -90,16 +89,15 @@ jobs:
 
       - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v4.6.2
-        working-directory: ./cordova
         with:
           name: electron-linux
           path: |
-            dist/*.deb
-            dist/*.AppImage
-            dist/*.snap
-            dist/*.rpm
-            dist/*.pacman
-            dist/*.tar.gz
+            cordova/dist/*.deb
+            cordova/dist/*.AppImage
+            cordova/dist/*.snap
+            cordova/dist/*.rpm
+            cordova/dist/*.pacman
+            cordova/dist/*.tar.gz
 
   build-electron-windows:
     runs-on: windows-latest
@@ -134,9 +132,8 @@ jobs:
 
       - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v4.6.2
-        working-directory: ./cordova
         with:
           name: electron-windows
           path: |
-            dist/*.exe
-            dist/*.msi
+            cordova/dist/*.exe
+            cordova/dist/*.msi
