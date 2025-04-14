@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v4.6.2
         with:
           name: android-apk
-          path: cordova/platforms/android/app/build/outputs/apk/release/*.apk
+          path: cordova/platforms/android/app/build/outputs/apk/debug/*.apk
       
       - name: Upload AAB
         uses: actions/upload-artifact@v4.6.2
