@@ -57,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v4.6.2
         with:
           name: android-apk
-          path: cordova/platforms/android/app/build/outputs/bundle/release/*.apk
+          path: cordova/platforms/android/app/build/outputs/bundle/release/*.aab
 
   build-electron-linux:
     runs-on: ubuntu-latest
