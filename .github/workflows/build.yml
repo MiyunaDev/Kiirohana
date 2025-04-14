@@ -68,10 +68,12 @@ jobs:
         run: sudo add-apt-repository universe && sudo apt update
       
       - name: Setup environment
-        run: sudo apt install -y build-essential fakeroot dpkg rpm snapd libarchive-tools libgconf-2-4 libgtk-3-dev libnss3 libxss1 libasound2 libxtst6 libx11-dev libxkbfile-dev gcc g++ make zlib1g-dev  liblzma-dev binutils
+        run: sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm bsdtar snapd
 
       - name: Setup environment (Snapcraft)
-        run : sudo snap install snapcraft --classic
+        run: |
+          sudo snap install snapcraft --classic
+          sudo snap install multipass --beta --classic
 
       - name: Install Cordova
         run: npm install -g cordova
@@ -87,10 +89,6 @@ jobs:
 
       - name: Build Electron for Linux
         run: cordova build electron --release
-        working-directory: ./cordova
-
-      - name: Package Electron App
-        run: npx electron-builder --linux deb AppImage snap rpm pacman tar.gz
         working-directory: ./cordova
 
       - name: Upload Linux Artifacts
@@ -130,10 +128,6 @@ jobs:
 
       - name: Build Electron for Windows
         run: cordova build electron --release
-        working-directory: ./cordova
-
-      - name: Package Electron App
-        run: npx electron-builder --win
         working-directory: ./cordova
 
       - name: Upload Windows Artifacts
