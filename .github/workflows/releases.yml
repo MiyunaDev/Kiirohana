@@ -1,0 +1,137 @@
+name: Release Build Cordova
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.3.0
+        with:
+          node-version: '18'
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3.2.2
+
+      - name: Install Cordova
+        run: npm install -g cordova
+      
+      - name: Prepare Android
+        run: |
+          cordova platform add android@latest
+          npm install
+        working-directory: ./cordova
+
+      - name: Build APK (Debug)
+        run: cordova build android
+        working-directory: ./cordova
+
+      - name: Build AAB (Release)
+        run: cordova build android --release
+        working-directory: ./cordova
+
+      - name: Upload APK to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: cordova/platforms/android/app/build/outputs/apk/debug/*.apk
+
+      - name: Upload AAB to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: cordova/platforms/android/app/build/outputs/bundle/release/*.aab
+
+  build-electron-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.3.0
+        with:
+          node-version: '18'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13' 
+
+      - name: Add Repository
+        run: sudo add-apt-repository universe && sudo apt update
+
+      - name: Install Linux build tools
+        run: sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm libarchive-tools snapd
+
+      - name: Setup Snapcraft
+        run: |
+          sudo snap install snapcraft --classic
+          sudo snap install multipass --beta --classic
+
+      - name: Install Cordova
+        run: npm install -g cordova
+        working-directory: ./cordova
+
+      - name: Prepare Electron
+        run: |
+          cordova platform add electron
+          npm install
+        working-directory: ./cordova
+
+      - name: Build Electron (Linux)
+        run: npm run build
+        working-directory: ./cordova
+
+      - name: Upload Linux Artifacts to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            cordova/platforms/electron/build/*.deb
+            cordova/platforms/electron/build/*.AppImage
+            cordova/platforms/electron/build/*.snap
+            cordova/platforms/electron/build/*.rpm
+            cordova/platforms/electron/build/*.pacman
+            cordova/platforms/electron/build/*.tar.gz
+
+  build-electron-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.3.0
+        with:
+          node-version: '18'
+
+      - name: Install Cordova
+        run: npm install -g cordova
+        working-directory: ./cordova
+
+      - name: Prepare Electron
+        run: |
+          cordova platform add electron
+          npm install
+        working-directory: ./cordova
+
+      - name: Build Electron (Windows)
+        run: npm run build
+        working-directory: ./cordova
+
+      - name: Upload Windows Artifacts to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            cordova/platforms/electron/build/*.exe
+            cordova/platforms/electron/build/*.msi
