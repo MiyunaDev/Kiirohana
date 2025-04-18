@@ -45,11 +45,15 @@ jobs:
 
       - name: Upload APK to GitHub Release
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           files: cordova/platforms/android/app/build/outputs/apk/debug/*.apk
 
       - name: Upload AAB to GitHub Release
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           files: cordova/platforms/android/app/build/outputs/bundle/release/*.aab
 
@@ -95,6 +99,8 @@ jobs:
 
       - name: Upload Linux Artifacts to GitHub Release
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           files: |
             cordova/platforms/electron/build/*.deb
@@ -131,6 +137,8 @@ jobs:
 
       - name: Upload Windows Artifacts to GitHub Release
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           files: |
             cordova/platforms/electron/build/*.exe

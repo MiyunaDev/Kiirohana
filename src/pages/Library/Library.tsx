@@ -31,10 +31,10 @@ const library: Array<{
 
 const Library = () => {
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 max-w-screen-xl mx-auto px-2">
             {library.map((detail, index) => (
-                <div key={index} className="flex flex-col w-full">
-                    <p className="rounded-t-2xl text-sm p-1 text-center bg-[#C667F7]">Anime</p>
+                <div key={index} className="flex flex-col w-full min-w-[120px] max-w-[180px] mx-auto">
+                    <p className="rounded-t-2xl text-xs sm:text-sm p-1 text-center bg-[#C667F7]">Anime</p>
 
                     <div className="relative w-full">
                         <Flag
@@ -45,19 +45,18 @@ const Library = () => {
                             12
                         </p>
                         <img
-                            className="w-full aspect-[2/3] object-cover bg-gray-300 rounded-b-lg"
+                            className="w-full aspect-[2/3] sm:aspect-[3/4] object-cover bg-gray-300 rounded-b-lg"
                             src={detail.cover}
                             alt={detail.title}
                         />
                     </div>
 
-                    <a className="w-full text-sm font-semibold text-center py-2 px-1 line-clamp-2">
+                    <a className="w-full text-xs sm:text-sm font-semibold text-center py-2 px-1 line-clamp-2">
                         {detail.title}
                     </a>
                 </div>
             ))}
         </div>
-
     )
 }
 
