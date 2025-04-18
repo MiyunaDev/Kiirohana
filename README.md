@@ -19,6 +19,5 @@ Testing option now have only 2 option. With desktop and with android
 
 |---|---|
 | Platform | execution |
-|---|---|
 | Android | `npm run dev:android` |
 | Electron (Windows, Mac, Linux) | `npm run dev:desktop` |
