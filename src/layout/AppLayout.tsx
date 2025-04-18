@@ -49,7 +49,7 @@ const AppLayout = () => {
     }, [])
 
     return (
-        <div className="w-screen h-screen bg-[#202020]">
+        <div className="w-screen h-screen bg-[#101010]">
             {showChangelog && (
                 <ChangelogModal content={changelogContent} onClose={() => setShowChangelog(false)} />
             )}

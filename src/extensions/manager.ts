@@ -1,5 +1,4 @@
 import axios from "axios";
-import * as cheerio from "cheerio";
 
 
 import ExtensionTypeEnum from "../enums/ExtensionTypeEnum";
@@ -67,7 +66,7 @@ export default class ExtensionManager {
         const module = { exports }
         const wrapped = new Function("axios", "cheerio", "module", "exports", `
             ${script}`)
-        await wrapped(axios, cheerio, module, module, exports )
+        await wrapped(axios, module, module, exports )
         return module.exports;
     }
 }

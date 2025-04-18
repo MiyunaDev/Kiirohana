@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="com.miyunadev.kiirohana" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.miyunadev.kiirohana" version="0.0.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
   <name>Kiirohana</name>
   <description>Sample Apache Cordova App</description>
   <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
         Miyuna Dev
-    </author>
+  </author>
   <content src="index.html"/>
   <allow-intent href="http://*/*"/>
   <allow-intent href="https://*/*"/>
