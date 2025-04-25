@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { onReady } from "../utils/onReady"
 import { Outlet } from "react-router"
 import ChangelogModal from "../components/ChangelogModal"
 
@@ -28,6 +27,7 @@ const AppLayout = () => {
         }
 
         const handleOffline = () => {
+            console.log("Connection disconnected")
             toast("Your connection is lost. Make sure your connection is connected again", {
                 icon: "🌍"
             })
@@ -35,18 +35,15 @@ const AppLayout = () => {
         }
 
         const handleOnline = () => {
+            console.log("Connection connected")
             toast.success("Your connection is back!!")
             window.location.reload()
             setIsOffline(false)
         }
 
-        window.addEventListener("offline", handleOffline)
-        window.addEventListener("online", handleOnline)
+        document.addEventListener("offline", handleOffline, false)
+        document.addEventListener("online", handleOnline, false)
     }, []);
-
-    useEffect(() => {
-        onReady()
-    }, [])
 
     return (
         <div className="w-screen h-screen bg-[#101010]">

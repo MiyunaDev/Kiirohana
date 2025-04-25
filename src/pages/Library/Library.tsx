@@ -1,6 +1,8 @@
 import Flag from 'react-world-flags'
 import getFlag from '../../utils/getFlag'
 import LanguageEnum from '../../enums/LanguageEnum'
+import { useEffect } from 'react'
+import { getSettings, saveSettings } from '../../utils/testData'
 
 const library: Array<{
     title: string,
@@ -30,6 +32,23 @@ const library: Array<{
     ]
 
 const Library = () => {
+
+    useEffect(() => {
+        const loadSettings = async () => {
+            let setting = await getSettings();
+            console.log("Before saving:", setting);
+
+            await saveSettings({
+                language: "ENGLISH"
+            });
+
+            setting = await getSettings();
+            console.log("After saving:", setting);
+        };
+
+        loadSettings();
+    }, []);
+
     return (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 max-w-screen-xl mx-auto px-2">
             {library.map((detail, index) => (

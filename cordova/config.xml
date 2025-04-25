@@ -20,8 +20,5 @@
   </platform>
   <preference name="scheme" value="app"/>
   <preference name="hostname" value="localhost"/>
-  <config-file target="AndroidManifest.xml" parent="/*" xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
-  </config-file>
   <icon src="res/playstore.png"/>
 </widget>

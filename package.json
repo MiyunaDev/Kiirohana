@@ -17,6 +17,7 @@
     "axios": "^1.8.4",
     "cli-color": "^2.0.4",
     "concurrently": "^9.1.2",
+    "localforage": "^1.10.0",
     "path": "^0.12.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@tailwindcss/typography": "^0.5.16",
+    "@types/localforage": "^0.0.33",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@types/react-world-flags": "^1.6.0",
