@@ -62,10 +62,10 @@ const NavigativeLayout = () => {
                         <Link
                             key={to}
                             to={to}
-                            className={`flex flex-col items-center justify-center gap-2 
+                            className={`transition-all duration-300 flex flex-col items-center justify-center gap-2 
         ${active ? "border-b-4 border-b-[#C667F7] text-[#C667F7]" : "text-white"}`}
                         >
-                            <div className={active ? "text-xl text-[#C667F7]" : "text-xl text-white"}>
+                            <div className={`transition-all duration-300 ` + (active ? "text-xl text-[#C667F7]" : "text-xl text-white")}>
                                 {icon}
                             </div>
 

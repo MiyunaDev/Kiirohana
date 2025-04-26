@@ -12,6 +12,8 @@ import App from './App.tsx'
 import AppLayout from './layout/AppLayout.tsx';
 import NavigativeLayout from './layout/NavigativeLayout.tsx';
 import Library from './pages/Library/Library.tsx';
+import Settings from './pages/Settings/Settings.tsx';
+import History from './pages/History/History.tsx';
 
 const router = createHashRouter([
   {
@@ -21,7 +23,9 @@ const router = createHashRouter([
       { index: true, Component: App },
       {
         path: "app", Component: NavigativeLayout, children: [
-          { path: "library", Component: Library }
+          { path: "library", Component: Library },
+          { path: "settings", Component: Settings },
+          { path: "history", Component: History }
         ]
       }
     ]
