@@ -10,24 +10,24 @@ const library: Array<{
     cover: string
 }> = [
         {
-            title: "Gochumon wa usagi desuga. Season 2",
+            title: "Ruri Dragon",
             language: LanguageEnum.INDONESIA,
-            cover: "https://cdn.discordapp.com/attachments/847678573040631818/1070984388612993024/Gochuumon_wa_Usagi_desu_ka_.jpg?ex=6802b630&is=680164b0&hm=a7bf4480a2cc0f098f7754ba7847e4d936ae7ed3f0d41c73640a470b29faa5b0&"
+            cover: "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/bx150440-QdBFoMh4YHsK.jpg"
         },
         {
-            title: "Gochumon wa usagi desuga. Season 2",
+            title: "Ruri Dragon",
             language: LanguageEnum.INDONESIA_DUB,
-            cover: "https://cdn.discordapp.com/attachments/847678573040631818/1070984388612993024/Gochuumon_wa_Usagi_desu_ka_.jpg?ex=6802b630&is=680164b0&hm=a7bf4480a2cc0f098f7754ba7847e4d936ae7ed3f0d41c73640a470b29faa5b0&"
+            cover: "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/bx150440-QdBFoMh4YHsK.jpg"
         },
         {
-            title: "Gochumon wa usagi desuga. Season 2",
+            title: "Ruri Dragon",
             language: LanguageEnum.ENGLISH,
-            cover: "https://cdn.discordapp.com/attachments/847678573040631818/1070984388612993024/Gochuumon_wa_Usagi_desu_ka_.jpg?ex=6802b630&is=680164b0&hm=a7bf4480a2cc0f098f7754ba7847e4d936ae7ed3f0d41c73640a470b29faa5b0&"
+            cover: "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/bx150440-QdBFoMh4YHsK.jpg"
         },
         {
-            title: "Gochumon wa usagi desuga. Season 2",
+            title: "Ruri Dragon",
             language: LanguageEnum.JAPANESE_DUB,
-            cover: "https://cdn.discordapp.com/attachments/847678573040631818/1070984388612993024/Gochuumon_wa_Usagi_desu_ka_.jpg?ex=6802b630&is=680164b0&hm=a7bf4480a2cc0f098f7754ba7847e4d936ae7ed3f0d41c73640a470b29faa5b0&"
+            cover: "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/bx150440-QdBFoMh4YHsK.jpg"
         }
     ]
 

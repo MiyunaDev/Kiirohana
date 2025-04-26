@@ -1,5 +1,10 @@
 # Changelogs
 
+## 0.0.2
+
+### Universal
+- Add data management for app (still experiment for now)
+
 ## 0.0.1
 
 ### Universal
