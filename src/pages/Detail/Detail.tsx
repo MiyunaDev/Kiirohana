@@ -12,7 +12,6 @@ const ChapterCard = ({
     type?: "novel" | "comic";
 }) => {
     const [preview, setPreview] = useState<string>();
-    const [selection, setSelection] = useState<string[]>([]);
 
     useEffect(() => {
         const slc = chapter.content
@@ -23,8 +22,6 @@ const ChapterCard = ({
             .map((content) =>
                 typeof content === "string" ? content : content.url
             ) as string[];
-
-        setSelection(slc);
 
         let previewUrl: string | undefined;
 

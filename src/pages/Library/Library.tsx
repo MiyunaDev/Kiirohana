@@ -1,6 +1,6 @@
 import Flag from 'react-world-flags'
 import getFlag from '../../utils/getFlag'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { library } from "../../../demo"
 import LanguageEnum from '../../enums/LanguageEnum'
