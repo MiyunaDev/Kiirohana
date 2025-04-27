@@ -19,7 +19,8 @@ export enum StatusEnum {
 export type NovelContent = {
     type: "paragraph" | "illustration" | "heading",
     value?: string,
-    size?: 1 | 2 | 3 | 4 | 5 | 6
+    size?: 1 | 2 | 3 | 4 | 5 | 6,
+    url?: string
 }
 
 export type Chapter = {
@@ -28,11 +29,13 @@ export type Chapter = {
     title?: string | null,
     url: string,
     id: string,
-    content: Array<string> | NovelContent
+    content: Array<string> | Array<NovelContent>
 }
 
 export type SeriesType = {
     title: string,
+    url: string,
+    id: string,
     cover: string,
     type: SeriesEnum,
     language: LanguageEnum,
@@ -41,5 +44,6 @@ export type SeriesType = {
     author: Array<string>,
     release: string,
     alternativeTitle: Array<string>
-    chapters: Array<Chapter>
+    chapters: Array<Chapter>,
+    synopsis: string
 }

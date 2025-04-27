@@ -40,7 +40,7 @@ const NavigativeLayout = () => {
     }, [])
 
     return (
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col w-full h-full">
             {showChangelog && (
                 <ChangelogModal content={changelogContent} onClose={() => setShowChangelog(false)} />
             )}
