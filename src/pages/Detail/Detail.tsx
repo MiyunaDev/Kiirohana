@@ -46,7 +46,7 @@ const ChapterCard = ({
         <div className="relative flex flex-row items-center p-2 h-24 gap-2 group before:absolute before:z-10 before:left-0 before:top-0
         before:min-h-full before:rounded-r-full before:transition-all before:duration-500
         hover:shadow active:shadow hover:shadow-[#C667F7] active:shadow-[#C667F7]
-        before:w-0 hover:before:w-screen active:before:w-screen before:bg-[#C667F7]">
+        before:w-0 hover:before:w-screen active:before:w-screen before:bg-[#C667F7] overflow-hidden rounded-r-xl">
             {preview && (
                 <div className={`relative z-10 w-15 aspect-[3/4] ${type === "novel" ? "group-hover:after:to-[rgba(198,103,247,0.7)] group-active:after:to-[rgba(198,103,247,0.7)] after:absolute after:inset-0 after:bg-gradient-to-r after:from-[rgba(0,0,0,0.2)] after:to-[rgba(0,0,0,1)] transition-all duration-500" : ""}`}>
                     <img
@@ -83,8 +83,14 @@ const Detail = () => {
     return (
         <div className="min-h-screen max-h-screen text-white overflow-x-hidden">
             <div className="w-full py-4 flex items-center px-4 gap-4 sticky top-0 bg-[#404040] z-50">
-                <FaArrowLeft onClick={() => navigate(-1)} size={18} className="cursor-pointer" />
-                <span className="truncate max-w-full">{detail?.title}</span>
+                <FaArrowLeft
+                    onClick={() => navigate(-1)}
+                    size={18}
+                    className="cursor-pointer flex-shrink-0"
+                />
+                <span className="line-clamp-1 overflow-hidden text-ellipsis whitespace-nowrap">
+                    {detail?.title}
+                </span>
             </div>
 
             <div className="w-full flex flex-col md:grid md:grid-cols-2">
@@ -113,7 +119,7 @@ const Detail = () => {
                     <div className="px-4 py-6 md:px-8 md:py-6 text-sm md:text-base leading-relaxed">
                         {detail?.synopsis}
                     </div>
-                    <div className="p-2">{detail?.genres?.map((gen) => <span className="py-2 px-3 border-2 border-[#C667F7] rounded-lg m-1">{gen}</span>)}</div>
+                    <div className="p-2 flex flex-row overflow-y-auto items-center">{detail?.genres?.map((gen) => <div className="py-2 px-3 border-2 border-[#C667F7] rounded-lg m-1">{gen}</div>)}</div>
                 </div>
 
                 <div className="p-4 gap-2">
