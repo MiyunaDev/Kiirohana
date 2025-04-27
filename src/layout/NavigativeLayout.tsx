@@ -24,7 +24,7 @@ const NavigativeLayout = () => {
 
         console.log("Memulai proses...")
 
-        if (!lastSeenVersion || lastSeenVersion == version) {
+        if (!lastSeenVersion || lastSeenVersion !== version) {
             console.log("Versi terdeteksi berbeda...")
             fetch("https://raw.githubusercontent.com/MiyunaDev/Kiirohana/refs/heads/main/public/CHANGELOGS.md")
                 .then(res => res.text())
