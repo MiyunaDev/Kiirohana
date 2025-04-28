@@ -61,7 +61,7 @@ const NovelReader = () => {
     const afterPreview = after && detail ? getPreview(after, detail.type) : "";
 
     return (
-        <div className="w-screen overflow-x-hidden h-full flex flex-col items-center max-w-screen-sm">
+        <div className="w-full h-full flex flex-col items-center max-w-screen">        
             {before ? <PageChanger type="before" chapter={before} chapterPreview={beforePreview} to={`/detail/reader/novel?title=${encodeURIComponent(detail?.title as string)}&chapterid=${encodeURIComponent(before?.id)}`} /> : null}
             <div className="w-full overflow-x-hidden">
                 {chapter?.content.map((ct, index) => {
