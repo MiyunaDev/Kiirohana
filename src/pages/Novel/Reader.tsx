@@ -58,11 +58,11 @@ const NovelReader = () => {
     const afterPreview = after && detail ? getPreview(after, detail.type) : "";
 
     return (
-        <div className="w-full h-full flex flex-col items-center">
+        <div className="w-full h-full flex flex-col items-center max-w-screen-sm">
             {before ? (
                 <button disabled={!before} className="w-4/5 bg-[#C667F7] flex flex-row my-5">
-                    {beforePreview && <img src={beforePreview} className="h-20 aspect-square object-cover object-top" alt="Preview Before" />}
-                    <div className="flex flex-col items-center justify-center ml-4">
+                    {beforePreview && <img src={beforePreview} className="w-2/5 aspect-square object-cover object-top" alt="Preview Before" />}
+                    <div className={`w-3/5 flex flex-col items-center justify-center ml-4 ${!beforePreview ? "!w-full" : ""}`}>
                         <a href="#">Previous</a>
                         <a>
                             {before.volume !== 0 ? `Volume ${before.volume} ` : ""}
@@ -85,17 +85,17 @@ const NovelReader = () => {
                     };
 
                     return (
-                        <p key={index} className={`px-4 my-4 font-bold ${textSizes[size]}`}>
+                        <div key={index} className={`max-w-full box-border px-4 my-4 font-bold ${textSizes[size]}`}>
                             {ct.value}
-                        </p>
+                        </div>
                     );
                 }
 
                 if (ct.type === "paragraph") {
                     return (
-                        <p key={index} className="px-4 mb-2 leading-relaxed">
+                        <div key={index} className="max-w-full box-border px-4 mb-2 leading-relaxed">
                             {ct.value}
-                        </p>
+                        </div>
                     );
                 }
 
@@ -114,8 +114,8 @@ const NovelReader = () => {
             })}
             {after ? (
                 <button disabled={!after} className="w-4/5 bg-[#C667F7] flex flex-row my-5">
-                    {afterPreview && <img src={afterPreview} className="h-20 aspect-square object-cover object-top" alt="Preview Before" />}
-                    <div className="flex flex-col items-center justify-center ml-4">
+                    {afterPreview && <img src={afterPreview} className="w-2/5 aspect-square object-cover object-top" alt="Preview Before" />}
+                    <div className={`w-3/5 flex flex-col items-center justify-center ml-4 ${!afterPreview ? "!w-full" : ""}`}>
                         <a href="#">Next</a>
                         <a>
                             {after.volume !== 0 ? `Volume ${after.volume} ` : ""}

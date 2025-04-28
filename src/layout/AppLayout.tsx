@@ -28,7 +28,7 @@ const AppLayout = () => {
     }, []);
 
     return (
-        <div className="w-screen h-screen bg-[#101010] select-none">
+        <div className="bg-[#101010] select-none">
             {isOffline ? <div className="w-full h-full flex items-center justify-center">
                 <div className="flex flex-col gap-2"><a className="text-3xl">-_-</a><a>You disconnected</a></div>
             </div> : <Outlet />}

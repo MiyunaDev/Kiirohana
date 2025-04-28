@@ -89,7 +89,7 @@ const Detail = () => {
     }, [title]);
 
     return (
-        <div className="min-h-screen max-h-screen text-white overflow-x-hidden">
+        <div className="min-h-screen text-white overflow-x-hidden">
 
             <div className="w-full flex flex-col md:grid md:grid-cols-2">
                 <div className="relative w-full overflow-hidden">
@@ -120,7 +120,7 @@ const Detail = () => {
                     <div className="p-2 flex flex-row overflow-y-auto items-center">{detail?.genres?.map((gen) => <div className="py-2 px-3 border-2 border-[#C667F7] rounded-lg m-1">{gen}</div>)}</div>
                 </div>
 
-                <div className="p-4 gap-2">
+                <div className="relative w-full overflow-hidden p-4 gap-2">
                     {detail?.chapters.sort((a, b) => {
                         if (a.volume === b.volume) {
                             return a.chapter - b.chapter;

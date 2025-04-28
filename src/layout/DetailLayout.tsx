@@ -17,7 +17,7 @@ const DetailLayout = () => {
     }, [title]);
 
     return (
-        <div className="w-full">
+        <div className="w-full overflow-x-hidden">
             <div className="w-full py-4 flex items-center px-4 gap-4 sticky top-0 bg-[#404040] z-50">
                 <FaArrowLeft
                     onClick={() => navigate(-1)}
