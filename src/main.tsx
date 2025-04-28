@@ -17,6 +17,7 @@ import History from './pages/History/History.tsx';
 import Detail from './pages/Detail/Detail.tsx';
 import DetailLayout from './layout/DetailLayout.tsx';
 import ComicReader from './pages/Comic/Reader.tsx';
+import NovelReader from './pages/Novel/Reader.tsx';
 
 const router = createHashRouter([
   {
@@ -36,7 +37,8 @@ const router = createHashRouter([
           { index: true, Component: Detail },
           {
             path: "reader", children: [
-              { path: "comic", Component: ComicReader }
+              { path: "comic", Component: ComicReader },
+              { path: "novel", Component: NovelReader },
             ]
           }
         ]

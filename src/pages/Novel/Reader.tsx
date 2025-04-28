@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from 'react-router';
-import { Chapter, SeriesType } from "./../../types/Series.ts";
+import { Chapter, NovelContent, SeriesType } from "./../../types/Series.ts";
 import { library } from "../../../demo";
 
 function getPreview(chapter: Chapter, type: string): string {
@@ -38,7 +38,12 @@ const NovelReader = () => {
         setDetail(info);
 
         if (info) {
-            const sortedChapters = [...info.chapters].sort((a, b) => a.chapter - b.chapter);
+            const sortedChapters = [...info.chapters].sort((a, b) => {
+                if (a.volume === b.volume) {
+                    return a.chapter - b.chapter;
+                }
+                return a.volume - b.volume;
+            });
             const currentChapterIndex = sortedChapters.findIndex(ch => ch.id === chapterid);
 
             if (currentChapterIndex !== -1) {
@@ -66,16 +71,46 @@ const NovelReader = () => {
                     </div>
                 </button>) : null}
             {chapter?.content.map((ct, index) => {
-                const src = typeof ct === "string" ? ct : ct.url;
-                return (
-                    <img
-                        key={index}
-                        src={src}
-                        className="w-full"
-                        loading="lazy"
-                        alt={`Page ${index + 1}`}
-                    />
-                );
+                ct = ct as NovelContent
+                if (ct.type === "heading") {
+                    const size = ct.size ?? 1;
+
+                    const textSizes = {
+                        1: "text-4xl",
+                        2: "text-3xl",
+                        3: "text-2xl",
+                        4: "text-xl",
+                        5: "text-lg",
+                        6: "text-base",
+                    };
+
+                    return (
+                        <p key={index} className={`px-4 my-4 font-bold ${textSizes[size]}`}>
+                            {ct.value}
+                        </p>
+                    );
+                }
+
+                if (ct.type === "paragraph") {
+                    return (
+                        <p key={index} className="px-4 mb-2 leading-relaxed">
+                            {ct.value}
+                        </p>
+                    );
+                }
+
+                if (ct.type === "illustration") {
+                    return (
+                        <img
+                            key={index}
+                            src={ct.url}
+                            className="w-full my-4"
+                            loading="lazy"
+                            alt={`Illust ${index + 1}`}
+                        />
+                    );
+                }
+                return null;
             })}
             {after ? (
                 <button disabled={!after} className="w-4/5 bg-[#C667F7] flex flex-row my-5">
