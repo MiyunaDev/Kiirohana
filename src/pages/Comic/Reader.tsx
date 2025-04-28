@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from 'react-router';
 import { Chapter, SeriesType } from "./../../types/Series.ts";
 import { library } from "../../../demo";
+import LazyImage from "../../components/LazyImage.tsx";
 
 function getPreview(chapter: Chapter, type: string): string {
     const slc = chapter.content
@@ -70,7 +71,7 @@ const ComicReader = () => {
             {chapter?.content.map((ct, index) => {
                 const src = typeof ct === "string" ? ct : ct.url;
                 return (
-                    <img
+                    <LazyImage
                         key={index}
                         src={src}
                         className="w-full"
