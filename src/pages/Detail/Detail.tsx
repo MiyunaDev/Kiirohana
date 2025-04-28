@@ -79,14 +79,15 @@ const ChapterCard = ({
 
 const Detail = () => {
     const [searchParams] = useSearchParams();
-    const title = searchParams.get('title');
-
+    
     const [detail, setDetail] = useState<SeriesType | null>(null);
-
+    
     useEffect(() => {
+        const title = searchParams.get('title');
+
         const info: SeriesType = library.find(x => x.title === title) as SeriesType;
         setDetail(info);
-    }, [title]);
+    }, [searchParams.toString()]);
 
     return (
         <div className="min-h-screen text-white overflow-x-hidden">

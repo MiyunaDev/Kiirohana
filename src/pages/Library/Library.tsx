@@ -11,7 +11,7 @@ const Library = () => {
     const [libraries] = useState<Array<any>>(library)
 
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 max-w-screen-xl mx-auto px-2">
+        <div className="w-full h-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 max-w-screen-xl mx-auto px-2">
             {libraries.map((detail: SeriesType, index: number) => (
                 <Link to={`/detail/?title=${encodeURIComponent(detail.title)}`} key={index} className="flex flex-col w-full min-w-[120px] max-w-[180px] mx-auto">
                     <div className="relative w-full">

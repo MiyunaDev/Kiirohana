@@ -31,10 +31,11 @@ const ComicReader = () => {
     const [before, setBefore] = useState<Chapter | null>(null);
     const [after, setAfter] = useState<Chapter | null>(null);
 
-    const title = searchParams.get('title');
-    const chapterid = searchParams.get('chapterid');
-
+    
     useEffect(() => {
+        const title = searchParams.get('title');
+        const chapterid = searchParams.get('chapterid');
+        
         const info = library.find(x => x.title === title) || null;
         setDetail(info);
 
@@ -53,7 +54,7 @@ const ComicReader = () => {
                 setAfter(sortedChapters[currentChapterIndex + 1] || null);
             }
         }
-    }, [title, chapterid]);
+    }, [searchParams.toString()]);
 
     const beforePreview = before && detail ? getPreview(before, detail.type) : "";
     const afterPreview = after && detail ? getPreview(after, detail.type) : "";
