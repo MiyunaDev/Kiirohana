@@ -59,7 +59,7 @@ const NovelReader = () => {
     const afterPreview = after && detail ? getPreview(after, detail.type) : "";
 
     return (
-        <div className="w-full h-full flex flex-col items-center max-w-screen-sm">
+        <div className="w-screen overflow-x-hidden h-full flex flex-col items-center max-w-screen-sm">
             {before ? (
                 <button disabled={!before} className="w-4/5 bg-[#C667F7] flex flex-row my-5">
                     {beforePreview && <img src={beforePreview} className="w-2/5 aspect-square object-cover object-top" alt="Preview Before" />}
@@ -68,48 +68,50 @@ const NovelReader = () => {
                         <a>{before.volume !== 0 ? `Volume ${before.volume} ` : ""}Chapter {before.chapter}</a>
                     </div>
                 </button>) : null}
-            {chapter?.content.map((ct, index) => {
-                ct = ct as NovelContent
-                if (ct.type === "heading") {
-                    const size = ct.size ?? 1;
+            <div className="w-full overflow-x-hidden">
+                {chapter?.content.map((ct, index) => {
+                    ct = ct as NovelContent
+                    if (ct.type === "heading") {
+                        const size = ct.size ?? 1;
 
-                    const textSizes = {
-                        1: "text-4xl",
-                        2: "text-3xl",
-                        3: "text-2xl",
-                        4: "text-xl",
-                        5: "text-lg",
-                        6: "text-base",
-                    };
+                        const textSizes = {
+                            1: "text-4xl",
+                            2: "text-3xl",
+                            3: "text-2xl",
+                            4: "text-xl",
+                            5: "text-lg",
+                            6: "text-base",
+                        };
 
-                    return (
-                        <div key={index} className={`max-w-full box-border px-4 my-4 font-bold ${textSizes[size]}`}>
-                            {ct.value}
-                        </div>
-                    );
-                }
+                        return (
+                            <div key={index} className={`max-w-full box-border break-words px-4 my-4 font-bold ${textSizes[size]}`}>
+                                {ct.value}
+                            </div>
+                        );
+                    }
 
-                if (ct.type === "paragraph") {
-                    return (
-                        <div key={index} className="max-w-full box-border px-4 mb-2 leading-relaxed">
-                            {ct.value}
-                        </div>
-                    );
-                }
+                    if (ct.type === "paragraph") {
+                        return (
+                            <div key={index} className="max-w-full box-border break-words px-4 mb-2 leading-relaxed">
+                                {ct.value}
+                            </div>
+                        );
+                    }
 
-                if (ct.type === "illustration") {
-                    return (
-                        <LazyImage
-                            key={index}
-                            src={ct.url}
-                            className="w-full my-4"
-                            loading="lazy"
-                            alt={`Illust ${index + 1}`}
-                        />
-                    );
-                }
-                return null;
-            })}
+                    if (ct.type === "illustration") {
+                        return (
+                            <LazyImage
+                                key={index}
+                                src={ct.url}
+                                className="w-full my-4"
+                                loading="lazy"
+                                alt={`Illust ${index + 1}`}
+                            />
+                        );
+                    }
+                    return null;
+                })}
+            </div>
             {after ? (
                 <button disabled={!after} className="w-4/5 bg-[#C667F7] flex flex-row my-5">
                     {afterPreview && <img src={afterPreview} className="w-2/5 aspect-square object-cover object-top" alt="Preview Before" />}
