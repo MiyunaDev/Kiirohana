@@ -54,44 +54,41 @@ const ComicReader = () => {
 
     return (
         <div className="w-full h-full flex flex-col items-center">
-            <button disabled={!before} className="w-4/5 bg-[#C667F7] flex flex-row my-5">
-                {beforePreview && <img src={beforePreview} className="h-20 aspect-square object-cover object-top" alt="Preview Before" />}
-                <div className="flex flex-col items-center justify-center ml-4">
-                    <a href="#">Previous</a>
-                    {before && (
+            {before ? (
+                <button disabled={!before} className="w-4/5 bg-[#C667F7] flex flex-row my-5">
+                    {beforePreview && <img src={beforePreview} className="h-20 aspect-square object-cover object-top" alt="Preview Before" />}
+                    <div className="flex flex-col items-center justify-center ml-4">
+                        <a href="#">Previous</a>
                         <a>
                             {before.volume !== 0 ? `Volume ${before.volume} ` : ""}
                             Chapter {before.chapter}
                         </a>
-                    )}
-                </div>
-            </button>
-            <iframe>
-                {chapter?.content.map((ct, index) => {
-                    const src = typeof ct === "string" ? ct : ct.url;
-                    return (
-                        <img
-                            key={index}
-                            src={src}
-                            className="w-full"
-                            loading="lazy"
-                            alt={`Page ${index + 1}`}
-                        />
-                    );
-                })}
-            </iframe>
-            <button disabled={!after} className="w-4/5 bg-[#C667F7] flex flex-row my-5">
-                {afterPreview && <img src={afterPreview} className="h-20 aspect-square object-cover object-top" alt="Preview Before" />}
-                <div className="flex flex-col items-center justify-center ml-4">
-                    <a href="#">Next</a>
-                    {after && (
+                    </div>
+                </button>) : null}
+            {chapter?.content.map((ct, index) => {
+                const src = typeof ct === "string" ? ct : ct.url;
+                return (
+                    <img
+                        key={index}
+                        src={src}
+                        className="w-full"
+                        loading="lazy"
+                        alt={`Page ${index + 1}`}
+                    />
+                );
+            })}
+            {after ? (
+                <button disabled={!after} className="w-4/5 bg-[#C667F7] flex flex-row my-5">
+                    {afterPreview && <img src={afterPreview} className="h-20 aspect-square object-cover object-top" alt="Preview Before" />}
+                    <div className="flex flex-col items-center justify-center ml-4">
+                        <a href="#">Next</a>
                         <a>
                             {after.volume !== 0 ? `Volume ${after.volume} ` : ""}
                             Chapter {after.chapter}
                         </a>
-                    )}
-                </div>
-            </button>
+                    </div>
+                </button>
+            ) : null}
         </div>
     );
 };
