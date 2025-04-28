@@ -62,12 +62,9 @@ const ComicReader = () => {
             {before ? (
                 <button disabled={!before} className="w-4/5 bg-[#C667F7] flex flex-row my-5">
                     {beforePreview && <img src={beforePreview} className="w-2/5 aspect-square object-cover object-top" alt="Preview Before" />}
-                    <div className={`w-3/5 flex flex-col items-center justify-center ml-4 ${!beforePreview ? "!w-full" : ""}`}>
+                    <div className={`w-3/5 flex flex-col items-center justify-center ${!beforePreview ? "!w-full" : ""}`}>
                         <a href="#">Previous</a>
-                        <a>
-                            {before.volume !== 0 ? `Volume ${before.volume} ` : ""}
-                            Chapter {before.chapter}
-                        </a>
+                        <a>{before.volume !== 0 ? `Volume ${before.volume} ` : ""}Chapter {before.chapter}</a>
                     </div>
                 </button>) : null}
             {chapter?.content.map((ct, index) => {
@@ -85,12 +82,9 @@ const ComicReader = () => {
             {after ? (
                 <button disabled={!after} className="w-4/5 bg-[#C667F7] flex flex-row my-5">
                     {afterPreview && <img src={afterPreview} className="w-2/5 aspect-square object-cover object-top" alt="Preview Before" />}
-                    <div className={`w-3/5 flex flex-col items-center justify-center ml-4 ${!afterPreview ? "!w-full" : ""}`}>
+                    <div className={`w-3/5 flex flex-col items-center justify-center ${!afterPreview ? "!w-full" : ""}`}>
                         <a href="#">Next</a>
-                        <a>
-                            {after.volume !== 0 ? `Volume ${after.volume} ` : ""}
-                            Chapter {after.chapter}
-                        </a>
+                        <a>{after.volume !== 0 ? `Volume ${after.volume} ` : ""}Chapter {after.chapter}</a>
                     </div>
                 </button>
             ) : null}
