@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react"
-import { useNavigate, useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { Chapter, SeriesEnum, SeriesType } from "./../../types/Series.ts"
 import { library } from "../../../demo"
-import { FaArrowLeft } from "react-icons/fa";
 
 const ChapterCard = ({
     chapter,
     type,
+    detail
 }: {
     chapter: Chapter;
     type?: "novel" | "comic";
+    detail: SeriesType
 }) => {
     const [preview, setPreview] = useState<string>();
+    const [destination, setDestination] = useState<string>()
 
     useEffect(() => {
         const slc = chapter.content
@@ -40,10 +42,17 @@ const ChapterCard = ({
         }
 
         setPreview(previewUrl);
+
+        if(type === "comic") {
+            setDestination(`/detail/reader/comic?title=${encodeURIComponent(detail.title)}&chapterid=${encodeURIComponent(chapter.id)}`)
+        } else if (type === "novel") {
+            setDestination(`/detail/reader/novel?title=${encodeURIComponent(detail.title)}&chapterid=${encodeURIComponent(chapter.id)}`)
+        }
+
     }, [chapter, type]);
 
     return (
-        <div className="relative flex flex-row items-center p-2 h-24 gap-2 group before:absolute before:z-10 before:left-0 before:top-0
+        <Link to={destination as string} className="relative flex flex-row items-center p-2 h-24 gap-2 group before:absolute before:z-10 before:left-0 before:top-0
         before:min-h-full before:rounded-r-full before:transition-all before:duration-500
         hover:shadow active:shadow hover:shadow-[#C667F7] active:shadow-[#C667F7]
         before:w-0 hover:before:w-screen active:before:w-screen before:bg-[#C667F7] overflow-hidden rounded-r-xl">
@@ -63,14 +72,13 @@ const ChapterCard = ({
                     Chapter {chapter.chapter}
                 </a>
             </div>
-        </div>
+        </Link>
     );
 };
 
 
 const Detail = () => {
     const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
     const title = searchParams.get('title');
 
     const [detail, setDetail] = useState<SeriesType | null>(null);
@@ -82,16 +90,6 @@ const Detail = () => {
 
     return (
         <div className="min-h-screen max-h-screen text-white overflow-x-hidden">
-            <div className="w-full py-4 flex items-center px-4 gap-4 sticky top-0 bg-[#404040] z-50">
-                <FaArrowLeft
-                    onClick={() => navigate(-1)}
-                    size={18}
-                    className="cursor-pointer flex-shrink-0"
-                />
-                <span className="line-clamp-1 overflow-hidden text-ellipsis whitespace-nowrap">
-                    {detail?.title}
-                </span>
-            </div>
 
             <div className="w-full flex flex-col md:grid md:grid-cols-2">
                 <div className="relative w-full overflow-hidden">
@@ -128,7 +126,7 @@ const Detail = () => {
                         const isComic = detail.type === SeriesEnum.Manga || detail.type === SeriesEnum.Manhwa || detail.type === SeriesEnum.Manhua;
                         const type = isComic ? "comic" : isNovel ? "novel" : undefined;
 
-                        return <ChapterCard key={ch.id} chapter={ch} type={type} />;
+                        return <ChapterCard key={ch.id} chapter={ch} type={type} detail={detail} />;
                     })}
                 </div>
             </div>

@@ -15,6 +15,8 @@ import Library from './pages/Library/Library.tsx';
 import Settings from './pages/Settings/Settings.tsx';
 import History from './pages/History/History.tsx';
 import Detail from './pages/Detail/Detail.tsx';
+import DetailLayout from './layout/DetailLayout.tsx';
+import ComicReader from './pages/Comic/Reader.tsx';
 
 const router = createHashRouter([
   {
@@ -30,8 +32,13 @@ const router = createHashRouter([
         ]
       },
       {
-        path: "detail", children: [
-          {index: true, Component: Detail}
+        path: "detail", Component: DetailLayout, children: [
+          { index: true, Component: Detail },
+          {
+            path: "reader", children: [
+              { path: "comic", Component: ComicReader }
+            ]
+          }
         ]
       }
     ]
