@@ -43,7 +43,7 @@ const ChapterCard = ({
 
         setPreview(previewUrl);
 
-        if(type === "comic") {
+        if (type === "comic") {
             setDestination(`/detail/reader/comic?title=${encodeURIComponent(detail.title)}&chapterid=${encodeURIComponent(chapter.id)}`)
         } else if (type === "novel") {
             setDestination(`/detail/reader/novel?title=${encodeURIComponent(detail.title)}&chapterid=${encodeURIComponent(chapter.id)}`)
@@ -121,7 +121,12 @@ const Detail = () => {
                 </div>
 
                 <div className="p-4 gap-2">
-                    {detail?.chapters.map((ch) => {
+                    {detail?.chapters.sort((a, b) => {
+                        if (a.volume === b.volume) {
+                            return a.chapter - b.chapter;
+                        }
+                        return a.volume - b.volume;
+                    }).map((ch) => {
                         const isNovel = detail.type === SeriesEnum.LightNovel || detail.type === SeriesEnum.WebNovel;
                         const isComic = detail.type === SeriesEnum.Manga || detail.type === SeriesEnum.Manhwa || detail.type === SeriesEnum.Manhua;
                         const type = isComic ? "comic" : isNovel ? "novel" : undefined;

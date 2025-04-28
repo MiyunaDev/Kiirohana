@@ -38,7 +38,12 @@ const ComicReader = () => {
         setDetail(info);
 
         if (info) {
-            const sortedChapters = [...info.chapters].sort((a, b) => a.chapter - b.chapter);
+            const sortedChapters = [...info.chapters].sort((a, b) => {
+                if (a.volume === b.volume) {
+                    return a.chapter - b.chapter;
+                }
+                return a.volume - b.volume;
+            });
             const currentChapterIndex = sortedChapters.findIndex(ch => ch.id === chapterid);
 
             if (currentChapterIndex !== -1) {
