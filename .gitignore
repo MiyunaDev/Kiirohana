@@ -4,9 +4,6 @@
 /plugins/
 /platforms/
 
-# Test
-prototype-test.ts
-
 #Keamanan
 
 android.keystore
@@ -148,3 +145,5 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+prototype-test.ts
