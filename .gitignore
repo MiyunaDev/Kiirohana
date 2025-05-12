@@ -4,6 +4,9 @@
 /plugins/
 /platforms/
 
+# Test
+prototype-test.ts
+
 #Keamanan
 
 android.keystore
