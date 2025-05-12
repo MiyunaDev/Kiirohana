@@ -1,0 +1,1 @@
+export const anilistId = 6595236; // Ganti ke anilist mu
