@@ -1,1 +1,0 @@
-export const anilistId = 0; // Ganti ke anilist mu
