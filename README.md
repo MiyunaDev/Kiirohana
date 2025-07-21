@@ -2,7 +2,9 @@
 
 ## About
 
-Kiirohana name is meaning yellow flower in japanese. This app feature is track your activity (reading and watching) series. You can track activity for Reading comic, novel or watch anime, movie and anything
+Kiirohana name is meaning yellow flower in japanese. This app feature is track your activity (reading and watching) series. You can track activity for Reading comic, novel or watch anime, movie and anything.
+
+[#] You must me 
 
 ## 👩‍💻 Development 
 
@@ -12,6 +14,8 @@ npm run init
 ```
 
 2. Supported Platform
+
+In this version is supported 
 
 2. Testing
 

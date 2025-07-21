@@ -17,6 +17,7 @@
     <icon src="res/android/mipmap-xhdpi/icon.png" density="xhdpi"/>
     <icon src="res/android/mipmap-xxhdpi/icon.png" density="xxhdpi"/>
     <icon src="res/android/mipmap-xxxhdpi/icon.png" density="xxxhdpi"/>
+    <preference name="AndroidBlacklistSecureSocketProtocols" value="SSLv3,TLSv1" />
   </platform>
   <preference name="scheme" value="app"/>
   <preference name="hostname" value="localhost"/>
