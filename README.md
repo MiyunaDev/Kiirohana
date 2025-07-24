@@ -4,9 +4,12 @@
 
 Kiirohana name is meaning yellow flower in japanese. This app feature is track your activity (reading and watching) series. You can track activity for Reading comic, novel or watch anime, movie and anything.
 
-[#] You must me 
+[#] You must read
 
-## 👩‍💻 Development 
+> [!WARNING]\
+> This app is need honoka backend. Check [Miyuna Website](https://miyunadev.github.io/) for more information
+
+## 👩‍💻 Development & Build
 
 1. Initialize
 ```sh
@@ -15,7 +18,13 @@ npm run init
 
 2. Supported Platform
 
-In this version is supported 
+In this version is supported
+
+- Android
+- IOS
+- Windows
+- Linux
+- Mac
 
 2. Testing
 
