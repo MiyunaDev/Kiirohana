@@ -14,7 +14,8 @@
                 "deb",
                 "AppImage",
                 "rpm",
-                "pacman"
+                "pacman",
+                "tar.gz"
             ],
             "arch": [
                 "x64"

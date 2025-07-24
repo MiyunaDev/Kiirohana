@@ -10,6 +10,8 @@ if (os.platform() === 'win32') {
   configFile = 'build-windows.json';
 } else if (os.platform() === 'linux') {
   configFile = 'build-linux.json';
+} else if (os.platform() === 'darwin') {
+  configFile = 'build-mac.json';
 } else {
   console.error('Unsupported platform for build.');
   process.exit(1);

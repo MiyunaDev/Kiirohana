@@ -2,7 +2,7 @@
     "appId": "com.miyunadev.kiirohana",
     "productName": "Kiirohana",
     "directories": {
-        "output": "build/windows"
+        "output": "build/mac"
     },
     "files": [
         "**/*"
@@ -10,10 +10,9 @@
     "electron": {
         "win": {
             "package": [
-                "nsis",
-                "msi",
-                "portable",
-                "tar.gz"
+                "app",
+                "dmg",
+                "pkg"
             ],
             "arch": [
                 "x64"
