@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react"
-import ExtensionsManager from "../../extensions/manager"
+// import ExtensionsManager from "../../extensions/manager"
 import { Link } from "react-router"
 
 const ExtensionList = () => {
-    const [extensions, setExtensions] = useState<Array<any>>([])
-    useEffect(() => {
-        const extensions: Array<any> = ExtensionsManager.getExtensions()
-        console.log(extensions)
-        setExtensions(extensions)
-    }, [])
+    const [extensions, _] = useState<Array<any>>([])
 
     return (
         <div className="flex flex-col">

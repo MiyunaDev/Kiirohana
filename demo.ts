@@ -4,9 +4,9 @@ import { SeriesEnum, SeriesType, StatusEnum } from "./src/types/Series";
 export const library: Array<SeriesType> = [
     {
         "title": "Ruri Dragon Bahasa Indonesia",
-        "url": "https://komikcast02.com/komik/ruri-dragon",
+        "url": "https://komikcast05.com/komik/ruri-dragon",
         "id": "ruri-dragon",
-        "cover": "https://komikcast02.com/wp-content/uploads/2025/03/l6wXmo.jpg",
+        "cover": "https://komikcast05.com/wp-content/uploads/2025/03/l6wXmo.jpg",
         "language": "ID" as LanguageEnum,
         "type": "Manga" as SeriesEnum,
         "genres": [
@@ -24,7 +24,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 33,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-33-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-33-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-33-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/R/Ruri_Dragon/033/01.jpg",
@@ -53,7 +53,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 32,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-32-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-32-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-32-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/R/Ruri_Dragon/032/001.jpg",
@@ -82,7 +82,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 31,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-31-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-31-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-31-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/R/Ruri_Dragon/031/01.jpg",
@@ -111,7 +111,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 30,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-30-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-30-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-30-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/R/Ruri_Dragon/030/001.jpg",
@@ -126,7 +126,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 29,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-29-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-29-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-29-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/R/Ruri_Dragon/029/001.jpg",
@@ -156,7 +156,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 28,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-28-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-28-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-28-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/R/Ruri_Dragon/028/01.jpg",
@@ -186,7 +186,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 27,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-27-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-27-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-27-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/R/Ruri_Dragon/027/001.jpg",
@@ -216,7 +216,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 26,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-26-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-26-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-26-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/R/Ruri_Dragon/026/001.jpg",
@@ -246,7 +246,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 25,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-25-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-25-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-25-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/R/Ruri_Dragon/025/001.jpg",
@@ -276,7 +276,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 24,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-24-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-24-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-24-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/R/Ruri_Dragon/024/001.jpg",
@@ -306,7 +306,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 23,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-23-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-23-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-23-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/R/Ruri_Dragon/023/001.jpg",
@@ -336,7 +336,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 22,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-22-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-22-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-22-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/R/Ruri_Dragon/022/001.jpg",
@@ -366,7 +366,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 21,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-21-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-21-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-21-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/R/Ruri_Dragon/021/001.jpg",
@@ -396,7 +396,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 20,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-20-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-20-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-20-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/R/Ruri_Dragon/020/001.jpg",
@@ -426,7 +426,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 19,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-19-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-19-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-19-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/R/Ruri_Dragon/019/001.jpg",
@@ -456,7 +456,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 18,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-18-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-18-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-18-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/R/Ruri_Dragon/018/001.jpg",
@@ -486,7 +486,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 17,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-17-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-17-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-17-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/R/Ruri_Dragon/017/001.jpg",
@@ -515,7 +515,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 16,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-16-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-16-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-16-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/R/Ruri_Dragon/016/001.jpg",
@@ -573,7 +573,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 15,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-15-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-15-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-15-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/R/Ruri_Dragon/015/001.jpg",
@@ -588,7 +588,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 14,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-14-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-14-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-14-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/R/Ruri_Dragon/014/001.jpg",
@@ -604,7 +604,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 13,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-13-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-13-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-13-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/R/Ruri_Dragon/013/001.jpg",
@@ -619,7 +619,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 12,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-12-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-12-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-12-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/R/Ruri_Dragon/012/001.jpg",
@@ -703,7 +703,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 11,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-11-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-11-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-11-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/R/Ruri_Dragon/011/001.jpg",
@@ -733,7 +733,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 10,
                 "title": "Fix",
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-10-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-10-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-10-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/R/Ruri_Dragon/010f/001.jpg",
@@ -763,7 +763,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 9,
                 "title": "Fix",
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-09-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-09-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-09-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/R/Ruri_Dragon/009f/001.jpg",
@@ -793,7 +793,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 8,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-08-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-08-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-08-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/R/Ruri_Dragon/008/001.jpg",
@@ -877,7 +877,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 7,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-07-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-07-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-07-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/R/Ruri_Dragon/007/001.jpg",
@@ -961,7 +961,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 6,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-06-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-06-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-06-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/R/Ruri_Dragon/006/001.jpg",
@@ -990,7 +990,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 5,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-05-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-05-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-05-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/R/Ruri_Dragon/005/001.jpg",
@@ -1020,7 +1020,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 4,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-04-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-04-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-04-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/R/Ruri_Dragon/004/001.jpg",
@@ -1050,7 +1050,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 3,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-03-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-03-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-03-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/R/Ruri_Dragon/003/001.jpg",
@@ -1084,7 +1084,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 2,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-02-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-02-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-02-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/R/Ruri_Dragon/002/001.jpg",
@@ -1119,7 +1119,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 1,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-01-1-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-01-1-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-01-1-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/R/Ruri_Dragon/001/00.jpg",
@@ -1183,7 +1183,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 0,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/ruri-dragon-chapter-00-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/ruri-dragon-chapter-00-bahasa-indonesia/",
                 "id": "ruri-dragon-chapter-00-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/R/Ruri_Dragon/000/001.jpg",
@@ -1239,9 +1239,9 @@ export const library: Array<SeriesType> = [
     }, //Ruri Dragon
     {
         "title": "Please Bully Me, Miss Villainess! Bahasa Indonesia",
-        "url": "https://komikcast02.com/komik/please-bully-me-miss-villainess",
+        "url": "https://komikcast05.com/komik/please-bully-me-miss-villainess",
         "id": "please-bully-me-miss-villainess",
-        "cover": "https://komikcast02.com/wp-content/uploads/2023/07/szadadadw.jpg",
+        "cover": "https://komikcast05.com/wp-content/uploads/2023/07/szadadadw.jpg",
         "language": "ID" as LanguageEnum,
         "type": "Manhua" as SeriesEnum,
         "genres": [
@@ -1261,7 +1261,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 112,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-112-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-112-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-112-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/112/01.jpg",
@@ -1285,7 +1285,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 111,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-111-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-111-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-111-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/111/01.jpg",
@@ -1303,7 +1303,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 110,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-110-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-110-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-110-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/110/001.jpg",
@@ -1324,7 +1324,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 109,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-109-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-109-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-109-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/109/001.jpg",
@@ -1346,7 +1346,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 108,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-108-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-108-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-108-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/108/001.jpg",
@@ -1366,7 +1366,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 107,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-107-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-107-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-107-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/107/001.jpg",
@@ -1386,7 +1386,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 106,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-106-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-106-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-106-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/106/001.jpg",
@@ -1406,7 +1406,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 105,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-105-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-105-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-105-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/105/01.jpg",
@@ -1425,7 +1425,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 104,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-104-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-104-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-104-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/104/01.jpg",
@@ -1445,7 +1445,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 103,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-103-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-103-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-103-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/103/001.jpg",
@@ -1461,7 +1461,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 102,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-102-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-102-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-102-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/102/001.jpg",
@@ -1487,7 +1487,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 101,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-101-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-101-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-101-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/101/001.jpg",
@@ -1508,7 +1508,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 100,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-100-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-100-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-100-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/100/001.jpg",
@@ -1534,7 +1534,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 99,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-99-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-99-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-99-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/099/001.jpg",
@@ -1558,7 +1558,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 98,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-98-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-98-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-98-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/098/001.jpg",
@@ -1596,7 +1596,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 97,
                 "title": "Fix",
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-97-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-97-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-97-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/097/001.jpg",
@@ -1615,7 +1615,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 96,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-96-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-96-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-96-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/096/001.jpg",
@@ -1632,7 +1632,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 95,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-95-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-95-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-95-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/095/001.jpg",
@@ -1663,7 +1663,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 94,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-94-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-94-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-94-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/094/001.jpg",
@@ -1682,7 +1682,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 93,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-93-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-93-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-93-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/093/001.jpg",
@@ -1699,7 +1699,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 92,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-92-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-92-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-92-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/092/001.jpg",
@@ -1714,7 +1714,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 91,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-91-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-91-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-91-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/091/001.jpg",
@@ -1732,7 +1732,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 90,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-90-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-90-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-90-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/090/001.jpg",
@@ -1750,7 +1750,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 89,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-89-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-89-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-89-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/089/001.jpg",
@@ -1771,7 +1771,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 88,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-88-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-88-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-88-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/088/001.jpg",
@@ -1790,7 +1790,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 87,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-87-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-87-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-87-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/087/001.jpg",
@@ -1810,7 +1810,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 86,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-86-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-86-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-86-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/086/001.jpg",
@@ -1828,7 +1828,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 85,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-85-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-85-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-85-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/085/001.jpg",
@@ -1850,7 +1850,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 84,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-84-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-84-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-84-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/084/001.jpg",
@@ -1870,7 +1870,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 83,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-83-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-83-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-83-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/083/001.jpg",
@@ -1891,7 +1891,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 82,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-82-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-82-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-82-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/082/001.jpg",
@@ -1908,7 +1908,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 81,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-81-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-81-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-81-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/081/001.jpg",
@@ -1927,7 +1927,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 80,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-80-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-80-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-80-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/080/001.jpg",
@@ -1947,7 +1947,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 79,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-79-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-79-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-79-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/079/001.jpg",
@@ -1967,7 +1967,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 78,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-78-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-78-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-78-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/078/001.jpg",
@@ -1992,7 +1992,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 77,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-77-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-77-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-77-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/077/001.jpg",
@@ -2011,7 +2011,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 76,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-76-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-76-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-76-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/076/001.jpg",
@@ -2030,7 +2030,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 75,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-75-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-75-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-75-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/075/001.jpg",
@@ -2049,7 +2049,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 74,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-74-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-74-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-74-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/074/001.jpg",
@@ -2081,7 +2081,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 73,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-73-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-73-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-73-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/073/001.jpg",
@@ -2101,7 +2101,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 72,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-72-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-72-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-72-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/072/001.jpg",
@@ -2146,7 +2146,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 71,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-71-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-71-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-71-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/071/001.jpg",
@@ -2204,7 +2204,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 70,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-70-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-70-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-70-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/070/001.jpg",
@@ -2263,7 +2263,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 69,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-69-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-69-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-69-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/069/001.jpg",
@@ -2317,7 +2317,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 68,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-68-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-68-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-68-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/068/001.jpg",
@@ -2336,7 +2336,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 67,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-67-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-67-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-67-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/067/001.jpg",
@@ -2355,7 +2355,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 66,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-66-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-66-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-66-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/066/001.jpg",
@@ -2373,7 +2373,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 65,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-65-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-65-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-65-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/065/001.jpg",
@@ -2389,7 +2389,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 64,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-64-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-64-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-64-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/064/001.jpg",
@@ -2404,7 +2404,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 63,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-63-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-63-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-63-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/063/001.jpg",
@@ -2423,7 +2423,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 62,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-62-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-62-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-62-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/062/001.jpg",
@@ -2444,7 +2444,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 61,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-61-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-61-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-61-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/061/001.jpg",
@@ -2464,7 +2464,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 60,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-60-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-60-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-60-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/060/001.jpg",
@@ -2487,7 +2487,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 59,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-59-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-59-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-59-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/059/001.jpg",
@@ -2509,7 +2509,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 58,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-58-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-58-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-58-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/058/001.jpg",
@@ -2534,7 +2534,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 57,
                 "title": ".5",
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-57-5-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-57-5-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-57-5-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/057.5/001.jpg",
@@ -2550,7 +2550,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 57,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-57-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-57-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-57-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/057/001.jpg",
@@ -2572,7 +2572,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 56,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-56-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-56-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-56-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/056/001.jpg",
@@ -2596,7 +2596,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 55,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-55-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-55-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-55-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/055/001.jpg",
@@ -2621,7 +2621,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 54,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-54-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-54-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-54-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/054/001.jpg",
@@ -2646,7 +2646,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 53,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-53-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-53-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-53-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/053/001.jpg",
@@ -2671,7 +2671,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 52,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-52-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-52-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-52-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/052/001.jpg",
@@ -2693,7 +2693,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 51,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-51-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-51-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-51-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/051/001.jpg",
@@ -2716,7 +2716,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 50,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-50-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-50-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-50-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/050/001.jpg",
@@ -2738,7 +2738,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 49,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-49-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-49-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-49-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/049/001.jpg",
@@ -2758,7 +2758,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 48,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-48-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-48-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-48-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/048/001.jpg",
@@ -2785,7 +2785,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 47,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-47-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-47-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-47-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/047/001.jpg",
@@ -2805,7 +2805,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 46,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-46-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-46-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-46-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/046/001.jpg",
@@ -2826,7 +2826,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 45,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-45-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-45-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-45-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/045/001.jpg",
@@ -2847,7 +2847,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 44,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-44-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-44-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-44-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/044/001.jpg",
@@ -2868,7 +2868,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 43,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-43-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-43-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-43-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/043/001.jpg",
@@ -2890,7 +2890,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 42,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-42-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-42-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-42-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/042/001.jpg",
@@ -2910,7 +2910,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 41,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-41-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-41-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-41-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/041/001.jpg",
@@ -2932,7 +2932,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 40,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-40-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-40-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-40-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/040/01.jpg",
@@ -2953,7 +2953,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 39,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-39-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-39-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-39-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/039/01.jpg",
@@ -2976,7 +2976,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 38,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-38-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-38-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-38-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/038/01.jpg",
@@ -2997,7 +2997,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 37,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-37-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-37-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-37-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/037/001.jpg",
@@ -3016,7 +3016,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 36,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-36-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-36-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-36-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/036/001.jpg",
@@ -3036,7 +3036,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 35,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-35-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-35-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-35-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/035/01.jpg",
@@ -3055,7 +3055,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 34,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-34-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-34-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-34-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/034/01.jpg",
@@ -3076,7 +3076,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 33,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-33-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-33-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-33-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/033/01.jpg",
@@ -3098,7 +3098,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 32,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-32-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-32-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-32-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/032/01.jpg",
@@ -3131,7 +3131,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 31,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-31-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-31-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-31-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/031/001.jpg",
@@ -3153,7 +3153,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 30,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-30-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-30-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-30-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/030/001.jpg",
@@ -3175,7 +3175,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 29,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-29-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-29-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-29-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/029/001.jpg",
@@ -3195,7 +3195,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 28,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-28-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-28-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-28-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/028/001.jpg",
@@ -3217,7 +3217,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 27,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-27-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-27-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-27-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/027/001.jpg",
@@ -3239,7 +3239,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 26,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-26-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-26-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-26-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/026/001.jpg",
@@ -3261,7 +3261,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 25,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-25-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-25-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-25-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/025/001.jpg",
@@ -3279,7 +3279,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 24,
                 "title": ".9",
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-24-9-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-24-9-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-24-9-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/024.9/001.jpg",
@@ -3290,7 +3290,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 24,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-24-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-24-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-24-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/024/001.jpg",
@@ -3311,7 +3311,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 23,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-23-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-23-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-23-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/023/001.jpg",
@@ -3333,7 +3333,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 22,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-22-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-22-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-22-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/022/001.jpg",
@@ -3393,7 +3393,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 21,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-21-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-21-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-21-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/021f/001.jpg",
@@ -3412,7 +3412,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 20,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-20-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-20-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-20-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/020/001.jpg",
@@ -3461,7 +3461,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 19,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-19-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-19-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-19-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/019/001.jpg",
@@ -3495,7 +3495,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 18,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-18-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-18-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-18-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/018/001.jpg",
@@ -3527,7 +3527,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 17,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-17-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-17-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-17-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/017/001_001.jpg",
@@ -3562,7 +3562,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 16,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-16-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-16-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-16-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/016/001.jpg",
@@ -3610,7 +3610,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 15,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-15-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-15-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-15-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/015/001.jpg",
@@ -3635,7 +3635,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 14,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-14-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-14-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-14-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/014/001.jpg",
@@ -3671,7 +3671,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 13,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-13-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-13-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-13-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/013/001.jpg",
@@ -3701,7 +3701,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 12,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-12-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-12-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-12-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/012/001.jpeg",
@@ -3730,7 +3730,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 11,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-11-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-11-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-11-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/011/001.jpeg",
@@ -3759,7 +3759,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 10,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-10-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-10-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-10-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/010/001.png",
@@ -3789,7 +3789,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 9,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-09-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-09-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-09-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/009/001.jpeg",
@@ -3838,7 +3838,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 8,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-08-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-08-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-08-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/008/001.jpg",
@@ -3877,7 +3877,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 7,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-07-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-07-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-07-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/007/001.jpeg",
@@ -3921,7 +3921,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 6,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-06-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-06-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-06-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/006/001.jpg",
@@ -3941,7 +3941,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 5,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-05-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-05-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-05-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/005/001.jpeg",
@@ -3977,7 +3977,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 4,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-04-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-04-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-04-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/004/001.jpg",
@@ -4038,7 +4038,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 3,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-03-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-03-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-03-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/003/001.jpeg",
@@ -4091,7 +4091,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 2,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-02-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-02-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-02-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/002/001.jpg",
@@ -4134,7 +4134,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 1,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/please-bully-me-miss-villainess-chapter-01-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/please-bully-me-miss-villainess-chapter-01-bahasa-indonesia/",
                 "id": "please-bully-me-miss-villainess-chapter-01-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/P/Please_Bully_Me_Miss_Villainess/001/001.jpg",
@@ -90226,9 +90226,9 @@ export const library: Array<SeriesType> = [
     }, // Katanai ossan
     {
         "title": "Black Killer Whale Baby Bahasa Indonesia",
-        "url": "https://komikcast02.com/komik/black-killer-whale-baby",
+        "url": "https://komikcast05.com/komik/black-killer-whale-baby",
         "id": "black-killer-whale-baby",
-        "cover": "https://komikcast02.com/wp-content/uploads/2024/07/Black_Whale_Killer-e1720101315681.png",
+        "cover": "https://komikcast05.com/wp-content/uploads/2024/07/Black_Whale_Killer-e1720101315681.png",
         "language": "ID" as LanguageEnum,
         "type": "Manhwa" as SeriesEnum,
         "genres": [
@@ -90245,7 +90245,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 51,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-51-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-51-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-51-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/051/000.jpg",
@@ -90319,7 +90319,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 50,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-50-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-50-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-50-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/050/000.jpg",
@@ -90386,7 +90386,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 49,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-49-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-49-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-49-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/049/000.jpg",
@@ -90465,7 +90465,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 48,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-48-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-48-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-48-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/048/000.jpg",
@@ -90517,7 +90517,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 47,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-47-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-47-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-47-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/047/000.jpg",
@@ -90562,7 +90562,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 46,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-46-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-46-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-46-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/B/Black_Killer_Whale_Baby/046/000.jpg",
@@ -90609,7 +90609,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 45,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-45-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-45-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-45-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/045/000.jpg",
@@ -90656,7 +90656,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 44,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-44-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-44-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-44-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/044/000.jpg",
@@ -90704,7 +90704,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 43,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-43-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-43-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-43-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/043/000.jpg",
@@ -90758,7 +90758,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 42,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-42-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-42-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-42-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/B/Black_Killer_Whale_Baby/042/000.jpg",
@@ -90804,7 +90804,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 41,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-41-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-41-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-41-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/041/000.jpg",
@@ -90852,7 +90852,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 40,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-40-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-40-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-40-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/040/000.jpg",
@@ -90898,7 +90898,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 39,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-39-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-39-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-39-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/039/000.jpg",
@@ -90943,7 +90943,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 38,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-38-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-38-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-38-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/038/000.jpg",
@@ -90988,7 +90988,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 37,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-37-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-37-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-37-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/B/Black_Killer_Whale_Baby/037/000.jpg",
@@ -91033,7 +91033,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 36,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-36-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-36-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-36-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/B/Black_Killer_Whale_Baby/036/000.jpg",
@@ -91084,7 +91084,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 35,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-35-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-35-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-35-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/035/000.jpg",
@@ -91133,7 +91133,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 34,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-34-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-34-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-34-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/034/000.jpg",
@@ -91182,7 +91182,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 33,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-33-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-33-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-33-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/033/000.jpg",
@@ -91231,7 +91231,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 32,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-32-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-32-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-32-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/B/Black_Killer_Whale_Baby/032/000.jpg",
@@ -91275,7 +91275,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 31,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-31-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-31-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-31-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/031/000.jpg",
@@ -91318,7 +91318,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 30,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-30-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-30-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-30-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/030/001.jpg",
@@ -91357,7 +91357,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 29,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-29-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-29-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-29-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/029/000.jpg",
@@ -91405,7 +91405,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 28,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-28-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-28-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-28-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/028/000.jpg",
@@ -91446,7 +91446,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 27,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-27-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-27-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-27-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/027/000.jpg",
@@ -91505,7 +91505,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 26,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-26-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-26-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-26-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/026f/000.jpg",
@@ -91553,7 +91553,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 25,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-25-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-25-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-25-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/B/Black_Killer_Whale_Baby/025/000.jpg",
@@ -91604,7 +91604,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 24,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-24-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-24-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-24-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/B/Black_Killer_Whale_Baby/024/000.jpg",
@@ -91653,7 +91653,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 23,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-23-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-23-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-23-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/023/000.jpg",
@@ -91702,7 +91702,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 22,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-22-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-22-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-22-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/022/000.jpg",
@@ -91748,7 +91748,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 21,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-21-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-21-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-21-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/021/000.jpg",
@@ -91803,7 +91803,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 20,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-20-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-20-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-20-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/020/000.jpg",
@@ -91853,7 +91853,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 19,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-19-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-19-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-19-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/019/000.jpg",
@@ -91906,7 +91906,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 18,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-18-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-18-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-18-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/B/Black_Killer_Whale_Baby/018/000.jpg",
@@ -91956,7 +91956,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 17,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-17-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-17-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-17-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/017/000.jpg",
@@ -92007,7 +92007,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 16,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-16-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-16-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-16-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/B/Black_Killer_Whale_Baby/016/000.jpg",
@@ -92046,7 +92046,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 15,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-15-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-15-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-15-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/015/000.jpg",
@@ -92089,7 +92089,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 14,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-14-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-14-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-14-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/014/000.jpg",
@@ -92142,7 +92142,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 13,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-13-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-13-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-13-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/B/Black_Killer_Whale_Baby/013/000.jpg",
@@ -92187,7 +92187,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 12,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-12-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-12-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-12-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/012/000.jpg",
@@ -92224,7 +92224,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 11,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-11-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-11-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-11-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/011/000.jpg",
@@ -92265,7 +92265,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 10,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-10-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-10-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-10-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/010/000.jpg",
@@ -92312,7 +92312,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 9,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-09-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-09-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-09-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/B/Black_Killer_Whale_Baby/009/000.jpg",
@@ -92351,7 +92351,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 8,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-08-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-08-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-08-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/008/000.jpg",
@@ -92392,7 +92392,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 7,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-07-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-07-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-07-bahasa-indonesia",
                 "content": [
                     "https://sv1.imgkc1.my.id/wp-content/img/B/Black_Killer_Whale_Baby/007/000.jpg",
@@ -92436,7 +92436,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 6,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-06-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-06-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-06-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/006/000.jpg",
@@ -92480,7 +92480,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 5,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-05-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-05-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-05-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/005/000.jpg",
@@ -92528,7 +92528,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 4,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-04-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-04-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-04-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/B/Black_Killer_Whale_Baby/004/000.jpg",
@@ -92579,7 +92579,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 3,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-03-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-03-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-03-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/B/Black_Killer_Whale_Baby/003/000.jpg",
@@ -92628,7 +92628,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 2,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-02-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-02-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-02-bahasa-indonesia",
                 "content": [
                     "https://sv3.imgkc3.my.id/wp-content/img/B/Black_Killer_Whale_Baby/002/000.jpg",
@@ -92677,7 +92677,7 @@ export const library: Array<SeriesType> = [
                 "volume": 0,
                 "chapter": 1,
                 "title": null,
-                "url": "https://komikcast02.com/chapter/black-killer-whale-baby-chapter-01-bahasa-indonesia/",
+                "url": "https://komikcast05.com/chapter/black-killer-whale-baby-chapter-01-bahasa-indonesia/",
                 "id": "black-killer-whale-baby-chapter-01-bahasa-indonesia",
                 "content": [
                     "https://sv2.imgkc2.my.id/wp-content/img/B/Black_Killer_Whale_Baby/001/000.jpg",

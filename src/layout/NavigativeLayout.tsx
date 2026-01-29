@@ -45,7 +45,7 @@ const NavigativeLayout = () => {
                 <ChangelogModal content={changelogContent} onClose={() => setShowChangelog(false)} />
             )}
 
-            <div className="h-[50px] bg-[#404040] rounded-b-4xl text-white sticky top-0 z-10 flex items-center justify-center">
+            <div className="h-[50px] bg-[#404040] rounded-b-4xl text-white sticky top-0 z-90 flex items-center justify-center">
                 Kiirohana
             </div>
 
@@ -54,7 +54,7 @@ const NavigativeLayout = () => {
                 <Outlet />
             </main>
 
-            <div className="h-[60px] bg-[#404040] rounded-t-4xl text-white sticky bottom-0 z-10 grid grid-cols-4">
+            <div className="h-[60px] bg-[#404040] rounded-t-4xl text-white sticky bottom-0 z-90 grid grid-cols-4">
                 {navItems.map(({ to, icon, label }) => {
                     const active = isActive(to);
 
