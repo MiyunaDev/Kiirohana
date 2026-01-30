@@ -31,19 +31,17 @@ jobs:
       - name: Install Cordova
         run: npm install -g cordova
       
-      - name: Add Android platform
-        run: cordova platform add android@latest
+      - name: Prepare Android
+        run: |
+          cordova platform add android@latest
+          npm install
         working-directory: ./cordova
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./cordova
-
-      - name: Build Android APK
+      - name: Build APK (Debug)
         run: cordova build android
         working-directory: ./cordova
-      
-      - name: Build Android AAB
+
+      - name: Build AAB (Release)
         run: cordova build android --release
         working-directory: ./cordova
 
@@ -69,18 +67,18 @@ jobs:
         uses: actions/setup-node@v4.3.0
         with:
           node-version: '18'
-      
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13' 
-      
-      - name: Add repository
+
+      - name: Add Repository
         run: sudo add-apt-repository universe && sudo apt update
-      
-      - name: Setup environment
+
+      - name: Install Linux build tools
         run: sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm libarchive-tools snapd
 
-      - name: Setup environment (Snapcraft)
+      - name: Setup Snapcraft
         run: |
           sudo snap install snapcraft --classic
           sudo snap install multipass --beta --classic
@@ -89,15 +87,13 @@ jobs:
         run: npm install -g cordova
         working-directory: ./cordova
 
-      - name: Install dependencies
-        run: npm install
+      - name: Prepare Electron
+        run: |
+          cordova platform add electron
+          npm install
         working-directory: ./cordova
 
-      - name: Add Electron platform
-        run: cordova platform add electron
-        working-directory: ./cordova
-
-      - name: Build Electron for Linux
+      - name: Build Electron (Linux)
         run: npm run build
         working-directory: ./cordova
 
@@ -128,15 +124,13 @@ jobs:
         run: npm install -g cordova
         working-directory: ./cordova
 
-      - name: Install dependencies
-        run: npm install
+      - name: Prepare Electron
+        run: |
+          cordova platform add electron
+          npm install
         working-directory: ./cordova
 
-      - name: Add Electron platform
-        run: cordova platform add electron
-        working-directory: ./cordova
-
-      - name: Build Electron for Windows
+      - name: Build Electron (Windows)
         run: npm run build
         working-directory: ./cordova
 
@@ -148,39 +142,40 @@ jobs:
             cordova/platforms/electron/build/*.exe
             cordova/platforms/electron/build/*.msi
             cordova/platforms/electron/build/*.tar.gz
+
   build-electron-macos:
-      runs-on: macos-latest
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4.2.2
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
 
-        - name: Setup Node.js
-          uses: actions/setup-node@v4.3.0
-          with:
-            node-version: '18'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.3.0
+        with:
+          node-version: '18'
 
-        - name: Install Cordova
-          run: npm install -g cordova
-          working-directory: ./cordova
+      - name: Install Cordova
+        run: npm install -g cordova
+        working-directory: ./cordova
 
-        - name: Install dependencies
-          run: npm install
-          working-directory: ./cordova
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./cordova
 
-        - name: Add Electron platform
-          run: cordova platform add electron
-          working-directory: ./cordova
+      - name: Add Electron platform
+        run: cordova platform add electron
+        working-directory: ./cordova
 
-        - name: Build Electron for macOS
-          run: npm run build
-          working-directory: ./cordova
+      - name: Build Electron for macOS
+        run: npm run build
+        working-directory: ./cordova
 
-        - name: Upload macOS Artifacts
-          uses: actions/upload-artifact@v4.6.2
-          with:
-            name: electron-macos
-            path: |
-              cordova/platforms/electron/build/*.dmg
-              cordova/platforms/electron/build/*.app
-              cordova/platforms/electron/build/*.pkg
-              cordova/platforms/electron/build/*.tar.gz
+      - name: Upload macOS Artifacts
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: electron-macos
+          path: |
+            cordova/platforms/electron/build/*.dmg
+            cordova/platforms/electron/build/*.app
+            cordova/platforms/electron/build/*.pkg
+            cordova/platforms/electron/build/*.tar.gz
