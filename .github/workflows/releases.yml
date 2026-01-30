@@ -9,11 +9,41 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-android:
+  build-react:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.3.0
+        with:
+          node-version: '18'
+
+      - name: Install dependencies (Root / React)
+        run: npm install
+
+      - name: Build React → cordova/www
+        run: npm run build
+
+      - name: Upload Cordova WWW
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: cordova-www
+          path: cordova/www
+
+  build-android:
+    runs-on: ubuntu-latest
+    needs: build-react
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+        
+      - name: Download Cordova WWW
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: cordova-www
+          path: cordova/www
       
       - name: Setup Java
         uses: actions/setup-java@v4.7.1
@@ -62,9 +92,16 @@ jobs:
 
   build-electron-linux:
     runs-on: ubuntu-latest
+    needs: build-react
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
+        
+      - name: Download Cordova WWW
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: cordova-www
+          path: cordova/www
 
       - name: Setup Node.js
         uses: actions/setup-node@v4.3.0
@@ -115,9 +152,16 @@ jobs:
 
   build-electron-windows:
     runs-on: windows-latest
+    needs: build-react
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
+        
+      - name: Download Cordova WWW
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: cordova-www
+          path: cordova/www
 
       - name: Setup Node.js
         uses: actions/setup-node@v4.3.0
@@ -148,9 +192,16 @@ jobs:
             cordova/platforms/electron/build/*.msi
   build-electron-macos:
     runs-on: macos-latest
+    needs: build-react
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
+        
+      - name: Download Cordova WWW
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: cordova-www
+          path: cordova/www
 
       - name: Setup Node.js
         uses: actions/setup-node@v4.3.0
