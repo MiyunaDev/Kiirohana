@@ -1,5 +1,5 @@
 import { version } from "./../../../package.json"
-import { FaPalette, FaBook, FaBookOpen, FaTv, FaNetworkWired, FaPuzzlePiece, FaShieldHeart, FaCircleInfo } from "react-icons/fa6"
+import { FaPalette, FaBook, FaBookOpen, FaTv, FaNetworkWired, FaPuzzlePiece, FaShieldHeart, FaCircleInfo, FaAnchor } from "react-icons/fa6"
 import SettingMenu from "../../components/Settings/SettingMenu";
 
 const Settings = () => {
@@ -22,6 +22,7 @@ const Settings = () => {
         <SettingMenu icon={<FaShieldHeart />} name="Privacy And Security" />
         <SettingMenu icon={<FaPuzzlePiece />} name="Service" path="/app/settings/services" />
         <SettingMenu icon={<FaCircleInfo />} name="About" />
+        {/* <SettingMenu icon={<FaAnchor />} name="Shinobu" path="/shinobu" /> */}
       </div>
     </div>
   );

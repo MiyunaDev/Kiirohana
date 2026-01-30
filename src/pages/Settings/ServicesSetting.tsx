@@ -10,22 +10,6 @@ interface ServicesState {
   shinobu: ServiceItem[];
 }
 
-const STORAGE_KEY = "services_provider";
-
-function loadServices(): ServicesState {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : { shinobu: [] };
-  } catch {
-    return { shinobu: [] };
-  }
-}
-
-function saveServices(data: ServicesState) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
-
 const Settings = () => {
   const [services, setServices] = useState<ServicesState>(() => loadServices());
 

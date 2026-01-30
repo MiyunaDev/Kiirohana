@@ -23,6 +23,11 @@ import Latest from './pages/Extension/Latest.tsx';
 import Settings from './pages/Settings/Settings.tsx';
 import ServicesSetting from './pages/Settings/ServicesSetting.tsx';
 
+// ------------------- Shinobu
+import ShinobuList from "./pages/Shinobu/List.tsx"
+import ShinobuChat from "./pages/Shinobu/Chat/ChatPage.tsx"
+import ShinobuNavigativeLayout from './layout/Shinobu/NavigativeLayout.tsx';
+
 const router = createHashRouter([
   {
     path: "/",
@@ -42,16 +47,18 @@ const router = createHashRouter([
               }
             ]
           },
-          { path: "settings", children: [
-            {
-              index: true,
-              Component: Settings
-            },
-            {
-              path:"services",
-              Component: ServicesSetting
-            }
-          ] },
+          {
+            path: "settings", children: [
+              {
+                index: true,
+                Component: Settings
+              },
+              {
+                path: "services",
+                Component: ServicesSetting
+              }
+            ]
+          },
           { path: "history", Component: History }
         ]
       },
@@ -65,7 +72,17 @@ const router = createHashRouter([
             ]
           }
         ]
-      }
+      },
+      {
+        path: "shinobu",
+        children: [
+          {
+            path: "app", Component: ShinobuNavigativeLayout, children: [
+              { index: true, Component: ShinobuList },
+            ]
+          }
+        ]
+      },
     ]
   },
 ]);
