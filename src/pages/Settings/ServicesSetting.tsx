@@ -4,11 +4,7 @@ import ServiceCard from "../../components/Settings/Service/ServiceCard";
 import { ServiceItem } from "../../interfaces/Service";
 import { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid"
-
-interface ServicesState {
-  honoka?: ServiceItem;
-  shinobu: ServiceItem[];
-}
+import { loadServices, saveServices, ServicesState } from "../../utils/service/serviceManager";
 
 const Settings = () => {
   const [services, setServices] = useState<ServicesState>(() => loadServices());
