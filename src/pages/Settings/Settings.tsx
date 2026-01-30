@@ -22,7 +22,7 @@ const Settings = () => {
         <SettingMenu icon={<FaShieldHeart />} name="Privacy And Security" />
         <SettingMenu icon={<FaPuzzlePiece />} name="Service" path="/app/settings/services" />
         <SettingMenu icon={<FaCircleInfo />} name="About" />
-        {/* <SettingMenu icon={<FaAnchor />} name="Shinobu" path="/shinobu" /> */}
+        <SettingMenu icon={<FaAnchor />} name="Shinobu" path="/shinobu/app" />
       </div>
     </div>
   );

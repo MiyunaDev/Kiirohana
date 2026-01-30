@@ -1,7 +1,6 @@
 import { FaPalette } from "react-icons/fa6"
 import SettingMenu from "../../components/Settings/SettingMenu";
 import ServiceCard from "../../components/Settings/Service/ServiceCard";
-import { ServiceItem } from "../../interfaces/Service";
 import { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid"
 import { loadServices, saveServices, ServicesState } from "../../utils/service/serviceManager";
@@ -49,10 +48,6 @@ const Settings = () => {
 
   /* ================= HONOKA ================= */
 
-  const setHonoka = (service?: ServiceItem) => {
-    setServices((prev) => ({ ...prev, honoka: service }));
-  };
-
   const addHonoka = (url: string) => {
     if (services.honoka) return;
     if (!url) return;
@@ -89,15 +84,6 @@ const Settings = () => {
     }));
   };
 
-
-  const updateShinobu = (updated: ServiceItem) => {
-    setServices((prev) => ({
-      ...prev,
-      shinobu: prev.shinobu.map((s) =>
-        s.id === updated.id ? updated : s
-      ),
-    }));
-  };
   return (
     <div className="min-h-full flex flex-col">
       <div className="grid gap-4 lg:grid-cols-2">
