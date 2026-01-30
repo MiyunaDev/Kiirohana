@@ -1,14 +1,13 @@
 import Flag from 'react-world-flags'
 import getFlag from '../../utils/getFlag'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import LanguageEnum from '../../enums/LanguageEnum'
 import { Link } from 'react-router'
-import axios from 'axios'
 import { library } from '../../../demo'
 
 const Library = () => {
-    const [libraries, setLibraries] = useState<Array<any>>(library)
+    const [libraries, _] = useState<Array<any>>(library)
 
     return (
         <div className="w-full h-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 max-w-screen-xl mx-auto px-2">

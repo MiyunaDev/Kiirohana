@@ -1,10 +1,9 @@
-import axios, { AxiosResponse } from 'axios'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import HistoryDate from '../../components/HistoryDate'
 // import { anilistId } from '../../../prototype-test'
 
 const History = () => {
-  const [histories, setHistories] = useState<Array<any>>([])
+  const [histories, _] = useState<Array<any>>([])
 
   return (
     <div className="w-full h-full flex flex-col">

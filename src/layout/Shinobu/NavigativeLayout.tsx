@@ -2,7 +2,6 @@ import {
   FaBook,
   FaHistory,
   FaSearch,
-  FaCog,
   FaComments,
   FaBell
 } from "react-icons/fa";

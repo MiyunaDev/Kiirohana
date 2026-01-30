@@ -17,15 +17,13 @@ import Detail from './pages/Detail/Detail.tsx';
 import DetailLayout from './layout/DetailLayout.tsx';
 import ComicReader from './pages/Comic/Reader.tsx';
 import NovelReader from './pages/Novel/Reader.tsx';
-import ExtensionList from './pages/Extension/List.tsx';
-import Latest from './pages/Extension/Latest.tsx';
 
 import Settings from './pages/Settings/Settings.tsx';
 import ServicesSetting from './pages/Settings/ServicesSetting.tsx';
 
 // ------------------- Shinobu
 import ShinobuList from "./pages/Shinobu/List.tsx"
-import ShinobuChat from "./pages/Shinobu/Chat/ChatPage.tsx"
+// import ShinobuChat from "./pages/Shinobu/Chat/ChatPage.tsx"
 import ShinobuNavigativeLayout from './layout/Shinobu/NavigativeLayout.tsx';
 
 const router = createHashRouter([
@@ -37,16 +35,6 @@ const router = createHashRouter([
       {
         path: "app", Component: NavigativeLayout, children: [
           { path: "library", Component: Library },
-          {
-            path: "browse", children: [
-              { index: true, Component: ExtensionList },
-              {
-                path: ":extensionId", children: [
-                  { path: "latest", Component: Latest }
-                ]
-              }
-            ]
-          },
           {
             path: "settings", children: [
               {
