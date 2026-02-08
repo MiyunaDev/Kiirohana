@@ -89,7 +89,7 @@ jobs:
 
   build-electron-linux:
     runs-on: ubuntu-latest
-    needs: build-react
+    needs: bu ild-react
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2

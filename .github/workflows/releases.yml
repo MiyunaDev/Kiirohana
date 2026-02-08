@@ -68,12 +68,8 @@ jobs:
           npm install
         working-directory: ./cordova
 
-      - name: Build APK (Debug)
+      - name: Build APK
         run: cordova build android
-        working-directory: ./cordova
-
-      - name: Build AAB (Release)
-        run: cordova build android --release
         working-directory: ./cordova
 
       - name: Upload APK to GitHub Release
@@ -82,13 +78,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           files: cordova/platforms/android/app/build/outputs/apk/debug/*.apk
-
-      - name: Upload AAB to GitHub Release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          files: cordova/platforms/android/app/build/outputs/bundle/release/*.aab
 
   build-electron-linux:
     runs-on: ubuntu-latest

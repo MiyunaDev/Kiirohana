@@ -30,7 +30,7 @@ fs.readFile(configPath, "utf-8", (err, xmlData) => {
       );
       console.log("  📦 package.json       :", clc.yellow(pkg.version));
       console.log("  📦 cordova/package.json:", clc.red(appPkg.version));
-      console.log("  ⚙️  config.xml         :", clc.magenta(configVersion));
+      console.log("  ⚙️ config.xml         :", clc.magenta(configVersion));
 
       appPkg.version = pkg.version;
       try {
