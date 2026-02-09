@@ -15,16 +15,23 @@ import Library from './pages/Library/Library.tsx';
 import History from './pages/History/History.tsx';
 import Detail from './pages/Detail/Detail.tsx';
 import DetailLayout from './layout/DetailLayout.tsx';
-import ComicReader from './pages/Comic/Reader.tsx';
-import NovelReader from './pages/Novel/Reader.tsx';
+import ComicReader from './pages/Shinobu/pages/Comic/Reader.tsx';
+import NovelReader from './pages/Shinobu/pages/Novel/Reader.tsx';
 
 import Settings from './pages/Settings/Settings.tsx';
 import ServicesSetting from './pages/Settings/ServicesSetting.tsx';
 
 // ------------------- Shinobu
-import ShinobuList from "./pages/Shinobu/List.tsx"
+import Latest from "./pages/Shinobu/pages/Browse/Latest.tsx"
 // import ShinobuChat from "./pages/Shinobu/Chat/ChatPage.tsx"
-import ShinobuNavigativeLayout from './layout/Shinobu/NavigativeLayout.tsx';
+import UserProfilePage from './pages/Shinobu/pages/Detail/User.tsx';
+import InstalledShinobu from './pages/Shinobu/pages/System/Main.tsx';
+import ShinobuBootstrap from './pages/Shinobu/pages/System/Bootsrap.tsx';
+import ShinobuLogin from './pages/Shinobu/pages/System/Login.tsx';
+import { ShinobuProvider } from './contexts/ShinobuContext.tsx';
+import ShinobuDetail from './pages/Shinobu/pages/Detail/Media.tsx';
+import MainLayout from './pages/Shinobu/layout/Main.layout.tsx';
+import Landing from './pages/Shinobu/Landing/Landing.tsx';
 
 const router = createHashRouter([
   {
@@ -62,17 +69,41 @@ const router = createHashRouter([
         ]
       },
       {
-        path: "shinobu",
-        children: [
+        path: "shinobu", children: [
+          { index: true, Component: InstalledShinobu },
           {
-            path: "app", Component: ShinobuNavigativeLayout, children: [
-              { index: true, Component: ShinobuList },
+            path: ":shinobuid", Component: ShinobuProvider, children: [
+              {
+                index: true, Component: ShinobuBootstrap
+              },
+              {
+                path: "login", Component: ShinobuLogin
+              },
+              {
+                path: "app", Component: MainLayout, children: [
+                  { index: true, Component: Landing },
+                  {
+                    path: "search/latest", Component: Latest
+                  }
+                ]
+              },
+              {
+                path: "profile", Component: UserProfilePage
+              },
+              {
+                path: "detail/:mediaId",
+                Component: ShinobuDetail,
+              },
+              // {
+              //   path: "reader/:mediaId/:chapterId",
+              //   Component: MediaReaderPage,
+              // },
             ]
           }
         ]
-      },
+      }
     ]
-  },
+  }
 ]);
 
 createRoot(document.getElementById('root')!).render(

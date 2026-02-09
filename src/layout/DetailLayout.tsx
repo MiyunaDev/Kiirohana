@@ -8,7 +8,6 @@ const DetailLayout = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
-
     const [ch, setCh] = useState<Chapter>()
     const [detail, setDetail] = useState<SeriesType | null>(null);
 

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from 'react-router';
-import { Chapter, NovelContent, SeriesType } from "./../../types/Series.ts";
-import { library } from "../../../demo";
-import LazyImage from "../../components/LazyImage.tsx";
-import PageChanger from "../../components/PageChanger.tsx";
+import { Chapter, NovelContent, SeriesType } from "../../../../types/Series.ts";
+import { library } from "../../../../../demo.ts";
+import LazyImage from "../../../../components/LazyImage.tsx";
+import PageChanger from "../../../../components/PageChanger.tsx";
 
 function getPreview(chapter: Chapter, type: string): string {
     const slc = chapter.content

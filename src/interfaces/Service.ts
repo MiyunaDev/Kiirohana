@@ -19,4 +19,6 @@ export interface ServiceItem {
   version?: ServiceVersion;
   logoData?: any; // ⬅️ Lottie JSON cache
   error?: string;
+  accessKey?: string,
+  secretKey?: string
 }
