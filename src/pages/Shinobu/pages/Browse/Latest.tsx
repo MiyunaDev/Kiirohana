@@ -5,28 +5,21 @@ import {
   useState,
 } from "react";
 import {
-  Link,
-  useNavigate,
-  useParams,
+  Link
 } from "react-router";
 import {
   FaXmark,
   FaFilter,
 } from "react-icons/fa6";
 
-import { useLocalStorage } from "../../../../hooks/useLocalStorage";
 import { ServiceItem } from "../../../../interfaces/Service";
 import { shinobuFetch } from "../../../../utils/fetchShinobu";
+import { useShinobu } from "../../../../hooks/useShinobu";
 
 /* ===================== Types ===================== */
 
-type ServicesStorage = {
-  honoka: ServiceItem | null;
-  shinobu: ServiceItem[];
-};
 
 /* --- API schema --- */
-/* --- Update API schema --- */
 interface ApiMediaWrapper {
   _id: string;
   media: {
@@ -59,10 +52,9 @@ export interface LatestMediaResponseWrapper {
 const mapApiMediaWrapperToManga = (m: ApiMediaWrapper): MangaItem => ({
   id: m._id,
   title: m.media.title,
-  cover: m.media.coverImage,
+  thumbnail: m.media.coverImage,
   genres: m.media.genres.map(g => g.name),
-  description: m.media.description,
-  type: m.media.type
+  description: m.media.description
 });
 
 /* --- API response --- */
@@ -76,10 +68,9 @@ export interface ApiLatestStatus {
 interface MangaItem {
   id: string;
   title: string;
-  cover: string;
+  thumbnail: string;
   genres: string[];
   description: string | null;
-  type: "COMIC" | "NOVEL" | "TV"
 }
 
 /* ===================== Manga Card ===================== */
@@ -91,7 +82,7 @@ const MangaCard = ({ manga, service }: { manga: MangaItem, service: ServiceItem 
   >
     <div className="relative w-full">
       <img
-        src={manga.cover}
+        src={manga.thumbnail}
         alt={manga.title}
         className="w-full aspect-[2/3] object-cover bg-gray-300 rounded-xl"
         loading="lazy"
@@ -100,10 +91,6 @@ const MangaCard = ({ manga, service }: { manga: MangaItem, service: ServiceItem 
         Shinobu
       </span>
     </div>
-
-    <a className='w-1/2 rounded-br-2xl px-0.5 py-1 text-xs text-center bg-[#C667F7]'>
-      {manga.type}
-    </a>
 
     <span className="mt-1 text-xs font-semibold text-center line-clamp-2">
       {manga.title}
@@ -190,18 +177,7 @@ const AdvanceSearchModal = ({
 /* ===================== Main Page ===================== */
 
 const MangaListPage = () => {
-  const navigate = useNavigate();
-  const { shinobuid } = useParams();
-
-  const [services] =
-    useLocalStorage<ServicesStorage>("services", {
-      honoka: null,
-      shinobu: [],
-    });
-
-  const [service, setService] =
-    useState<ServiceItem | null>(null);
-
+  const { service } = useShinobu()
   const [data, setData] = useState<MangaItem[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -216,23 +192,6 @@ const MangaListPage = () => {
   });
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-
-  /* ===== Resolve Service ===== */
-
-  useEffect(() => {
-    if (!shinobuid) return;
-
-    const current = services.shinobu.find(
-      s => s.id === shinobuid
-    );
-
-    if (!current) {
-      navigate("/#/shinobu", { replace: true });
-      return;
-    }
-
-    setService(current);
-  }, [shinobuid, services, navigate]);
 
   /* ===== Fetch ===== */
 

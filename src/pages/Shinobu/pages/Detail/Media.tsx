@@ -1,17 +1,11 @@
 // ... imports sama seperti sebelumnya
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, Link } from "react-router";
+import { useParams, Link } from "react-router";
 import { motion } from "framer-motion";
 import { shinobuFetch } from "../../../../utils/fetchShinobu";
-import { useLocalStorage } from "../../../../hooks/useLocalStorage";
-import { ServiceItem } from "../../../../interfaces/Service";
+import { useShinobu } from "../../../../hooks/useShinobu";
 
 /* ================= Types ================= */
-
-type ServicesStorage = {
-    honoka: ServiceItem | null;
-    shinobu: ServiceItem[];
-};
 
 export interface Media {
     _id: string;
@@ -46,7 +40,7 @@ const ChapterCard = ({
     detail
 }: {
     chapter: Chapter;
-    type?: "novel" | "comic";
+    type?: "NOVEL" | "COMIC";
     detail: Media
 }) => {
     const [preview, setPreview] = useState<string>();
@@ -65,7 +59,7 @@ const ChapterCard = ({
 
             let previewUrl: string | undefined;
 
-            if (type === "novel") {
+            if (type === "COMIC") {
                 previewUrl = slc[0];
             } else {
                 if (slc.length === 1) {
@@ -82,9 +76,9 @@ const ChapterCard = ({
             setPreview(previewUrl);
         }
 
-        if (type === "comic") {
+        if (type === "COMIC") {
             setDestination(`/detail/reader/comic?title=${encodeURIComponent(detail.title)}&chapterid=${encodeURIComponent(chapter.id)}`)
-        } else if (type === "novel") {
+        } else if (type === "NOVEL") {
             setDestination(`/detail/reader/novel?title=${encodeURIComponent(detail.title)}&chapterid=${encodeURIComponent(chapter.id)}`)
         }
 
@@ -104,7 +98,7 @@ const ChapterCard = ({
         hover:shadow active:shadow hover:shadow-[#C667F7] active:shadow-[#C667F7]
         before:w-0 hover:before:w-screen active:before:w-screen before:bg-[#C667F7] overflow-hidden rounded-r-xl">
                 {preview && (
-                    <div className={`relative z-10 w-15 aspect-[3/4] ${type === "novel" ? "group-hover:after:to-[rgba(198,103,247,0.7)] group-active:after:to-[rgba(198,103,247,0.7)] after:absolute after:inset-0 after:bg-gradient-to-r after:from-[rgba(0,0,0,0.2)] after:to-[rgba(0,0,0,1)] transition-all duration-500" : ""}`}>
+                    <div className={`relative z-10 w-15 aspect-[3/4] ${type === "NOVEL" ? "group-hover:after:to-[rgba(198,103,247,0.7)] group-active:after:to-[rgba(198,103,247,0.7)] after:absolute after:inset-0 after:bg-gradient-to-r after:from-[rgba(0,0,0,0.2)] after:to-[rgba(0,0,0,1)] transition-all duration-500" : ""}`}>
                         <img
                             className="w-full h-full object-cover object-top"
                             src={preview}
@@ -113,7 +107,7 @@ const ChapterCard = ({
                     </div>
 
                 )}
-                <div className={`flex z-10 flex-col ${type === "novel" ? "absolute left-10" : ""}`}>
+                <div className={`flex z-10 flex-col ${type === "NOVEL" ? "absolute left-10" : ""}`}>
                     <a>
                         {chapter.volume !== 0 ? `Volume ${chapter.volume} ` : ""}
                         Chapter {chapter.chapter}
@@ -129,31 +123,14 @@ const ChapterCard = ({
 // Paste ChapterCard yang kamu kirim di sini (tidak perlu diubah)
 
 const ShinobuDetail = () => {
-  const { mediaId, shinobuid } = useParams();
-  const navigate = useNavigate();
+  const { mediaId } = useParams();
+  const { service } = useShinobu()
 
-  const [services] = useLocalStorage<ServicesStorage>("services", {
-    honoka: null,
-    shinobu: [],
-  });
-
-  const [service, setService] = useState<ServiceItem | null>(null);
   const [media, setMedia] = useState<Media | null>(null);
   const [externals, setExternals] = useState<ExternalData[]>([]);
   const [selectedSource, setSelectedSource] = useState<string | null>(null); // <-- New
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!shinobuid) return;
-
-    const current = services.shinobu.find((s) => s.id === shinobuid);
-    if (!current) {
-      navigate("/shinobu", { replace: true });
-      return;
-    }
-    setService(current);
-  }, [shinobuid, services, navigate]);
 
   useEffect(() => {
     if (!mediaId || !service) return;
@@ -285,9 +262,9 @@ const ShinobuDetail = () => {
                 value={selectedSource ?? ""}
                 onChange={(e) => setSelectedSource(e.target.value)}
               >
-                {externals.map((ext) => (
-                  <option key={ext.sourceName} value={ext.sourceName}>
-                    {ext.sourceName}
+                {externals.map((ext, idx) => (
+                  <option key={`source${idx}`} value={ext.sourceName}>
+                    Source {idx}
                   </option>
                 ))}
               </select>
@@ -313,7 +290,7 @@ const ShinobuDetail = () => {
                     <ChapterCard
                       key={chapter._id}
                       chapter={chapter}
-                      type={media.type.toLowerCase() as "novel" | "comic"}
+                      type={media.type.toLowerCase() as "NOVEL" | "COMIC"}
                       detail={media}
                     />
                   ))}

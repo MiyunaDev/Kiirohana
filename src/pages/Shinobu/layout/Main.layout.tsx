@@ -2,8 +2,6 @@
 import { FaBook, FaHistory, FaSearch, FaCog } from 'react-icons/fa';
 import { Link, Outlet, useLocation } from 'react-router';
 
-import { useState } from 'react';
-
 const navItems = [
     { to: "/app/library", icon: <FaBook size={18} />, label: "Library" },
     { to: "/app/history", icon: <FaHistory size={18} />, label: "History" },

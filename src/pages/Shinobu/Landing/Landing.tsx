@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
 import { useShinobu } from "../../../hooks/useShinobu";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link } from "react-router";
 import { ServiceItem } from "../../../interfaces/Service";
-import { useLocalStorage } from "../../../hooks/useLocalStorage";
 import { shinobuFetch } from "../../../utils/fetchShinobu";
 
 /* ===================== Types ===================== */
-
-type ServicesStorage = {
-    honoka: ServiceItem | null;
-    shinobu: ServiceItem[];
-};
 
 /* --- API schema --- */
 interface ApiMediaWrapper {
@@ -98,39 +92,13 @@ const MangaCard = ({ manga, service }: { manga: MangaItem, service: ServiceItem 
 );
 
 const Landing = () => {
-    const { user } = useShinobu()
+    const { service, user } = useShinobu()
     const [time, setTime] = useState<string>()
-
-    const navigate = useNavigate();
-    const { shinobuid } = useParams();
-
-    const [services] =
-        useLocalStorage<ServicesStorage>("services", {
-            honoka: null,
-            shinobu: [],
-        });
-
-    const [service, setService] =
-        useState<ServiceItem | null>(null);
 
     const [data, setData] = useState<MangaItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [_, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (!shinobuid) return;
-
-        const current = services.shinobu.find(
-            s => s.id === shinobuid
-        );
-
-        if (!current) {
-            navigate("/#/shinobu", { replace: true });
-            return;
-        }
-
-        setService(current);
-    }, [shinobuid, services, navigate]);
 
     /* ===== Fetch ===== */
 

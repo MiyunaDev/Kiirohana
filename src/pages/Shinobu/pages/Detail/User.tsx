@@ -1,30 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { shinobuFetch } from "../../../../utils/fetchShinobu";
-import { useLocalStorage } from "../../../../hooks/useLocalStorage";
-import type { ServiceItem } from "../../../../interfaces/Service";
 import type { ShinobuUser } from "../../../../interfaces/ShinobuSession";
-
-type ServicesStorage = {
-    honoka: ServiceItem | null;
-    shinobu: ServiceItem[];
-};
+import { useShinobu } from "../../../../hooks/useShinobu";
 
 export default function UserProfilePage() {
     const navigate = useNavigate();
-    const { shinobuid } = useParams();
-
-    const [services] =
-        useLocalStorage<ServicesStorage>("services", {
-            honoka: null,
-            shinobu: [],
-        });
-
-    const [service, setService] =
-        useState<ServiceItem | null>(null);
+    const { service } = useShinobu()
 
     const [user, setUser] =
         useState<ShinobuUser | null>(null);
@@ -40,23 +25,6 @@ export default function UserProfilePage() {
         useState<string | null>(null);
 
     const [saving, setSaving] = useState(false);
-
-    /* ================= RESOLVE SERVICE ================= */
-
-    useEffect(() => {
-        if (!shinobuid) return;
-
-        const current = services.shinobu.find(
-            (s) => s.id === shinobuid
-        );
-
-        if (!current) {
-            navigate("/shinobu", { replace: true });
-            return;
-        }
-
-        setService(current);
-    }, [shinobuid, services]);
 
     /* ================= FETCH PROFILE ================= */
 

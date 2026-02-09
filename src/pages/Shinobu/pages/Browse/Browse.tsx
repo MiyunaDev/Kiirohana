@@ -5,9 +5,7 @@ import {
   useState,
 } from "react";
 import {
-  Link,
-  useNavigate,
-  useParams,
+  Link
 } from "react-router";
 import {
   FaMagnifyingGlass,
@@ -15,19 +13,14 @@ import {
   FaFilter,
 } from "react-icons/fa6";
 
-import { useLocalStorage } from "../../../../hooks/useLocalStorage";
 import { ServiceItem } from "../../../../interfaces/Service";
 import { shinobuFetch } from "../../../../utils/fetchShinobu";
+import { useShinobu } from "../../../../hooks/useShinobu";
 
 /* ===================== Types ===================== */
 
-type ServicesStorage = {
-  honoka: ServiceItem | null;
-  shinobu: ServiceItem[];
-};
 
 /* --- API schema --- */
-/* --- Update API schema --- */
 interface ApiMediaWrapper {
   _id: string;
   media: {
@@ -185,18 +178,7 @@ const AdvanceSearchModal = ({
 /* ===================== Main Page ===================== */
 
 const MangaListPage = () => {
-  const navigate = useNavigate();
-  const { shinobuid } = useParams();
-
-  const [services] =
-    useLocalStorage<ServicesStorage>("services", {
-      honoka: null,
-      shinobu: [],
-    });
-
-  const [service, setService] =
-    useState<ServiceItem | null>(null);
-
+  const { service } = useShinobu()
   const [data, setData] = useState<MangaItem[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -211,23 +193,6 @@ const MangaListPage = () => {
   });
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-
-  /* ===== Resolve Service ===== */
-
-  useEffect(() => {
-    if (!shinobuid) return;
-
-    const current = services.shinobu.find(
-      s => s.id === shinobuid
-    );
-
-    if (!current) {
-      navigate("/#/shinobu", { replace: true });
-      return;
-    }
-
-    setService(current);
-  }, [shinobuid, services, navigate]);
 
   /* ===== Fetch ===== */
 
