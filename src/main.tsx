@@ -94,10 +94,14 @@ const router = createHashRouter([
                 path: "detail/:mediaId",
                 Component: ShinobuDetail,
               },
-              // {
-              //   path: "reader/:mediaId/:chapterId",
-              //   Component: MediaReaderPage,
-              // },
+              {
+                path: "reader/novel/:chapterId",
+                Component: NovelReader,
+              },
+              {
+                path: "reader/novel/:chapterId",
+                Component: ComicReader,
+              },
             ]
           }
         ]
