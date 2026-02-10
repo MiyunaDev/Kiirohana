@@ -2,6 +2,8 @@
  * Shinobu Fetch Utils (TypeScript)
  * =============================== */
 
+import { ShinobuAuthError, ShinobuBackendError, ShinobuNetworkError } from "./handleShinobu";
+
 export interface ShinobuFetchOptions<TBody = unknown> {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: TBody;
@@ -86,15 +88,19 @@ export async function shinobuFetch<
         body == null
           ? undefined
           : isFormData
-          ? body
-          : JSON.stringify(body),
+            ? body
+            : JSON.stringify(body),
     });
 
     const text = await response.text();
     data = text ? JSON.parse(text) : null;
+
   } catch (error) {
-    console.error("Shinobu Fetch Error:", error);
-    throw new Error("Gagal menghubungi server");
+    console.error("Shinobu Network Error:", error);
+
+    throw new ShinobuNetworkError(
+      "Tidak dapat terhubung ke server. Periksa koneksi atau konfigurasi aplikasi."
+    );
   }
 
   /* ---------- Error Handling ---------- */
@@ -102,14 +108,14 @@ export async function shinobuFetch<
   if (!response.ok) {
     const message =
       (data as ShinobuErrorResponse)?.message ??
-      "Terjadi kesalahan";
+      `Server error (${response.status})`;
 
     if (
       message ===
       "Akses ditolak: kredensial aplikasi tidak lengkap"
     ) {
       redirectTo("/settings/service");
-      throw new Error(message);
+      throw new ShinobuAuthError(message);
     }
 
     if (
@@ -118,10 +124,10 @@ export async function shinobuFetch<
     ) {
       localStorage.removeItem(`${localId}-auth-token`);
       redirectTo("/shinobu/signin");
-      throw new Error(message);
+      throw new ShinobuAuthError(message);
     }
 
-    throw new Error(message);
+    throw new ShinobuBackendError(message, response.status);
   }
 
   return data as TResponse;
