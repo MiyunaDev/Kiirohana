@@ -16,7 +16,7 @@ import History from './pages/History/History.tsx';
 import Detail from './pages/Detail/Detail.tsx';
 import DetailLayout from './layout/DetailLayout.tsx';
 import ComicReader from './pages/Shinobu/pages/Comic/Reader.tsx';
-import NovelReader from './pages/Shinobu/pages/Novel/Reader.tsx';
+// import NovelReader from './pages/Shinobu/pages/Novel/Reader.tsx';
 
 import Settings from './pages/Settings/Settings.tsx';
 import ServicesSetting from './pages/Settings/ServicesSetting.tsx';
@@ -62,8 +62,8 @@ const router = createHashRouter([
           { index: true, Component: Detail },
           {
             path: "reader", children: [
-              { path: "comic", Component: ComicReader },
-              { path: "novel", Component: NovelReader },
+              // { path: "comic", Component: ComicReader },
+              // { path: "novel", Component: NovelReader },
             ]
           }
         ]
@@ -94,10 +94,10 @@ const router = createHashRouter([
                 path: "detail/:mediaId",
                 Component: ShinobuDetail,
               },
-              {
-                path: "reader/novel/:chapterId",
-                Component: NovelReader,
-              },
+              // {
+              //   path: "reader/novel/:chapterId",
+              //   Component: NovelReader,
+              // },
               {
                 path: "reader/comic/:chapterId",
                 Component: ComicReader,
