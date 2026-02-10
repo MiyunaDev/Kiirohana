@@ -1,29 +1,25 @@
 import { useEffect, useState } from "react";
-import { useShinobu } from "../../../hooks/useShinobu";
+import { useShinobu } from "../../../../hooks/useShinobu";
 import { Link } from "react-router";
-import { ServiceItem } from "../../../interfaces/Service";
-import { shinobuFetch } from "../../../utils/fetchShinobu";
+import { ServiceItem } from "../../../../interfaces/Service";
+import { shinobuFetch } from "../../../../utils/fetchShinobu";
 
 /* ===================== Types ===================== */
 
 /* --- API schema --- */
 interface ApiMediaWrapper {
     _id: string;
-    media: {
-        _id: string;
-        title: string;
-        alternativeTitle: string[];
-        description: string | null;
-        genres: { name: string }[];
-        coverImage: string;
-        bannerImage?: string;
-        status: "ONGOING" | "COMPLETED" | "HIATUS";
-        type: "COMIC" | "NOVEL" | "TV";
-        releaseDate: string | null;
-        createdAt: string;
-        updatedAt: string;
-    };
-    lastUploadedAt: string;
+    title: string;
+    alternativeTitle?: string[];
+    description?: string | null;
+    genres?: { name: string }[];
+    coverImage?: string;
+    bannerImage?: string;
+    status?: "ONGOING" | "COMPLETED" | "HIATUS";
+    type: "COMIC" | "NOVEL" | "TV";
+    releaseDate?: string | null;
+    createdAt: string;
+    updatedAt: string;
 }
 
 /* --- Update API response --- */
@@ -38,11 +34,11 @@ export interface LatestMediaResponseWrapper {
 /* --- Update Adapter --- */
 const mapApiMediaWrapperToManga = (m: ApiMediaWrapper): MangaItem => ({
     id: m._id,
-    title: m.media.title,
-    cover: m.media.coverImage,
-    genres: m.media.genres.map(g => g.name),
-    description: m.media.description,
-    type: m.media.type
+    title: m.title,
+    cover: m.coverImage,
+    genres: m.genres?.map(g => g.name) ?? [],
+    description: m.description,
+    type: m.type
 });
 
 /* --- API response --- */
@@ -56,9 +52,9 @@ export interface ApiLatestStatus {
 interface MangaItem {
     id: string;
     title: string;
-    cover: string;
-    genres: string[];
-    description: string | null;
+    cover?: string;
+    genres?: string[];
+    description?: string | null;
     type: "COMIC" | "NOVEL" | "TV"
 }
 
@@ -71,7 +67,7 @@ const MangaCard = ({ manga, service }: { manga: MangaItem, service: ServiceItem 
     >
         <div className="relative w-full">
             <img
-                src={manga.cover}
+                src={manga?.cover ?? `${service.url}/assets/noimage.png`}
                 alt={manga.title}
                 className="w-full aspect-[2/3] object-cover bg-gray-300 rounded-xl"
                 loading="lazy"
@@ -118,7 +114,6 @@ const Landing = () => {
             );
 
             const mapped = res.result
-                .sort((a, b) => new Date(b.lastUploadedAt).getTime() - new Date(a.lastUploadedAt).getTime()) // sort terbaru
                 .map(mapApiMediaWrapperToManga);
 
             setData(mapped)

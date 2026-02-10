@@ -4,10 +4,10 @@ import { useState } from 'react'
 
 import LanguageEnum from '../../enums/LanguageEnum'
 import { Link } from 'react-router'
-import { library } from '../../../demo'
+// import { library } from '../../../demo'
 
 const Library = () => {
-    const [libraries, _] = useState<Array<any>>(library)
+    const [libraries, _] = useState<Array<any>>([])
 
     return (
         <div className="w-full h-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 max-w-screen-xl mx-auto px-2">

@@ -1,16 +1,10 @@
 import {
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
-import {
-  Link
-} from "react-router";
-import {
-  FaXmark,
-  FaFilter,
-} from "react-icons/fa6";
+import { Link } from "react-router";
+import { FaXmark, FaFilter } from "react-icons/fa6";
 
 import { ServiceItem } from "../../../../interfaces/Service";
 import { shinobuFetch } from "../../../../utils/fetchShinobu";
@@ -18,28 +12,21 @@ import { useShinobu } from "../../../../hooks/useShinobu";
 
 /* ===================== Types ===================== */
 
-
-/* --- API schema --- */
 interface ApiMediaWrapper {
   _id: string;
-  media: {
-    _id: string;
-    title: string;
-    alternativeTitle: string[];
-    description: string | null;
-    genres: { name: string }[];
-    coverImage: string;
-    bannerImage?: string;
-    status: "ONGOING" | "COMPLETED" | "HIATUS";
-    type: "COMIC" | "NOVEL" | "TV";
-    releaseDate: string | null;
-    createdAt: string;
-    updatedAt: string;
-  };
-  lastUploadedAt: string;
+  title: string;
+  alternativeTitle?: string[];
+  description?: string | null;
+  genres?: { name: string }[];
+  coverImage?: string;
+  bannerImage?: string;
+  status?: "ONGOING" | "COMPLETED" | "HIATUS";
+  type: "COMIC" | "NOVEL" | "TV";
+  releaseDate?: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
-/* --- Update API response --- */
 export interface LatestMediaResponseWrapper {
   success: boolean;
   fetchedAt: string;
@@ -48,41 +35,40 @@ export interface LatestMediaResponseWrapper {
   result: ApiMediaWrapper[];
 }
 
-/* --- Update Adapter --- */
-const mapApiMediaWrapperToManga = (m: ApiMediaWrapper): MangaItem => ({
-  id: m._id,
-  title: m.media.title,
-  thumbnail: m.media.coverImage,
-  genres: m.media.genres.map(g => g.name),
-  description: m.media.description
-});
-
-/* --- API response --- */
-export interface ApiLatestStatus {
-  refreshed: number;   // berhasil fetch
-  cooldown: number;    // dilewati karena cooldown
-  fail: number;        // error
+interface ApiLatestStatus {
+  refreshed: number;
+  cooldown: number;
+  fail: number;
 }
 
-/* --- UI model --- */
 interface MangaItem {
   id: string;
   title: string;
-  thumbnail: string;
-  genres: string[];
-  description: string | null;
+  cover?: string;
+  genres?: string[];
+  description?: string | null;
+  type: "COMIC" | "NOVEL" | "TV";
 }
+
+const mapApiMediaWrapperToManga = (m: ApiMediaWrapper): MangaItem => ({
+  id: m._id,
+  title: m.title,
+  cover: m.coverImage,
+  genres: m.genres?.map(g => g.name) ?? [],
+  description: m.description,
+  type: m.type,
+});
 
 /* ===================== Manga Card ===================== */
 
-const MangaCard = ({ manga, service }: { manga: MangaItem, service: ServiceItem }) => (
+const MangaCard = ({ manga, service }: { manga: MangaItem; service: ServiceItem }) => (
   <Link
     to={`/shinobu/${service.id}/detail/${manga.id}`}
     className="flex flex-col w-full min-w-[120px] max-w-[180px] mx-auto"
   >
     <div className="relative w-full">
       <img
-        src={manga.thumbnail}
+        src={manga?.cover ?? `${service.url}/assets/noimage.png`}
         alt={manga.title}
         className="w-full aspect-[2/3] object-cover bg-gray-300 rounded-xl"
         loading="lazy"
@@ -91,6 +77,10 @@ const MangaCard = ({ manga, service }: { manga: MangaItem, service: ServiceItem 
         Shinobu
       </span>
     </div>
+
+    <a className="w-1/2 rounded-br-2xl px-0.5 py-1 text-xs text-center bg-[#C667F7]">
+      {manga.type}
+    </a>
 
     <span className="mt-1 text-xs font-semibold text-center line-clamp-2">
       {manga.title}
@@ -107,11 +97,7 @@ const AdvanceSearchModal = ({
 }: {
   open: boolean;
   onClose: () => void;
-  onApply: (v: {
-    title: string;
-    genre: string;
-    adult: boolean;
-  }) => void;
+  onApply: (v: { title: string; genre: string; adult: boolean }) => void;
 }) => {
   const [title, setTitle] = useState("");
   const [genre, setGenre] = useState("");
@@ -121,15 +107,9 @@ const AdvanceSearchModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="relative w-full max-w-md rounded-2xl bg-[#1e1e1e] p-6">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4"
-        >
+        <button onClick={onClose} className="absolute top-4 right-4">
           <FaXmark />
         </button>
 
@@ -177,7 +157,7 @@ const AdvanceSearchModal = ({
 /* ===================== Main Page ===================== */
 
 const MangaListPage = () => {
-  const { service } = useShinobu()
+  const { service } = useShinobu();
   const [data, setData] = useState<MangaItem[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -194,7 +174,6 @@ const MangaListPage = () => {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   /* ===== Fetch ===== */
-
   const fetchLatest = async (targetPage: number) => {
     if (!service || loading || !hasMore) return;
 
@@ -205,18 +184,17 @@ const MangaListPage = () => {
       localStorage.setItem(`${service.id}-x-app-key`, service.accessKey!);
       localStorage.setItem(`${service.id}-x-app-secret`, service.secretKey!);
 
-      const res = await shinobuFetch<LatestMediaResponseWrapper>(
-        `/${service.version?.endpoint}/media/latest?page=${targetPage}`,
-        { baseUrl: service.url, localId: service.id, auth: true }
-      );
+      let url = `/${service.version?.endpoint}/media/latest?page=${targetPage}`;
 
-      // Map API wrapper ke MangaItem
-      const mapped = res.result
-        .sort((a, b) => new Date(b.lastUploadedAt).getTime() - new Date(a.lastUploadedAt).getTime()) // sort terbaru
-        .map(mapApiMediaWrapperToManga);
+      const res = await shinobuFetch<LatestMediaResponseWrapper>(url, {
+        baseUrl: service.url,
+        localId: service.id,
+        auth: true,
+      });
+
+      const mapped = res.result.map(mapApiMediaWrapperToManga);
 
       setData(prev => [...prev, ...mapped]);
-      setPage(targetPage);
       setHasMore(mapped.length === 20);
     } catch {
       setError("Gagal memuat data");
@@ -225,8 +203,7 @@ const MangaListPage = () => {
     }
   };
 
-  /* ===== Initial Load ===== */
-
+  /* ===== Initial Load / Reset on Service or Filter Change ===== */
   useEffect(() => {
     if (!service) return;
 
@@ -235,17 +212,21 @@ const MangaListPage = () => {
     setHasMore(true);
 
     fetchLatest(1);
-  }, [service]);
+  }, [service, filter]);
 
   /* ===== Infinite Scroll ===== */
-
   useEffect(() => {
     if (!loadMoreRef.current) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          fetchLatest(page + 1);
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting && !loading && hasMore) {
+          setPage(prev => {
+            const nextPage = prev + 1;
+            fetchLatest(nextPage);
+            return nextPage;
+          });
         }
       },
       { rootMargin: "200px" }
@@ -253,52 +234,17 @@ const MangaListPage = () => {
 
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [page, hasMore, loading]);
-
-  /* ===== Filter ===== */
-
-  const filteredData = useMemo(() => {
-    return data.filter(m => {
-      if (
-        filter.title &&
-        !m.title
-          .toLowerCase()
-          .includes(filter.title.toLowerCase())
-      ) return false;
-
-      if (
-        filter.genre &&
-        !m.genres.some(g =>
-          g.toLowerCase().includes(
-            filter.genre.toLowerCase()
-          )
-        )
-      ) return false;
-
-      // if (!filter.adult && m.isAdult) return false;
-
-      return true;
-    });
-  }, [data, filter]);
+  }, [loading, hasMore, filter, service]);
 
   /* ===== Render ===== */
-
   return (
     <>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 max-w-screen-xl mx-auto px-2">
-        {service && filteredData.map(m => (
-          <MangaCard key={m.id} manga={m} service={service} />
-        ))}
+        {service &&
+          data.map(m => <MangaCard key={m.id} manga={m} service={service} />)}
 
-        <div
-          ref={loadMoreRef}
-          className="col-span-full flex justify-center py-6"
-        >
-          {loading && (
-            <span className="text-sm animate-pulse">
-              Memuat data...
-            </span>
-          )}
+        <div ref={loadMoreRef} className="col-span-full flex justify-center py-6">
+          {loading && <span className="text-sm animate-pulse">Memuat data...</span>}
 
           {error && (
             <button
@@ -310,9 +256,7 @@ const MangaListPage = () => {
           )}
 
           {!hasMore && !loading && (
-            <span className="text-xs text-gray-500">
-              Tidak ada data lagi
-            </span>
+            <span className="text-xs text-gray-500">Tidak ada data lagi</span>
           )}
         </div>
       </div>

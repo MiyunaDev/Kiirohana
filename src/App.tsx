@@ -6,7 +6,7 @@ const App = () => {
 
     useEffect(() => {
         setTimeout(() => { 
-            navigate("/app/library") 
+            navigate("/app/library", { replace: true }) 
         }, 3500)
     }, [navigate])
 

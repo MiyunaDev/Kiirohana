@@ -1,7 +1,6 @@
 import { Link } from "react-router"
-import { Chapter } from "../types/Series"
 
-const PageChanger = ({ to, chapter, chapterPreview, type }: { to?: string, chapter: Chapter | null, chapterPreview: string, type: "next" | "before" }) => {
+const PageChanger = ({ to, chapter, chapterPreview, type }: { to?: string, chapter: any, chapterPreview?: string, type: "next" | "before" }) => {
     return (
         <Link
             to={to as string}

@@ -31,7 +31,7 @@ import ShinobuLogin from './pages/Shinobu/pages/System/Login.tsx';
 import { ShinobuProvider } from './contexts/ShinobuContext.tsx';
 import ShinobuDetail from './pages/Shinobu/pages/Detail/Media.tsx';
 import MainLayout from './pages/Shinobu/layout/Main.layout.tsx';
-import Landing from './pages/Shinobu/Landing/Landing.tsx';
+import Landing from './pages/Shinobu/pages/Landing/Landing.tsx';
 
 const router = createHashRouter([
   {
@@ -99,7 +99,7 @@ const router = createHashRouter([
                 Component: NovelReader,
               },
               {
-                path: "reader/novel/:chapterId",
+                path: "reader/comic/:chapterId",
                 Component: ComicReader,
               },
             ]

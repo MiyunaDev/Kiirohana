@@ -5,24 +5,24 @@ import { library } from "../../../../../demo.ts";
 import LazyImage from "../../../../components/LazyImage.tsx";
 import PageChanger from "../../../../components/PageChanger.tsx";
 
-function getPreview(chapter: Chapter, type: string): string {
-    const slc = chapter.content
-        .filter(co => typeof co === "string" || (typeof co === "object" && co.url))
-        .map(content => typeof content === "string" ? content : content.url) as string[];
+// function getPreview(chapter: Chapter, type: string): string {
+//     const slc = chapter.content
+//         .filter(co => typeof co === "string" || (typeof co === "object" && co.url))
+//         .map(content => typeof content === "string" ? content : content.url) as string[];
 
-    if (!slc.length) return "";
+//     if (!slc.length) return "";
 
-    if (type === "novel") {
-        return slc[0];
-    } else {
-        if (slc.length === 1) return slc[0];
-        if (slc.length < 3) return slc[slc.length - 1];
+//     if (type === "novel") {
+//         return slc[0];
+//     } else {
+//         if (slc.length === 1) return slc[0];
+//         if (slc.length < 3) return slc[slc.length - 1];
 
-        let page = Math.floor(slc.length * 0.05);
-        if (page < 2) page = 2;
-        return slc[page];
-    }
-}
+//         let page = Math.floor(slc.length * 0.05);
+//         if (page < 2) page = 2;
+//         return slc[page];
+//     }
+// }
 
 const NovelReader = () => {
     const [searchParams] = useSearchParams();

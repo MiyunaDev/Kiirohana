@@ -18,34 +18,29 @@ const LazyImage: React.FC<LazyImageProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
   const [retryKey, setRetryKey] = useState<number>(0);
+
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Observe visibility
+  // Intersection Observer untuk lazy loading
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
+      (entries, obs) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setIsVisible(true);
-            observer.disconnect();
+            obs.disconnect();
           }
         });
       },
-      {
-        rootMargin: '100px', // preload 100px sebelum viewport
-        threshold: 0.1,
-      }
+      { rootMargin: '200px', threshold: 0.1 }
     );
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
+    if (containerRef.current) observer.observe(containerRef.current);
 
-    return () => {
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, []);
 
+  // Load image
   const loadImage = (imageUrl: string) => {
     setLoading(true);
     setError(false);
@@ -58,49 +53,54 @@ const LazyImage: React.FC<LazyImageProps> = ({
     };
 
     img.onerror = () => {
-      setError(true);
-      setLoading(false);
+      if (fallbackSrc && imageUrl !== fallbackSrc) {
+        loadImage(fallbackSrc);
+      } else {
+        setError(true);
+        setLoading(false);
+      }
     };
   };
 
   useEffect(() => {
-    if (isVisible && src) {
-      loadImage(src);
-    }
+    if (isVisible && src) loadImage(src);
   }, [isVisible, src, retryKey]);
 
   return (
-    <div ref={containerRef} className={`relative w-full ${loading ? '' : 'h-auto'}`}>
+    <div ref={containerRef} className={`relative w-full max-w-full ${loading ? 'min-h-[300px]' : 'h-auto'} ${className}`}>
+      {/* Placeholder loading */}
       {loading && (
         <div
-          className="flex flex-col items-center justify-center text-gray-400"
-          style={{ height: placeholderHeight }}
+          className="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 dark:bg-gray-900"
+          style={{ minHeight: placeholderHeight }}
         >
-          <div className="w-10 h-10 border-4 border-t-blue-500 border-gray-300 rounded-full animate-spin" />
-          <p className="mt-2 text-sm">Loading...</p>
+          <div className="w-12 h-12 border-4 border-t-blue-500 border-gray-400 rounded-full animate-spin" />
+          <p className="mt-2 text-sm text-gray-300 dark:text-gray-400">Loading...</p>
         </div>
       )}
 
+      {/* Error */}
       {error && !loading && !imageSrc && (
         <div
-          className="text-center text-red-200 bg-red-50 flex flex-col items-center justify-center"
-          style={{ height: placeholderHeight }}
+          className="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 dark:bg-gray-900 text-center p-4"
+          style={{ minHeight: placeholderHeight }}
         >
-          <p className="mb-2">Gagal memuat gambar</p>
+          <p className="mb-2 text-red-400">Gagal memuat gambar</p>
           <button
             onClick={() => setRetryKey((prev) => prev + 1)}
-            className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+            className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition"
           >
             Coba Lagi
           </button>
         </div>
       )}
 
+      {/* Image */}
       {imageSrc && (
         <img
           src={imageSrc}
           alt={alt}
-          className={`w-full h-auto object-cover ${className}`}
+          className={`w-full h-auto object-contain transition-all duration-300 ${className}`}
           {...props}
         />
       )}

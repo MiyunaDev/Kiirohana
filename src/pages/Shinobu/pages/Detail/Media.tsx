@@ -1,4 +1,4 @@
-// ... imports sama seperti sebelumnya
+// ShinobuDetail.tsx
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router";
 import { motion } from "framer-motion";
@@ -8,127 +8,118 @@ import { useShinobu } from "../../../../hooks/useShinobu";
 /* ================= Types ================= */
 
 export interface Media {
-    _id: string;
-    title: string;
-    description: string | null;
-    coverImage: string;
-    bannerImage?: string;
-    type: "COMIC" | "NOVEL" | "TV";
-    status: string;
-    genres: { name: string; slug: string }[];
-    tags: { name: string; slug: string }[];
+  _id: string;
+  title: string;
+  description: string | null;
+  coverImage: string;
+  bannerImage?: string;
+  type: "COMIC" | "NOVEL" | "TV";
+  status: string;
+  genres: { name: string; slug: string }[];
+  tags: { name: string; slug: string }[];
 }
 
-export interface Chapter {
+export interface ChapterContentItem {
+  _id: string;
+  chapter: string;
+  mediaExternal: string;
+  language: string;
+  authors: string[];
+  content: Array<string | { url: string }>;
+  extension: string;
+  isApproved: boolean;
+  raw: any;
+  createdAt: string;
+  updatedAt: string;
+  uploadedAt: string;
+  url?: string;
+}
+
+export interface ChapterTreeItem {
+  chapter: {
     _id: string;
-    id: string; // untuk ChapterCard destination
     chapter: number;
-    volume: number;
-    title?: string;
-    content: Array<string | { url: string }>; // penting untuk preview
-    createdAt?: string;
+    volume: number | null;
+    media: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  hasContent: boolean;
+  contentId?: string;
+  content?: ChapterContentItem;
 }
 
 interface ExternalData {
-    sourceName: string;
-    chapters: Chapter[];
+  sourceName: string;
+  chapters: ChapterTreeItem[];
 }
-
-const ChapterCard = ({
-    chapter,
-    type,
-    detail
-}: {
-    chapter: Chapter;
-    type?: "NOVEL" | "COMIC";
-    detail: Media
-}) => {
-    const [preview, setPreview] = useState<string>();
-    const [destination, setDestination] = useState<string>()
-
-    useEffect(() => {
-        if (chapter.content) {
-            const slc = chapter.content
-                .filter(
-                    (co) =>
-                        typeof co === "string" || (typeof co === "object" && co.url)
-                )
-                .map((content) =>
-                    typeof content === "string" ? content : content.url
-                ) as string[];
-
-            let previewUrl: string | undefined;
-
-            if (type === "COMIC") {
-                previewUrl = slc[0];
-            } else {
-                if (slc.length === 1) {
-                    previewUrl = slc[0];
-                } else if (slc.length < 3) {
-                    previewUrl = slc[slc.length - 1];
-                } else {
-                    let page = Math.floor(slc.length * 0.05);
-                    if (page < 2) page = 2;
-                    previewUrl = slc[page];
-                }
-            }
-
-            setPreview(previewUrl);
-        }
-
-        if (type === "COMIC") {
-            setDestination(`/detail/reader/comic?title=${encodeURIComponent(detail.title)}&chapterid=${encodeURIComponent(chapter.id)}`)
-        } else if (type === "NOVEL") {
-            setDestination(`/detail/reader/novel?title=${encodeURIComponent(detail.title)}&chapterid=${encodeURIComponent(chapter.id)}`)
-        }
-
-    }, [chapter, type]);
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
-            whileHover={{ scale: 1.015 }}
-            whileTap={{ scale: 0.98 }}
-        >
-            <Link to={destination as string} className="relative flex flex-row items-center p-2 h-24 gap-2 group before:absolute before:z-10 before:left-0 before:top-0
-        before:min-h-full before:rounded-r-full before:transition-all before:duration-500
-        hover:shadow active:shadow hover:shadow-[#C667F7] active:shadow-[#C667F7]
-        before:w-0 hover:before:w-screen active:before:w-screen before:bg-[#C667F7] overflow-hidden rounded-r-xl">
-                {preview && (
-                    <div className={`relative z-10 w-15 aspect-[3/4] ${type === "NOVEL" ? "group-hover:after:to-[rgba(198,103,247,0.7)] group-active:after:to-[rgba(198,103,247,0.7)] after:absolute after:inset-0 after:bg-gradient-to-r after:from-[rgba(0,0,0,0.2)] after:to-[rgba(0,0,0,1)] transition-all duration-500" : ""}`}>
-                        <img
-                            className="w-full h-full object-cover object-top"
-                            src={preview}
-                            alt="Chapter preview"
-                        />
-                    </div>
-
-                )}
-                <div className={`flex z-10 flex-col ${type === "NOVEL" ? "absolute left-10" : ""}`}>
-                    <a>
-                        {chapter.volume !== 0 ? `Volume ${chapter.volume} ` : ""}
-                        Chapter {chapter.chapter}
-                    </a>
-                </div>
-            </Link>
-        </motion.div>
-    );
-};
 
 /* ================= ChapterCard ================= */
 
-// Paste ChapterCard yang kamu kirim di sini (tidak perlu diubah)
+const ChapterCard = ({
+  chapter,
+  type,
+}: {
+  chapter: ChapterTreeItem;
+  type?: "NOVEL" | "COMIC" | "TV";
+  detail: Media;
+}) => {
+  const { service } = useShinobu();
+
+  // Tentukan preview image/text
+  const previewUrl = chapter.content?.content?.[0]
+    ? typeof chapter.content.content[0] === "string"
+      ? chapter.content.content[0]
+      : (chapter.content.content[0] as { url: string }).url
+    : undefined;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      whileHover={{ scale: 1.015 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      <Link
+        to={`/shinobu/${service?.id}/reader/${type?.toLowerCase()}/${chapter.content?._id}`}
+        className="relative flex flex-row items-center p-2 h-24 gap-2 group before:absolute before:z-10 before:left-0 before:top-0
+          before:min-h-full before:rounded-r-full before:transition-all before:duration-500
+          hover:shadow active:shadow hover:shadow-[#C667F7] active:shadow-[#C667F7]
+          before:w-0 hover:before:w-screen active:before:w-screen before:bg-[#C667F7] overflow-hidden rounded-r-xl"
+      >
+        {previewUrl && (
+          <div className="relative z-10 w-15 aspect-[3/4]">
+            <img
+              className="w-full h-full object-cover object-top"
+              src={previewUrl}
+              alt="Chapter preview"
+            />
+          </div>
+        )}
+        <div className={`flex z-10 flex-col ${type === "NOVEL" ? "absolute left-10" : ""}`}>
+          <a>
+            {chapter.chapter.volume && chapter.chapter.volume !== 0
+              ? `Volume ${chapter.chapter.volume} `
+              : ""}
+            Chapter {chapter.chapter.chapter}
+          </a>
+        </div>
+      </Link>
+    </motion.div>
+  );
+};
+
+/* ================= ShinobuDetail ================= */
 
 const ShinobuDetail = () => {
   const { mediaId } = useParams();
-  const { service } = useShinobu()
+  const { service } = useShinobu();
 
   const [media, setMedia] = useState<Media | null>(null);
   const [externals, setExternals] = useState<ExternalData[]>([]);
-  const [selectedSource, setSelectedSource] = useState<string | null>(null); // <-- New
+  const [selectedSource, setSelectedSource] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -138,13 +129,14 @@ const ShinobuDetail = () => {
     const fetchDetail = async () => {
       try {
         setLoading(true);
+
         const res = await shinobuFetch<{
           success: boolean;
           media: Media;
           tree: {
             externals: {
               source: { name: string };
-              chapters: { chapter: Chapter }[];
+              chapters: ChapterTreeItem[];
             }[];
           };
         }>(`/${service.version?.endpoint}/media/${mediaId}`, {
@@ -155,14 +147,14 @@ const ShinobuDetail = () => {
 
         setMedia(res.media);
 
-        const externalData = res.tree.externals.map((ext) => ({
+        const externalData: ExternalData[] = res.tree.externals.map((ext) => ({
           sourceName: ext.source.name,
-          chapters: ext.chapters.map((c) => c.chapter),
+          chapters: ext.chapters,
         }));
 
         setExternals(externalData);
 
-        // Set default selected source
+        // Default selected source
         if (externalData.length > 0) setSelectedSource(externalData[0].sourceName);
       } catch (err) {
         console.error(err);
@@ -179,7 +171,6 @@ const ShinobuDetail = () => {
   if (error) return <div className="p-6">{error}</div>;
   if (!media) return null;
 
-  // Filter chapters based on selected source
   const currentExternal = externals.find((e) => e.sourceName === selectedSource);
 
   return (
@@ -192,7 +183,6 @@ const ShinobuDetail = () => {
       <div className="w-full flex flex-col md:grid md:grid-cols-2">
         {/* Left Panel */}
         <div className="relative w-full overflow-hidden">
-          {/* Banner & Cover */}
           <motion.div
             initial={{ scale: 1.05, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -251,9 +241,8 @@ const ShinobuDetail = () => {
           </motion.div>
         </div>
 
-        {/* Right Panel: Externals & Chapters */}
+        {/* Right Panel */}
         <div className="relative w-full overflow-hidden p-4 gap-4">
-          {/* Source Selector */}
           {externals.length > 1 && (
             <div className="mb-4">
               <label className="mr-2 font-medium">Pilih Source:</label>
@@ -262,35 +251,37 @@ const ShinobuDetail = () => {
                 value={selectedSource ?? ""}
                 onChange={(e) => setSelectedSource(e.target.value)}
               >
-                {externals.map((ext, idx) => (
-                  <option key={`source${idx}`} value={ext.sourceName}>
-                    Source {idx}
+                {externals.map((ext) => (
+                  <option key={ext.sourceName} value={ext.sourceName}>
+                    {ext.sourceName}
                   </option>
                 ))}
               </select>
             </div>
           )}
 
-          {/* Chapters */}
           {currentExternal ? (
-            Object.entries(
+            Array.from(
               currentExternal.chapters.reduce(
-                (acc: Record<number, Chapter[]>, ch) => {
-                  if (!acc[ch.volume]) acc[ch.volume] = [];
-                  acc[ch.volume].push(ch);
-                  return acc;
+                (map: Map<number, ChapterTreeItem[]>, ch: ChapterTreeItem) => {
+                  const vol = ch.chapter.volume ?? 0;
+                  if (!map.has(vol)) map.set(vol, []);
+                  map.get(vol)!.push(ch);
+                  return map;
                 },
-                {}
+                new Map<number, ChapterTreeItem[]>()
               )
             ).map(([volume, chapters]) => (
               <div key={volume} className="mb-3">
-                <h3 className="font-medium mb-1">Volume {volume}</h3>
+                <h3 className="font-medium mb-1">
+                  Volume {volume !== 0 ? volume : "Misc"}
+                </h3>
                 <div className="flex flex-col">
-                  {chapters.map((chapter) => (
+                  {chapters.map((ch) => (
                     <ChapterCard
-                      key={chapter._id}
-                      chapter={chapter}
-                      type={media.type.toLowerCase() as "NOVEL" | "COMIC"}
+                      key={ch.chapter._id}
+                      chapter={ch}
+                      type={media.type as "NOVEL" | "COMIC"}
                       detail={media}
                     />
                   ))}
