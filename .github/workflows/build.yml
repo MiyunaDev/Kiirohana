@@ -230,7 +230,7 @@ jobs:
             cordova/platforms/electron/build/*.app
             cordova/platforms/electron/build/*.pkg
             cordova/platforms/electron/build/*.tar.gz
-    notify-telegram:
+  notify-telegram:
     runs-on: ubuntu-latest
     needs:
       - build-android
