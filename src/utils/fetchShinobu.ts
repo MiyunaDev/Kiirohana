@@ -1,7 +1,8 @@
 /* ===============================
- * Shinobu Fetch Utils (TypeScript)
+ * Shinobu Fetch Utils with Axios (TypeScript)
  * =============================== */
 
+import axios, { AxiosRequestConfig } from "axios";
 import { ShinobuAuthError, ShinobuBackendError, ShinobuNetworkError } from "./handleShinobu";
 
 export interface ShinobuFetchOptions<TBody = unknown> {
@@ -12,12 +13,6 @@ export interface ShinobuFetchOptions<TBody = unknown> {
   baseUrl?: string;
   localId: string; // WAJIB
 }
-
-interface ShinobuErrorResponse {
-  message?: string;
-}
-
-/* ---------- Helpers ---------- */
 
 const getAppCredentials = (localId: string) => ({
   appKey: localStorage.getItem(`${localId}-x-app-key`),
@@ -30,8 +25,6 @@ const getAuthToken = (localId: string): string | null =>
 const redirectTo = (path: string): void => {
   window.location.href = path;
 };
-
-/* ---------- Core Fetch ---------- */
 
 export async function shinobuFetch<
   TResponse = unknown,
@@ -70,65 +63,52 @@ export async function shinobuFetch<
     ...headers,
   };
 
-  /**
-   * ❗ Jangan set Content-Type untuk FormData
-   */
   if (!isFormData) {
     requestHeaders["Content-Type"] ??= "application/json";
   }
 
-  let response: Response;
-  let data: TResponse | ShinobuErrorResponse | null = null;
+  const axiosConfig: AxiosRequestConfig = {
+    url: `${baseUrl}${endpoint}`,
+    method,
+    headers: requestHeaders,
+    data: isFormData ? body : body ?? undefined,
+  };
 
   try {
-    response = await fetch(`${baseUrl}${endpoint}`, {
-      method,
-      headers: requestHeaders,
-      body:
-        body == null
-          ? undefined
-          : isFormData
-            ? body
-            : JSON.stringify(body),
-    });
+    const response = await axios(axiosConfig);
+    return response.data as TResponse;
+  } catch (error: any) {
+    if (error.response) {
+      // Error dari server
+      const status = error.response.status;
+      const message = error.response.data?.message ?? `Server error (${status})`;
 
-    const text = await response.text();
-    data = text ? JSON.parse(text) : null;
+      if (
+        message === "Akses ditolak: kredensial aplikasi tidak lengkap"
+      ) {
+        redirectTo("/settings/service");
+        throw new ShinobuAuthError(message);
+      }
 
-  } catch (error) {
-    console.error("Shinobu Network Error:", error);
+      if (
+        message === "User tidak valid" ||
+        message === "Token autentikasi tidak ditemukan"
+      ) {
+        localStorage.removeItem(`${localId}-auth-token`);
+        redirectTo("/shinobu/signin");
+        throw new ShinobuAuthError(message);
+      }
 
-    throw new ShinobuNetworkError(
-      "Tidak dapat terhubung ke server. Periksa koneksi atau konfigurasi aplikasi."
-    );
-  }
-
-  /* ---------- Error Handling ---------- */
-
-  if (!response.ok) {
-    const message =
-      (data as ShinobuErrorResponse)?.message ??
-      `Server error (${response.status})`;
-
-    if (
-      message ===
-      "Akses ditolak: kredensial aplikasi tidak lengkap"
-    ) {
-      redirectTo("/settings/service");
-      throw new ShinobuAuthError(message);
+      throw new ShinobuBackendError(message, status);
+    } else if (error.request) {
+      // Tidak ada respons dari server
+      console.error("Shinobu Network Error:", error);
+      throw new ShinobuNetworkError(
+        "Tidak dapat terhubung ke server. Periksa koneksi atau konfigurasi aplikasi."
+      );
+    } else {
+      // Error lain
+      throw error;
     }
-
-    if (
-      message === "User tidak valid" ||
-      message === "Token autentikasi tidak ditemukan"
-    ) {
-      localStorage.removeItem(`${localId}-auth-token`);
-      redirectTo("/shinobu/signin");
-      throw new ShinobuAuthError(message);
-    }
-
-    throw new ShinobuBackendError(message, response.status);
   }
-
-  return data as TResponse;
 }
