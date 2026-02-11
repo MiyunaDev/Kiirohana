@@ -39,15 +39,23 @@
   <allow-intent href="https://*/*" />
 
   <platform name="android">
+  </platform>
+  <platform name="android">
     <icon src="res/android/mipmap-mdpi/icon.png" density="mdpi"/>
     <icon src="res/android/mipmap-hdpi/icon.png" density="hdpi"/>
     <icon src="res/android/mipmap-xhdpi/icon.png" density="xhdpi"/>
     <icon src="res/android/mipmap-xxhdpi/icon.png" density="xxhdpi"/>
     <icon src="res/android/mipmap-xxxhdpi/icon.png" density="xxxhdpi"/>
-    <preference
-      name="android-usesCleartextTraffic"
-      value="true"
-    />
+    <resource-file
+      src="res/android/xml/network_security_config.xml"
+      target="app/src/main/res/xml/network_security_config.xml" />
+
+    <edit-config
+      file="app/src/main/AndroidManifest.xml"
+      mode="merge"
+      target="/manifest/application">
+      <application android:networkSecurityConfig="@xml/network_security_config" />
+    </edit-config>
   </platform>
   <platform name="electron">
     <preference
