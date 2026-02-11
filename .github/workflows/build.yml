@@ -230,3 +230,77 @@ jobs:
             cordova/platforms/electron/build/*.app
             cordova/platforms/electron/build/*.pkg
             cordova/platforms/electron/build/*.tar.gz
+    notify-telegram:
+    runs-on: ubuntu-latest
+    needs:
+      - build-android
+      - build-electron-linux
+      - build-electron-windows
+      - build-electron-macos
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 1. Download Android APK & AAB
+      - name: Download Android Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+          path: artifacts/android
+      - name: Download Android AAB
+        uses: actions/download-artifact@v4
+        with:
+          name: android-aab
+          path: artifacts/android
+
+      # 2. Download Electron Artifacts (Linux, Windows, macOS)
+      - name: Download Electron Linux
+        uses: actions/download-artifact@v4
+        with:
+          name: electron-linux
+          path: artifacts/electron/linux
+      - name: Download Electron Windows
+        uses: actions/download-artifact@v4
+        with:
+          name: electron-windows
+          path: artifacts/electron/windows
+      - name: Download Electron macOS
+        uses: actions/download-artifact@v4
+        with:
+          name: electron-macos
+          path: artifacts/electron/macos
+
+      - name: Send files to Telegram (Renamed)
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          REPO_NAME: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          rename_file() {
+            local file_path="$1"
+            local ext="${file_path##*.}"
+            local new_name="${REPO_NAME}-${COMMIT_SHA}.${ext}"
+            echo "$new_name"
+          }
+
+          # Kirim Android files
+          for file in artifacts/android/*; do
+            [ -f "$file" ] || continue
+            NEW_NAME=$(rename_file "$file")
+            curl -s -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendDocument" \
+              -F chat_id="$CHAT_ID" \
+              -F document=@"$file";filename="$NEW_NAME" \
+              -F caption="Android Build: $NEW_NAME"
+          done
+
+          # Kirim Electron files
+          for file in artifacts/electron/**/*; do
+            [ -f "$file" ] || continue
+            NEW_NAME=$(rename_file "$file")
+            curl -s -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendDocument" \
+              -F chat_id="$CHAT_ID" \
+              -F document=@"$file";filename="$NEW_NAME" \
+              -F caption="Electron Build: $NEW_NAME"
+          done
