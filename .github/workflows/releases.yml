@@ -242,16 +242,16 @@ jobs:
           CHANGELOG: ${{ github.event.release.body || "No changelog provided." }}
         run: |
           MESSAGE=$(cat <<EOF
-🚀 *Release Published*
+          🚀 *Release Published*
 
-📦 Application: *$APP_NAME*
-🏷 Version: *$VERSION*
+          📦 Application: *$APP_NAME*
+          🏷 Version: *$VERSION*
 
-📝 Changelog:
-$CHANGELOG
+          📝 Changelog:
+          $CHANGELOG
 
-🔗 [View Release](${{ github.event.release.html_url }})
-EOF
+          🔗 [View Release](${{ github.event.release.html_url }})
+          EOF
           )
 
           curl -s -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendMessage" \
