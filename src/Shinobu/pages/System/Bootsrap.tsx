@@ -5,196 +5,216 @@ import { shinobuFetch } from "../../../utils/fetchShinobu";
 import ServiceLogo from "../../../components/Settings/Service/ServiceLogo";
 import type { ServiceItem } from "../../../interfaces/Service";
 
+/* ================= TYPES ================= */
+
 type BootStep =
-    | "init"
-    | "connecting"
-    | "auth-check"
-    | "redirecting"
-    | "error";
+  | "init"
+  | "connecting"
+  | "auth-check"
+  | "redirecting"
+  | "error";
 
 type ServicesStorage = {
-    honoka: ServiceItem | null;
-    shinobu: ServiceItem[];
+  honoka: ServiceItem | null;
+  shinobu: ServiceItem[];
 };
 
+/* ================= UTILS ================= */
+
 const sleep = (ms: number) =>
-    new Promise((resolve) => setTimeout(resolve, ms));
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 const stepLabel: Record<BootStep, string> = {
-    init: "Menyiapkan koneksi…",
-    connecting: "Menghubungkan ke Shinobu…",
-    "auth-check": "Memverifikasi akun…",
-    redirecting: "Menyiapkan aplikasi…",
-    error: "Terjadi kesalahan",
+  init: "Menyiapkan koneksi…",
+  connecting: "Menghubungkan ke Shinobu…",
+  "auth-check": "Memverifikasi akun…",
+  redirecting: "Menyiapkan aplikasi…",
+  error: "Terjadi kesalahan",
 };
 
 const stepIndex: Record<BootStep, number> = {
-    init: 0,
-    connecting: 1,
-    "auth-check": 2,
-    redirecting: 3,
-    error: 3,
+  init: 0,
+  connecting: 1,
+  "auth-check": 2,
+  redirecting: 3,
+  error: 3,
 };
+
+/* ================= UI ================= */
 
 const ShinobuProgress = ({ step }: { step: BootStep }) => {
-    const progress = ((stepIndex[step] + 1) / 4) * 100;
+  const progress = ((stepIndex[step] + 1) / 4) * 100;
 
-    return (
-        <div className="w-full max-w-xs mt-4">
-            <div className="h-[2px] w-full bg-white/10 rounded overflow-hidden">
-                <div
-                    className="h-full bg-[#C667F7] transition-all duration-500"
-                    style={{ width: `${progress}%` }}
-                />
-            </div>
+  return (
+    <div className="w-full max-w-xs mt-4">
+      <div className="h-[2px] bg-white/10 rounded overflow-hidden">
+        <div
+          className="h-full bg-[#C667F7] transition-all duration-500"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
 
-            <p className="mt-2 text-[11px] text-white/60 text-center">
-                {stepLabel[step]}
-            </p>
-        </div>
-    );
+      <p className="mt-2 text-[11px] text-white/60 text-center">
+        {stepLabel[step]}
+      </p>
+    </div>
+  );
 };
 
+/* ================= BOOTSTRAP ================= */
+
 const ShinobuBootstrap = () => {
-    const navigate = useNavigate();
-    const { shinobuid } = useParams();
+  const navigate = useNavigate();
+  const { shinobuid } = useParams<{ shinobuid?: string }>();
 
-    const [services] = useLocalStorage<ServicesStorage>("services", {
-        honoka: null,
-        shinobu: [],
-    });
+  const [services] = useLocalStorage<ServicesStorage>("services", {
+    honoka: null,
+    shinobu: [],
+  });
 
-    const [service, setService] = useState<ServiceItem | null>(null);
-    const [step, setStep] = useState<BootStep>("init");
-    const [error, setError] = useState<string | null>(null);
+  const [service, setService] = useState<ServiceItem | null>(null);
+  const [step, setStep] = useState<BootStep>("init");
+  const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (!shinobuid) {
-            navigate("/shinobu/", { replace: true });
-            return;
-        }
+  useEffect(() => {
+    /* ================= GUARD ================= */
 
-        const current = services.shinobu.find(
-            (s) => s.id === shinobuid
+    if (!shinobuid) {
+      navigate("/shinobu", { replace: true });
+      return;
+    }
+
+    const current = services.shinobu.find((s) => s.id === shinobuid);
+    if (!current) {
+      navigate("/shinobu", { replace: true });
+      return;
+    }
+
+    let cancelled = false;
+    setService(current);
+
+    const run = async () => {
+      try {
+        /* INIT */
+        await sleep(600);
+        if (cancelled) return;
+
+        /* CONNECTING */
+        setStep("connecting");
+
+        localStorage.setItem(
+          `${current.id}-x-app-key`,
+          current.accessKey ?? ""
+        );
+        localStorage.setItem(
+          `${current.id}-x-app-secret`,
+          current.secretKey ?? ""
         );
 
-        if (!current) {
-            navigate("/shinobu/", { replace: true });
-            return;
+        const info = await shinobuFetch<ServiceItem["info"]>(
+          `/info`,
+          {
+            baseUrl: current.url,
+            auth: false,
+            localId: current.id,
+          }
+        );
+
+        await sleep(600);
+        if (cancelled) return;
+
+        setService((prev) =>
+          prev
+            ? {
+                ...prev,
+                info,
+                version:
+                  prev.version ?? info?.versions?.[0],
+              }
+            : prev
+        );
+
+        /* AUTH CHECK */
+        setStep("auth-check");
+        await sleep(600);
+        if (cancelled) return;
+
+        const token = localStorage.getItem(
+          `${current.id}-auth-token`
+        );
+
+        if (!token) {
+          navigate(
+            `/shinobu/${current.id}/login`,
+            { replace: true }
+          );
+          return;
         }
 
-        let cancelled = false;
-        setService(current);
+        /* REDIRECT */
+        setStep("redirecting");
+        await sleep(600);
+        if (cancelled) return;
 
-        const run = async () => {
-            try {
-                /* INIT */
-                await sleep(1000);
-                if (cancelled) return;
+        navigate(
+          `/shinobu/${current.id}/app/home`,
+          { replace: true }
+        );
+      } catch (err) {
+        if (cancelled) return;
 
-                /* CONNECTING */
-                setStep("connecting");
-                localStorage.setItem(`${current.id}-x-app-key`, current.accessKey!);
-                localStorage.setItem(`${current.id}-x-app-secret`, current.secretKey!);
+        setStep("error");
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Gagal terhubung ke Shinobu"
+        );
 
-                const info = await shinobuFetch<ServiceItem["info"]>(
-                    `/info`,
-                    {
-                        baseUrl: current.url,
-                        auth: false, 
-                        localId: current.id
-                    }
-                );
+        await sleep(2000);
+        navigate("/shinobu", { replace: true });
+      }
+    };
 
-                await sleep(1000);
-                if (cancelled) return;
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [shinobuid, navigate, services.shinobu]);
 
-                setService((prev) =>
-                    prev
-                        ? {
-                            ...prev,
-                            info,
-                            version:
-                                prev.version ?? info?.versions?.[0],
-                        }
-                        : prev
-                );
+  /* ================= RENDER ================= */
 
-                /* AUTH CHECK */
-                setStep("auth-check");
-                await sleep(1000);
-                if (cancelled) return;
+  return (
+    <div className="w-screen h-screen flex items-center justify-center bg-[#101010] text-white">
+      <div className="flex flex-col items-center text-center max-w-xs px-4 gap-3">
+        {service?.info?.logo && (
+          <ServiceLogo
+            baseUrl={service.url}
+            logo={service.info.logo}
+            logoData={service.logoData}
+            onLoad={() => {}}
+          />
+        )}
 
-                const token = localStorage.getItem(`${current.id}-auth-token`);
-                if (!token) {
-                    navigate(
-                        `/shinobu/${current.id}/login`,
-                        { replace: true }
-                    );
-                    return;
-                }
+        <h1 className="font-semibold text-lg">
+          {service?.info?.name ?? "Shinobu"}
+        </h1>
 
-                /* REDIRECT */
-                setStep("redirecting");
-                await sleep(1000);
-                if (cancelled) return;
+        {service?.version && (
+          <span className="text-xs opacity-60">
+            v{service.version.version}
+          </span>
+        )}
 
-                navigate(
-                    `/shinobu/${current.id}/app/home`
-                );
-            } catch (err) {
-                setStep("error");
-                setError(
-                    err instanceof Error
-                        ? err.message
-                        : "Gagal terhubung ke Shinobu"
-                );
+        <ShinobuProgress step={step} />
 
-                await sleep(2500);
-                navigate("/shinobu/", { replace: true });
-            }
-        };
-
-        run();
-        return () => {
-            cancelled = true;
-        };
-    }, [shinobuid, navigate, services.shinobu]);
-
-    return (
-        <div className="w-screen h-screen flex items-center justify-center bg-[#101010] text-white">
-            <div className="flex flex-col items-center text-center w-full max-w-xs sm:max-w-sm md:max-w-md px-4 sm:px-6 gap-3 sm:gap-4">
-                {service?.info?.logo && (
-                    <div className="scale-90 sm:scale-100 md:scale-110">
-                        <ServiceLogo
-                            baseUrl={service.url}
-                            logo={service.info.logo}
-                            logoData={service.logoData}
-                            onLoad={() => { }}
-                        />
-                    </div>
-                )}
-
-                <h1 className="font-semibold text-base sm:text-lg md:text-xl">
-                    {service?.info?.name ?? "Shinobu"}
-                </h1>
-
-                {service?.version && (
-                    <span className="text-[10px] sm:text-xs opacity-60">
-                        v{service.version.version}
-                    </span>
-                )}
-
-                <ShinobuProgress step={step} />
-
-                {error && (
-                    <p className="text-[11px] sm:text-xs text-red-400 mt-1 max-w-xs">
-                        {error}
-                    </p>
-                )}
-            </div>
-        </div>
-    );
+        {error && (
+          <p className="text-xs text-red-400 mt-1">
+            {error}
+          </p>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default ShinobuBootstrap;
