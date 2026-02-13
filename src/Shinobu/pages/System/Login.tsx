@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router";
-import { shinobuFetch } from "../../../../utils/fetchShinobu";
-import { useLocalStorage } from "../../../../hooks/useLocalStorage";
-import ServiceLogo from "../../../../components/Settings/Service/ServiceLogo";
-import type { ServiceItem } from "../../../../interfaces/Service";
+import { useParams } from "react-router";
+import { shinobuFetch } from "../../../utils/fetchShinobu";
+import { useLocalStorage } from "../../../hooks/useLocalStorage";
+import ServiceLogo from "../../../components/Settings/Service/ServiceLogo";
+import type { ServiceItem } from "../../../interfaces/Service";
+import { useShiNavigate } from "../../utils/shiNavigate";
 
 type ServicesStorage = {
     honoka: ServiceItem | null;
@@ -11,8 +12,8 @@ type ServicesStorage = {
 };
 
 const ShinobuLogin = () => {
-    const navigate = useNavigate();
     const { shinobuid } = useParams();
+    const navigate = useShiNavigate(shinobuid);
 
     const [services] =
         useLocalStorage<ServicesStorage>("services", {

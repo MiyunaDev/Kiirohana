@@ -1,57 +1,82 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { shinobuFetch } from "../../../../utils/fetchShinobu";
-import type { ShinobuUser } from "../../../../interfaces/ShinobuSession";
-import { useShinobu } from "../../../../hooks/useShinobu";
+import { shinobuFetch } from "../../../utils/fetchShinobu";
+import type { ShinobuUser } from "../../../interfaces/ShinobuSession";
+import { useShinobu } from "../../../hooks/useShinobu";
+import { useShiNavigate } from "../../utils/shiNavigate";
+
+type UserHistoryItem = {
+    media: {
+        _id: string;
+        title: string;
+        alternativeTitle?: string;
+        coverImage?: string | null;
+        bannerImage?: string | null;
+    };
+    chapter?: {
+        chapter?: number;
+        volume?: number;
+    } | null;
+    createdAt: string;
+};
 
 export default function UserProfilePage() {
-    const navigate = useNavigate();
-    const { service } = useShinobu()
+    const { service } = useShinobu();
+    const navigate = useShiNavigate(service?.id);
 
-    const [user, setUser] =
-        useState<ShinobuUser | null>(null);
-
+    const [user, setUser] = useState<ShinobuUser | null>(null);
     const [loading, setLoading] = useState(true);
 
     const [editMode, setEditMode] = useState(false);
     const [draftBio, setDraftBio] = useState("");
-    const [draftAvatar, setDraftAvatar] =
-        useState<File | null>(null);
-
-    const [avatarPreview, setAvatarPreview] =
-        useState<string | null>(null);
-
+    const [draftAvatar, setDraftAvatar] = useState<File | null>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
 
-    /* ================= FETCH PROFILE ================= */
+    const [history, setHistory] = useState<UserHistoryItem[]>([]);
+    const [historyLoading, setHistoryLoading] = useState(false);
 
+    /* ================= FETCH PROFILE ================= */
     const fetchProfile = async () => {
         if (!service) return;
 
-        const token =
-            localStorage.getItem(`${service.id}-auth-token`);
-
+        const token = localStorage.getItem(`${service.id}-auth-token`);
         if (!token) {
-            navigate(
-                `/shinobu/${service.id}/login`,
-                { replace: true }
-            );
+            navigate(`/shinobu/${service.id}/login`, { replace: true });
             return;
         }
 
-        const userData =
-            await shinobuFetch<ShinobuUser>(
-                `/${service.version?.endpoint}/user/me/profile`,
-                { baseUrl: service.url, localId: service.id }
-            );
+        const userData = await shinobuFetch<ShinobuUser>(
+            `/${service.version?.endpoint}/user/me/profile`,
+            { baseUrl: service.url, localId: service.id }
+        );
 
         setUser(userData);
         setDraftBio(userData.bio ?? "");
     };
 
+    /* ================= FETCH HISTORY ================= */
+    const fetchHistory = async () => {
+        if (!service) return;
+        setHistoryLoading(true);
+
+        try {
+            const res = await shinobuFetch<{ data: UserHistoryItem[] }>(
+                `/${service.version?.endpoint}/user/me/history`,
+                { baseUrl: service.url, localId: service.id }
+            );
+            setHistory(res.data);
+        } catch (err) {
+            console.error("Failed to fetch history", err);
+            setHistory([]);
+        } finally {
+            setHistoryLoading(false);
+        }
+    };
+
+    /* ================= INITIAL LOAD ================= */
     useEffect(() => {
         if (!service) return;
 
@@ -59,22 +84,14 @@ export default function UserProfilePage() {
             try {
                 setLoading(true);
 
-                localStorage.setItem(
-                    `${service.id}-x-app-key`,
-                    service.accessKey!
-                );
-                localStorage.setItem(
-                    `${service.id}-x-app-secret`,
-                    service.secretKey!
-                );
+                localStorage.setItem(`${service.id}-x-app-key`, service.accessKey!);
+                localStorage.setItem(`${service.id}-x-app-secret`, service.secretKey!);
 
                 await fetchProfile();
+                await fetchHistory();
             } catch {
                 localStorage.removeItem(`${service.id}-auth-token`);
-                navigate(
-                    `/shinobu/${service.id}/login`,
-                    { replace: true }
-                );
+                navigate(`/shinobu/${service.id}/login`, { replace: true });
             } finally {
                 setLoading(false);
             }
@@ -84,15 +101,13 @@ export default function UserProfilePage() {
     }, [service]);
 
     /* ================= AVATAR PREVIEW ================= */
-
     useEffect(() => {
         if (!draftAvatar) {
             setAvatarPreview(null);
             return;
         }
 
-        const url =
-            URL.createObjectURL(draftAvatar);
+        const url = URL.createObjectURL(draftAvatar);
         setAvatarPreview(url);
 
         return () => {
@@ -101,31 +116,22 @@ export default function UserProfilePage() {
     }, [draftAvatar]);
 
     /* ================= UPDATE PROFILE ================= */
-
     const handleSave = async () => {
         if (!service || !user) return;
-
         setSaving(true);
 
         try {
             const form = new FormData();
             form.append("bio", draftBio);
+            if (draftAvatar) form.append("avatar", draftAvatar);
 
-            if (draftAvatar) {
-                form.append("avatar", draftAvatar);
-            }
+            await shinobuFetch(`/${service.version?.endpoint}/user/me/profile`, {
+                method: "PUT",
+                baseUrl: service.url,
+                body: form,
+                localId: service.id,
+            });
 
-            await shinobuFetch(
-                `/${service.version?.endpoint}/user/me/profile`,
-                {
-                    method: "PUT",
-                    baseUrl: service.url,
-                    body: form, 
-                    localId: service.id
-                }
-            );
-
-            // ✅ optimistic update (instant UI feedback)
             setUser({
                 ...user,
                 bio: draftBio,
@@ -135,7 +141,7 @@ export default function UserProfilePage() {
             setEditMode(false);
             setDraftAvatar(null);
 
-            // 🔁 hard refetch (signed URL safety)
+            // Hard refetch to get signed URLs
             await fetchProfile();
         } finally {
             setSaving(false);
@@ -143,7 +149,6 @@ export default function UserProfilePage() {
     };
 
     /* ================= RENDER ================= */
-
     if (loading || !user) {
         return (
             <div className="min-h-screen flex items-center justify-center text-slate-400">
@@ -155,8 +160,7 @@ export default function UserProfilePage() {
     const avatarSrc =
         editMode && avatarPreview
             ? avatarPreview
-            : user.avatarUrl ||
-            `https://api.dicebear.com/8.x/identicon/svg?seed=${user.username}`;
+            : user.avatarUrl || `https://api.dicebear.com/8.x/identicon/svg?seed=${user.username}`;
 
     return (
         <div className="min-h-screen w-full bg-slate-950 text-slate-100">
@@ -172,19 +176,15 @@ export default function UserProfilePage() {
 
                         {editMode && (
                             <>
-                                {/* FILE INPUT — HARUS PALING ATAS */}
                                 <input
                                     type="file"
                                     accept="image/*"
                                     className="absolute inset-0 z-20 opacity-0 cursor-pointer"
                                     onChange={(e) => {
-                                        if (e.target.files?.[0]) {
-                                            setDraftAvatar(e.target.files[0]);
-                                        }
+                                        if (e.target.files?.[0]) setDraftAvatar(e.target.files[0]);
                                     }}
                                 />
 
-                                {/* OVERLAY */}
                                 <div className="absolute inset-0 z-10 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-xs text-white transition pointer-events-none">
                                     Change
                                 </div>
@@ -194,13 +194,8 @@ export default function UserProfilePage() {
 
                     {/* INFO */}
                     <div className="flex-1">
-                        <h1 className="text-3xl font-bold">
-                            {user.displayName ||
-                                user.username}
-                        </h1>
-                        <p className="text-slate-400">
-                            @{user.username}
-                        </p>
+                        <h1 className="text-3xl font-bold">{user.displayName || user.username}</h1>
+                        <p className="text-slate-400">@{user.username}</p>
 
                         {user.role && (
                             <span className="inline-block mt-2 px-3 py-1 rounded-full text-xs bg-slate-800 text-slate-300">
@@ -225,27 +220,19 @@ export default function UserProfilePage() {
                 {/* BIO */}
                 <section className="lg:col-span-1">
                     <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6">
-                        <h2 className="text-lg font-semibold mb-4">
-                            Bio
-                        </h2>
+                        <h2 className="text-lg font-semibold mb-4">Bio</h2>
 
                         {editMode ? (
                             <textarea
                                 value={draftBio}
-                                onChange={(e) =>
-                                    setDraftBio(e.target.value)
-                                }
+                                onChange={(e) => setDraftBio(e.target.value)}
                                 rows={10}
                                 className="w-full bg-slate-950 border border-slate-700 rounded p-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#C667F7]"
                                 placeholder="Markdown supported"
                             />
                         ) : (
                             <div className="prose prose-invert prose-sm max-w-none">
-                                <Markdown
-                                    remarkPlugins={[remarkGfm]}
-                                >
-                                    {user.bio || "_No bio yet_"}
-                                </Markdown>
+                                <Markdown remarkPlugins={[remarkGfm]}>{user.bio || "_No bio yet_"}</Markdown>
                             </div>
                         )}
 
@@ -262,9 +249,7 @@ export default function UserProfilePage() {
                                 <button
                                     onClick={() => {
                                         setEditMode(false);
-                                        setDraftBio(
-                                            user.bio ?? ""
-                                        );
+                                        setDraftBio(user.bio ?? "");
                                         setDraftAvatar(null);
                                     }}
                                     className="px-4 py-2 rounded bg-slate-800 text-sm"
@@ -276,11 +261,45 @@ export default function UserProfilePage() {
                     </div>
                 </section>
 
-                {/* RIGHT */}
+                {/* HISTORY */}
                 <section className="lg:col-span-2">
-                    <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 text-slate-400 text-sm">
-                        History / comments / activity
-                        bisa ditaruh di sini.
+                    <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6">
+                        <h2 className="text-lg font-semibold mb-4">Reading History</h2>
+
+                        {historyLoading && (
+                            <div className="text-slate-400 text-sm">Loading history...</div>
+                        )}
+
+                        {!historyLoading && history.length === 0 && (
+                            <div className="text-slate-500 text-sm">No history yet.</div>
+                        )}
+
+                        <ul className="space-y-4">
+                            {history.map((item) => (
+                                <li key={`${item.media._id}-${item.createdAt}`} className="flex gap-4 items-start">
+                                    <img
+                                        src={item.media.coverImage || "https://placehold.co/96x128?text=No+Cover"}
+                                        alt={item.media.title}
+                                        className="w-16 h-24 rounded border border-slate-700 object-cover flex-shrink-0"
+                                    />
+
+                                    <div className="flex-1">
+                                        <p className="font-medium text-slate-100">{item.media.title}</p>
+
+                                        {item.chapter && (
+                                            <p className="text-xs text-slate-400">
+                                                Chapter {item.chapter.chapter}
+                                                {item.chapter.volume ? ` · Vol ${item.chapter.volume}` : ""}
+                                            </p>
+                                        )}
+
+                                        <p className="text-xs text-slate-500 mt-1">
+                                            {new Date(item.createdAt).toLocaleString()}
+                                        </p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </section>
             </div>

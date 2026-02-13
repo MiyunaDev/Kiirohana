@@ -6,9 +6,9 @@ import {
 import { Link } from "react-router";
 import { FaXmark, FaFilter } from "react-icons/fa6";
 
-import { ServiceItem } from "../../../../interfaces/Service";
-import { shinobuFetch } from "../../../../utils/fetchShinobu";
-import { useShinobu } from "../../../../hooks/useShinobu";
+import { ServiceItem } from "../../../interfaces/Service";
+import { shinobuFetch } from "../../../utils/fetchShinobu";
+import { useShinobu } from "../../../hooks/useShinobu";
 
 /* ===================== Types ===================== */
 
@@ -195,7 +195,7 @@ const MangaListPage = () => {
       const mapped = res.result.map(mapApiMediaWrapperToManga);
 
       setData(prev => [...prev, ...mapped]);
-      setHasMore(mapped.length === 20);
+      setHasMore(res.result.length > 5);
     } catch {
       setError("Gagal memuat data");
     } finally {
@@ -208,11 +208,24 @@ const MangaListPage = () => {
     if (!service) return;
 
     setData([]);
-    setPage(1);
     setHasMore(true);
 
     fetchLatest(1);
   }, [service, filter]);
+
+  // Hapus fetchLatest dari setPage
+  const handleNextPage = () => {
+    if (!loading && hasMore) {
+      setPage(prev => prev + 1);
+    }
+  };
+
+  // Panggil fetchLatest setiap page berubah
+  useEffect(() => {
+    if (page === 1) return; // 1 sudah di-fetch pada initial load
+    fetchLatest(page);
+  }, [page]);
+
 
   /* ===== Infinite Scroll ===== */
   useEffect(() => {
@@ -220,13 +233,8 @@ const MangaListPage = () => {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const entry = entries[0];
-        if (entry.isIntersecting && !loading && hasMore) {
-          setPage(prev => {
-            const nextPage = prev + 1;
-            fetchLatest(nextPage);
-            return nextPage;
-          });
+        if (entries[0].isIntersecting) {
+          handleNextPage();
         }
       },
       { rootMargin: "200px" }
@@ -234,7 +242,7 @@ const MangaListPage = () => {
 
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [loading, hasMore, filter, service]);
+  }, [loadMoreRef.current, loading, hasMore, service, filter]);
 
   /* ===== Render ===== */
   return (

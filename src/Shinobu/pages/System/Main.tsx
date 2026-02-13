@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { useLocalStorage } from "../../../../hooks/useLocalStorage";
-import type { ServiceItem } from "../../../../interfaces/Service";
-import ServiceLogo from "../../../../components/Settings/Service/ServiceLogo";
-import { shinobuFetch } from "../../../../utils/fetchShinobu";
+import { useLocalStorage } from "../../../hooks/useLocalStorage";
+import type { ServiceItem } from "../../../interfaces/Service";
+import ServiceLogo from "../../../components/Settings/Service/ServiceLogo";
+import { shinobuFetch } from "../../../utils/fetchShinobu";
 
 type ServicesStorage = {
     honoka: ServiceItem | null;

@@ -1,8 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router";
-import LazyImage from "../../../../components/LazyImage";
-import { useShinobu } from "../../../../hooks/useShinobu";
-import { shinobuFetch } from "../../../../utils/fetchShinobu";
+import { useParams } from "react-router";
 import {
   HiArrowLeft,
   HiArrowRight,
@@ -10,52 +7,23 @@ import {
   HiX,
   HiViewList,
 } from "react-icons/hi";
-import { Media } from "../Detail/Media";
 
-type ChapterContentDTO = {
-  _id: string;
-  chapter?: string;
-  title: string | null;
-  language: string;
-  authors: string[];
-  content: Array<string | { url: string }>;
-  raw: any;
-};
+import LazyImage from "../../../components/LazyImage";
+import { useShinobu } from "../../../hooks/useShinobu";
+import { shinobuFetch } from "../../../utils/fetchShinobu";
+import { useShiNavigate } from "../../utils/shiNavigate";
 
-function sortChapters(chapters: ChapterContentDTO[]) {
-  return [...chapters].sort((a, b) => {
-    const aNum = Number((a as any)?.raw?.chapter ?? 0);
-    const bNum = Number((b as any)?.raw?.chapter ?? 0);
-    return aNum - bNum;
-  });
-}
-
-function resolveNavigation(
-  current: ChapterContentDTO,
-  others: ChapterContentDTO[]
-) {
-  const all = sortChapters([current, ...others]);
-  const idx = all.findIndex((c) => c._id === current._id);
-  console.log(all)
-  return {
-    before: idx > 0 ? all[idx - 1] : null,
-    after: idx < all.length - 1 ? all[idx + 1] : null,
-    allChapters: all,
-    currentIndex: idx,
-  };
-}
+import Media from "../../../interfaces/Media";
+import ChapterContent from "../../../interfaces/ChapterContent";
 
 const ComicReader = () => {
-  const { chapterId } = useParams<{
-    chapterId: string;
-  }>();
-
-  const navigate = useNavigate();
+  const { chapterId } = useParams<{ chapterId: string }>();
   const { service } = useShinobu();
+  const navigate = useShiNavigate(service?.id);
 
-  const [media, setMedia] = useState<Media>();
-  const [content, setContent] = useState<ChapterContentDTO | null>(null);
-  const [others, setOthers] = useState<ChapterContentDTO[]>([]);
+  const [media, setMedia] = useState<Media | null>(null);
+  const [content, setContent] = useState<ChapterContent | null>(null);
+  const [chapters, setChapters] = useState<ChapterContent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -66,6 +34,7 @@ const ComicReader = () => {
   /* ================= FETCH ================= */
   useEffect(() => {
     if (!chapterId || !service) return;
+
     let canceled = false;
 
     const fetchChapter = async () => {
@@ -74,9 +43,9 @@ const ComicReader = () => {
 
       try {
         const res = await shinobuFetch<{
-          media: Media,
-          content: ChapterContentDTO;
-          otherChapters: ChapterContentDTO[];
+          media: Media;
+          content: ChapterContent;
+          otherChapters: ChapterContent[];
         }>(`/${service.version?.endpoint}/media/content/${chapterId}`, {
           auth: true,
           baseUrl: service.url,
@@ -84,9 +53,10 @@ const ComicReader = () => {
         });
 
         if (canceled) return;
-        setMedia(res.media)
+
+        setMedia(res.media);
         setContent(res.content);
-        setOthers(res.otherChapters ?? []);
+        setChapters(res.otherChapters ?? []);
         window.scrollTo({ top: 0 });
       } catch {
         if (!canceled) setError("Failed to load chapter.");
@@ -107,6 +77,7 @@ const ComicReader = () => {
       const doc = document.documentElement;
       const total = doc.scrollHeight - window.innerHeight;
       if (total <= 0) return;
+
       setScrollProgress(
         Math.min(100, Math.max(0, (window.scrollY / total) * 100))
       );
@@ -114,25 +85,31 @@ const ComicReader = () => {
 
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
+
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const { before, after, allChapters, currentIndex } = useMemo(() => {
-    if (!content)
-      return {
-        before: null,
-        after: null,
-        allChapters: [],
-        currentIndex: 0,
-      };
-    return resolveNavigation(content, others);
-  }, [content, others]);
+  /* ================= CHAPTER COMPUTATION ================= */
+  const currentIndex = useMemo(() => {
+    if (!content) return -1;
+    return chapters.findIndex((ch) => ch._id === content._id);
+  }, [chapters, content]);
+
+  const before = currentIndex > 0 ? chapters[currentIndex - 1] : null;
+  const after =
+    currentIndex >= 0 && currentIndex < chapters.length - 1
+      ? chapters[currentIndex + 1]
+      : null;
+
+  const allChapters = chapters;
 
   /* ================= STATES ================= */
   if (loading)
     return <div className="py-10 text-center text-gray-400">Loading…</div>;
+
   if (error)
     return <div className="py-10 text-center text-red-500">{error}</div>;
+
   if (!content) return null;
 
   /* ================= RENDER ================= */
@@ -140,13 +117,14 @@ const ComicReader = () => {
     <div className="bg-gray-900 text-gray-200 min-h-screen">
       {/* ===== HEADER ===== */}
       {showActionBar && (
-        <div className="fixed top-0 left-0 right-0 z-50
+        <div
+          className="fixed top-0 left-0 right-0 z-50
           bg-gray-900/90 backdrop-blur
           border-b border-gray-800
-          flex items-center gap-3 px-4 py-3">
-
+          flex items-center gap-3 px-4 py-3"
+        >
           <button
-            onClick={() => navigate(`/shinobu/${service?.id}/detail/${media?._id}`, { replace: true })}
+            onClick={() => navigate(`/detail/${media?._id}`)}
             className="p-2 bg-gray-800 rounded-full hover:bg-gray-700"
           >
             <HiArrowLeft size={18} />
@@ -165,8 +143,9 @@ const ComicReader = () => {
 
       {/* ===== CONTENT ===== */}
       <div className="pt-16">
-        {content.content.map((ct, i) => {
-          const src = typeof ct === "string" ? ct : ct.url;
+        {content.content?.map((ct, i) => {
+          const src = typeof ct === "string" ? ct : undefined;
+
           return (
             <LazyImage
               key={i}
@@ -180,18 +159,16 @@ const ComicReader = () => {
 
       {/* ===== ACTION BAR ===== */}
       {showActionBar && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2
+        <div
+          className="fixed bottom-4 left-1/2 -translate-x-1/2
           bg-gray-800/90 backdrop-blur
           rounded-xl shadow-xl
-          flex items-center gap-4 px-5 py-3 z-50">
-
+          flex items-center gap-4 px-5 py-3 z-50"
+        >
           <button
             disabled={!before}
             onClick={() =>
-              before &&
-              navigate(
-                `/shinobu/${service?.id}/reader/comic/${before._id}`, { replace: true }
-              )
+              before && navigate(`/reader/comic/${before._id}`)
             }
             className="p-2 bg-gray-700 rounded-full disabled:opacity-40"
           >
@@ -213,10 +190,7 @@ const ComicReader = () => {
           <button
             disabled={!after}
             onClick={() =>
-              after &&
-              navigate(
-                `/shinobu/${service?.id}/reader/comic/${after._id}`, { replace: true }
-              )
+              after && navigate(`/reader/comic/${after._id}`)
             }
             className="p-2 bg-gray-700 rounded-full disabled:opacity-40"
           >
@@ -253,9 +227,10 @@ const ComicReader = () => {
 
       {/* ===== CHAPTER PANEL ===== */}
       {showChapterPanel && (
-        <div className="fixed inset-y-0 right-0 w-full sm:w-64
-          bg-gray-900 border-l border-gray-800 z-50">
-
+        <div
+          className="fixed inset-y-0 right-0 w-full sm:w-64
+          bg-gray-900 border-l border-gray-800 z-50"
+        >
           <div className="flex justify-between items-center p-4 border-b border-gray-800">
             <span className="font-semibold">Chapters</span>
             <button onClick={() => setShowChapterPanel(false)}>
@@ -266,11 +241,9 @@ const ComicReader = () => {
           <div className="overflow-y-auto">
             {allChapters.map((ch, idx) => (
               <button
-                key={ch.chapter}
+                key={ch._id}
                 onClick={() => {
-                  navigate(
-                    `/shinobu/${service?.id}/reader/comic/${ch._id}`, { replace: true }
-                  );
+                  navigate(`/reader/comic/${ch._id}`);
                   setShowChapterPanel(false);
                 }}
                 className={`w-full text-left px-4 py-3 border-b border-gray-800

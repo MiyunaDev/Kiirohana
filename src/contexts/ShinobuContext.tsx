@@ -3,11 +3,12 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Outlet, useNavigate, useParams } from "react-router";
+import { Outlet, useParams } from "react-router";
 import { shinobuFetch } from "../utils/fetchShinobu";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import type { ServiceItem } from "../interfaces/Service";
 import type { ShinobuUser } from "../interfaces/ShinobuSession";
+import { useShiNavigate } from "../Shinobu/utils/shiNavigate";
 
 type ServicesStorage = {
   honoka: ServiceItem | null;
@@ -25,9 +26,9 @@ export const ShinobuContext = createContext<ShinobuContextValue | null>(
 );
 
 export const ShinobuProvider = () => {
-  const navigate = useNavigate();
   const { shinobuid } = useParams();
-
+  const navigate = useShiNavigate(shinobuid);
+  
   const [services] =
     useLocalStorage<ServicesStorage>("services", {
       honoka: null,
@@ -48,7 +49,7 @@ export const ShinobuProvider = () => {
     );
 
     if (!current) {
-      navigate("/shinobu", { replace: true });
+      navigate(`/shinobu/`);
       return;
     }
 
@@ -72,10 +73,7 @@ export const ShinobuProvider = () => {
           localStorage.getItem(`${current.id}-auth-token`);
 
         if (!token) {
-          navigate(
-            `/shinobu/${current.id}/login`,
-            { replace: true }
-          );
+          navigate(`/shinobu/${current.id}/login`);
           return;
         }
 
@@ -89,10 +87,7 @@ export const ShinobuProvider = () => {
         setUser(userData);
       } catch {
         localStorage.removeItem(`${current.id}-auth-token`);
-        navigate(
-          `/shinobu/${current.id}/login`,
-          { replace: true }
-        );
+        navigate(`/shinobu/${current.id}/login`);
       } finally {
         setLoading(false);
       }

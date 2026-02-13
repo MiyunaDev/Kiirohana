@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useLocalStorage } from "../../../../hooks/useLocalStorage";
-import { shinobuFetch } from "../../../../utils/fetchShinobu";
-import ServiceLogo from "../../../../components/Settings/Service/ServiceLogo";
-import type { ServiceItem } from "../../../../interfaces/Service";
+import { useLocalStorage } from "../../../hooks/useLocalStorage";
+import { shinobuFetch } from "../../../utils/fetchShinobu";
+import ServiceLogo from "../../../components/Settings/Service/ServiceLogo";
+import type { ServiceItem } from "../../../interfaces/Service";
 
 type BootStep =
     | "init"
@@ -70,7 +70,7 @@ const ShinobuBootstrap = () => {
 
     useEffect(() => {
         if (!shinobuid) {
-            navigate("/shinobu", { replace: true });
+            navigate("/shinobu/", { replace: true });
             return;
         }
 
@@ -79,7 +79,7 @@ const ShinobuBootstrap = () => {
         );
 
         if (!current) {
-            navigate("/shinobu", { replace: true });
+            navigate("/shinobu/", { replace: true });
             return;
         }
 
@@ -140,8 +140,7 @@ const ShinobuBootstrap = () => {
                 if (cancelled) return;
 
                 navigate(
-                    `/shinobu/${current.id}/app`,
-                    { replace: true }
+                    `/shinobu/${current.id}/app/home`
                 );
             } catch (err) {
                 setStep("error");
@@ -152,7 +151,7 @@ const ShinobuBootstrap = () => {
                 );
 
                 await sleep(2500);
-                navigate("/shinobu", { replace: true });
+                navigate("/shinobu/", { replace: true });
             }
         };
 

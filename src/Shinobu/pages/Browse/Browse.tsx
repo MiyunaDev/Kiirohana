@@ -13,9 +13,9 @@ import {
   FaFilter,
 } from "react-icons/fa6";
 
-import { ServiceItem } from "../../../../interfaces/Service";
-import { shinobuFetch } from "../../../../utils/fetchShinobu";
-import { useShinobu } from "../../../../hooks/useShinobu";
+import { ServiceItem } from "../../../interfaces/Service";
+import { shinobuFetch } from "../../../utils/fetchShinobu";
+import { useShinobu } from "../../../hooks/useShinobu";
 
 /* ===================== Types ===================== */
 

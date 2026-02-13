@@ -15,23 +15,23 @@ import Library from './pages/Library/Library.tsx';
 import History from './pages/History/History.tsx';
 import Detail from './pages/Detail/Detail.tsx';
 import DetailLayout from './layout/DetailLayout.tsx';
-import ComicReader from './pages/Shinobu/pages/Comic/Reader.tsx';
 // import NovelReader from './pages/Shinobu/pages/Novel/Reader.tsx';
 
 import Settings from './pages/Settings/Settings.tsx';
 import ServicesSetting from './pages/Settings/ServicesSetting.tsx';
 
 // ------------------- Shinobu
-import Latest from "./pages/Shinobu/pages/Browse/Latest.tsx"
+import Latest from "./Shinobu/pages/Browse/Latest.tsx"
 // import ShinobuChat from "./pages/Shinobu/Chat/ChatPage.tsx"
-import UserProfilePage from './pages/Shinobu/pages/Detail/User.tsx';
-import InstalledShinobu from './pages/Shinobu/pages/System/Main.tsx';
-import ShinobuBootstrap from './pages/Shinobu/pages/System/Bootsrap.tsx';
-import ShinobuLogin from './pages/Shinobu/pages/System/Login.tsx';
+import ComicReader from './Shinobu/pages/Comic/Reader.tsx';
+import UserProfilePage from './Shinobu/pages/Detail/User.tsx';
+import InstalledShinobu from './Shinobu/pages/System/Main.tsx';
+import ShinobuBootstrap from './Shinobu/pages/System/Bootsrap.tsx';
+import ShinobuLogin from './Shinobu/pages/System/Login.tsx';
 import { ShinobuProvider } from './contexts/ShinobuContext.tsx';
-import ShinobuDetail from './pages/Shinobu/pages/Detail/Media.tsx';
-import MainLayout from './pages/Shinobu/layout/Main.layout.tsx';
-import Landing from './pages/Shinobu/pages/Landing/Landing.tsx';
+import ShinobuDetail from './Shinobu/pages/Detail/Media.tsx';
+import MainLayout from './Shinobu/layout/Main.layout.tsx';
+import Landing from './Shinobu/pages/Landing/Landing.tsx';
 
 const router = createHashRouter([
   {
@@ -81,7 +81,7 @@ const router = createHashRouter([
               },
               {
                 path: "app", Component: MainLayout, children: [
-                  { index: true, Component: Landing },
+                  { path: "home", Component: Landing },
                   {
                     path: "search/latest", Component: Latest
                   }

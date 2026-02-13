@@ -2,114 +2,75 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router";
 import { motion } from "framer-motion";
-import { shinobuFetch } from "../../../../utils/fetchShinobu";
-import { useShinobu } from "../../../../hooks/useShinobu";
-
-/* ================= Types ================= */
-
-export interface Media {
-  _id: string;
-  title: string;
-  description: string | null;
-  coverImage: string;
-  bannerImage?: string;
-  type: "COMIC" | "NOVEL" | "TV";
-  status: string;
-  genres: { name: string; slug: string }[];
-  tags: { name: string; slug: string }[];
-}
-
-export interface ChapterContentItem {
-  _id: string;
-  chapter: string;
-  mediaExternal: string;
-  language: string;
-  authors: string[];
-  content: Array<string | { url: string }>;
-  extension: string;
-  isApproved: boolean;
-  raw: any;
-  createdAt: string;
-  updatedAt: string;
-  uploadedAt: string;
-  url?: string;
-}
-
-export interface ChapterTreeItem {
-  chapter: {
-    _id: string;
-    chapter: number;
-    volume: number | null;
-    media: string;
-    createdAt: string;
-    updatedAt: string;
-  };
-  hasContent: boolean;
-  contentId?: string;
-  content?: ChapterContentItem;
-}
-
-interface ExternalData {
-  sourceName: string;
-  chapters: ChapterTreeItem[];
-}
-
-/* ================= ChapterCard ================= */
+import { shinobuFetch } from "../../../utils/fetchShinobu";
+import { useShinobu } from "../../../hooks/useShinobu";
+import { Chapter } from "../../../types/Series";
+import Media from "../../../interfaces/Media";
+import MediaExternal from "../../../interfaces/MediaExternal";
+import MultiSourceTree from "../../../interfaces/MultiSourceTree";
+import Source from "../../../interfaces/Source";
+import ChapterContent from "../../../interfaces/ChapterContent";
+import Type from "../../../enums/TypeEnum";
 
 const ChapterCard = ({
   chapter,
-  type,
+  type
 }: {
-  chapter: ChapterTreeItem;
-  type?: "NOVEL" | "COMIC" | "TV";
-  detail: Media;
+  chapter: {
+    chapter: Chapter
+    hasContent: boolean
+    contentId?: string | null
+    content: ChapterContent
+  },
+  type: Type,
 }) => {
-  const { service } = useShinobu();
+  const { service } = useShinobu()
 
-  // Tentukan preview image/text
-  const previewUrl = chapter.content?.content?.[0]
-    ? typeof chapter.content.content[0] === "string"
-      ? chapter.content.content[0]
-      : (chapter.content.content[0] as { url: string }).url
-    : undefined;
+  const previewUrl =
+    typeof chapter.content?.content === "string"
+      ? chapter.content.content
+      : undefined
+
+  if (!chapter.hasContent || !chapter.contentId) {
+    return (
+      <div className="opacity-50 p-2">
+        Chapter {chapter.chapter.chapter} (no content)
+      </div>
+    )
+  }
 
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-      whileHover={{ scale: 1.015 }}
-      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.35 }}
     >
       <Link
-        to={`/shinobu/${service?.id}/reader/${type?.toLowerCase()}/${chapter.content?._id}`}
-        className="relative flex flex-row items-center p-2 h-24 gap-2 group before:absolute before:z-10 before:left-0 before:top-0
-          before:min-h-full before:rounded-r-full before:transition-all before:duration-500
-          hover:shadow active:shadow hover:shadow-[#C667F7] active:shadow-[#C667F7]
-          before:w-0 hover:before:w-screen active:before:w-screen before:bg-[#C667F7] overflow-hidden rounded-r-xl"
+        to={`/shinobu/${service?.id}/reader/${type.toLowerCase()}/${chapter.contentId}`}
+        className="relative flex flex-row items-center p-2 h-24 gap-2 group before:absolute before:z-10 before:left-0 before:top-0 before:min-h-full before:rounded-r-full before:transition-all before:duration-500 hover:shadow active:shadow hover:shadow-[#C667F7] active:shadow-[#C667F7] before:w-0 hover:before:w-screen active:before:w-screen before:bg-[#C667F7] overflow-hidden rounded-r-xl"
       >
         {previewUrl && (
           <div className="relative z-10 w-15 aspect-[3/4]">
             <img
-              className="w-full h-full object-cover object-top"
               src={previewUrl}
-              alt="Chapter preview"
+              className="w-full h-full object-cover"
+              alt="preview"
             />
           </div>
         )}
+
         <div className={`flex z-10 flex-col ${type === "NOVEL" ? "absolute left-10" : ""}`}>
-          <a>
-            {chapter.chapter.volume && chapter.chapter.volume !== 0
+          <span>
+            {chapter.chapter.volume
               ? `Volume ${chapter.chapter.volume} `
               : ""}
             Chapter {chapter.chapter.chapter}
-          </a>
+          </span>
         </div>
       </Link>
     </motion.div>
-  );
-};
+  )
+}
 
 /* ================= ShinobuDetail ================= */
 
@@ -118,7 +79,19 @@ const ShinobuDetail = () => {
   const { service } = useShinobu();
 
   const [media, setMedia] = useState<Media | null>(null);
-  const [externals, setExternals] = useState<ExternalData[]>([]);
+  const [externals, setExternals] = useState<
+    {
+      source: Source
+      mediaExternal: MediaExternal
+      chapters: {
+        chapter: Chapter
+        hasContent: boolean
+        contentId?: string | null
+        content: ChapterContent
+      }[]
+    }[]
+  >([])
+
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -131,14 +104,8 @@ const ShinobuDetail = () => {
         setLoading(true);
 
         const res = await shinobuFetch<{
-          success: boolean;
-          media: Media;
-          tree: {
-            externals: {
-              source: { name: string };
-              chapters: ChapterTreeItem[];
-            }[];
-          };
+          media: Media,
+          tree: MultiSourceTree
         }>(`/${service.version?.endpoint}/media/${mediaId}`, {
           auth: true,
           baseUrl: service.url,
@@ -147,15 +114,12 @@ const ShinobuDetail = () => {
 
         setMedia(res.media);
 
-        const externalData: ExternalData[] = res.tree.externals.map((ext) => ({
-          sourceName: ext.source.name,
-          chapters: ext.chapters,
-        }));
+        const externalData = res.tree.externals
 
         setExternals(externalData);
 
         // Default selected source
-        if (externalData.length > 0) setSelectedSource(externalData[0].sourceName);
+        if (externalData.length > 0) setSelectedSource(externalData[0].source.name);
       } catch (err) {
         console.error(err);
         setError("Gagal memuat ShinobuDetail media");
@@ -171,7 +135,7 @@ const ShinobuDetail = () => {
   if (error) return <div className="p-6">{error}</div>;
   if (!media) return null;
 
-  const currentExternal = externals.find((e) => e.sourceName === selectedSource);
+  const currentExternal = externals.find((e) => e.source.name === selectedSource);
 
   return (
     <motion.div
@@ -230,14 +194,17 @@ const ShinobuDetail = () => {
             transition={{ delay: 0.55 }}
             className="p-2 flex flex-row overflow-x-auto items-center"
           >
-            {media.genres.map((gen) => (
-              <div
-                key={gen.slug}
-                className="py-2 px-3 border-2 border-[#C667F7] rounded-lg m-1"
-              >
-                {gen.name}
-              </div>
-            ))}
+            {media.genres.map((gen) => {
+              const name = typeof gen === "string" ? gen : gen.name
+              return (
+                <div
+                  key={name}
+                  className="py-2 px-3 border-2 border-[#C667F7] rounded-lg m-1"
+                >
+                  {name}
+                </div>
+              )
+            })}
           </motion.div>
         </div>
 
@@ -252,8 +219,8 @@ const ShinobuDetail = () => {
                 onChange={(e) => setSelectedSource(e.target.value)}
               >
                 {externals.map((ext) => (
-                  <option key={ext.sourceName} value={ext.sourceName}>
-                    {ext.sourceName}
+                  <option key={ext.source.name} value={ext.source.name}>
+                    {ext.source.name}
                   </option>
                 ))}
               </select>
@@ -263,13 +230,28 @@ const ShinobuDetail = () => {
           {currentExternal ? (
             Array.from(
               currentExternal.chapters.reduce(
-                (map: Map<number, ChapterTreeItem[]>, ch: ChapterTreeItem) => {
+                (map: Map<number, {
+                  chapter: Chapter
+                  hasContent: boolean
+                  contentId?: string | null
+                  content: ChapterContent
+                }[]>, ch: {
+                  chapter: Chapter
+                  hasContent: boolean
+                  contentId?: string | null
+                  content: ChapterContent
+                }) => {
                   const vol = ch.chapter.volume ?? 0;
                   if (!map.has(vol)) map.set(vol, []);
                   map.get(vol)!.push(ch);
                   return map;
                 },
-                new Map<number, ChapterTreeItem[]>()
+                new Map<number, {
+                  chapter: Chapter
+                  hasContent: boolean
+                  contentId?: string | null
+                  content: ChapterContent
+                }[]>()
               )
             ).map(([volume, chapters]) => (
               <div key={volume} className="mb-3">
@@ -279,10 +261,9 @@ const ShinobuDetail = () => {
                 <div className="flex flex-col">
                   {chapters.map((ch) => (
                     <ChapterCard
-                      key={ch.chapter._id}
+                      key={ch.chapter.id}
                       chapter={ch}
-                      type={media.type as "NOVEL" | "COMIC"}
-                      detail={media}
+                      type={media?.type}
                     />
                   ))}
                 </div>

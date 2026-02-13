@@ -5,12 +5,22 @@
     <link rel="icon" type="image/svg+xml" href="./vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kiirohana</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
+        connect-src *;
+        img-src * data: blob:;
+        style-src * 'unsafe-inline';
+        script-src * 'unsafe-inline' 'unsafe-eval';
+      "
+    />
     <script type="text/javascript" src="cordova.js"></script>
     <!-- <script src="cordova.js"></script> -->
-    <script type="module" crossorigin src="./assets/index-Z_Xgy9yF.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-DhydjF98.css">
+    <script type="module" crossorigin src="./assets/index-Bao4Sw8I.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-jZ5CILyN.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"></div>
   </body>
 </html>
