@@ -1,16 +1,30 @@
-import { useNavigate, type NavigateOptions, type To } from "react-router"
+import { useNavigate, type NavigateOptions, type To } from "react-router";
 
 export const useShiNavigate = (serviceId?: string) => {
-    const navigate = useNavigate()
+  const navigate = useNavigate();
 
-    return (to: To, options?: NavigateOptions) => {
-        if (!serviceId) return
+  return (to: To | number, options?: NavigateOptions) => {
+    if (!serviceId) return;
 
-        const path =
-            typeof to === "string"
-                ? to.startsWith("/") ? to.slice(1) : to
-                : to
-
-        navigate(`/shinobu/${serviceId}/${path}`, options)
+    if (typeof to === "number") {
+      navigate(to);
+      return;
     }
-}
+
+    if (typeof to === "string") {
+      const cleanPath = to.startsWith("/") ? to.slice(1) : to;
+      navigate(`/shinobu/${serviceId}/${cleanPath}`, options);
+      return;
+    }
+
+    navigate(
+      {
+        ...to,
+        pathname: to.pathname?.startsWith("/")
+          ? `/shinobu/${serviceId}${to.pathname}`
+          : `/shinobu/${serviceId}/${to.pathname ?? ""}`,
+      },
+      options
+    );
+  };
+};

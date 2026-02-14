@@ -4,7 +4,7 @@ import {
   useState,
 } from "react";
 import { Link } from "react-router";
-import { FaXmark, FaFilter } from "react-icons/fa6";
+
 
 import { ServiceItem } from "../../../interfaces/Service";
 import { shinobuFetch } from "../../../utils/fetchShinobu";
@@ -88,72 +88,6 @@ const MangaCard = ({ manga, service }: { manga: MangaItem; service: ServiceItem 
   </Link>
 );
 
-/* ===================== Advance Search ===================== */
-
-const AdvanceSearchModal = ({
-  open,
-  onClose,
-  onApply,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onApply: (v: { title: string; genre: string; adult: boolean }) => void;
-}) => {
-  const [title, setTitle] = useState("");
-  const [genre, setGenre] = useState("");
-  const [adult, setAdult] = useState(false);
-
-  if (!open) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative w-full max-w-md rounded-2xl bg-[#1e1e1e] p-6">
-        <button onClick={onClose} className="absolute top-4 right-4">
-          <FaXmark />
-        </button>
-
-        <h2 className="flex items-center gap-2 mb-4">
-          <FaFilter /> Advance Search
-        </h2>
-
-        <input
-          className="w-full mb-2 px-3 py-2 rounded bg-[#2a2a2a]"
-          placeholder="Judul"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-        />
-
-        <input
-          className="w-full mb-2 px-3 py-2 rounded bg-[#2a2a2a]"
-          placeholder="Genre"
-          value={genre}
-          onChange={e => setGenre(e.target.value)}
-        />
-
-        <label className="flex gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={adult}
-            onChange={() => setAdult(v => !v)}
-          />
-          Tampilkan Adult
-        </label>
-
-        <button
-          onClick={() => {
-            onApply({ title, genre, adult });
-            onClose();
-          }}
-          className="mt-4 w-full py-2 rounded bg-[#C667F7]"
-        >
-          Terapkan
-        </button>
-      </div>
-    </div>
-  );
-};
-
 /* ===================== Main Page ===================== */
 
 const MangaListPage = () => {
@@ -163,13 +97,6 @@ const MangaListPage = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const [modalOpen, setModalOpen] = useState(false);
-  const [filter, setFilter] = useState({
-    title: "",
-    genre: "",
-    adult: false,
-  });
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -211,7 +138,7 @@ const MangaListPage = () => {
     setHasMore(true);
 
     fetchLatest(1);
-  }, [service, filter]);
+  }, [service]);
 
   // Hapus fetchLatest dari setPage
   const handleNextPage = () => {
@@ -242,7 +169,7 @@ const MangaListPage = () => {
 
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [loadMoreRef.current, loading, hasMore, service, filter]);
+  }, [loadMoreRef.current, loading, hasMore, service]);
 
   /* ===== Render ===== */
   return (
@@ -268,12 +195,6 @@ const MangaListPage = () => {
           )}
         </div>
       </div>
-
-      <AdvanceSearchModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onApply={setFilter}
-      />
     </>
   );
 };

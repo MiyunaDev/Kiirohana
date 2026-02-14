@@ -32,6 +32,9 @@ import { ShinobuProvider } from './contexts/ShinobuContext.tsx';
 import ShinobuDetail from './Shinobu/pages/Detail/Media.tsx';
 import MainLayout from './Shinobu/layout/Main.layout.tsx';
 import Landing from './Shinobu/pages/Landing/Landing.tsx';
+import SearchLayout from './Shinobu/layout/Search.layout.tsx';
+import Advance from './Shinobu/pages/Browse/Advance.tsx';
+import HistoryPage from './Shinobu/pages/History/History.tsx';
 
 const router = createHashRouter([
   {
@@ -82,8 +85,12 @@ const router = createHashRouter([
               {
                 path: "app", Component: MainLayout, children: [
                   { path: "home", Component: Landing },
+                  { path: "history", Component: HistoryPage },
                   {
-                    path: "search/latest", Component: Latest
+                    path: "search", Component: SearchLayout, children: [
+                      { path: "latest", Component: Latest },
+                      { path: "advance", Component: Advance }
+                    ]
                   }
                 ]
               },

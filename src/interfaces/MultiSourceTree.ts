@@ -1,4 +1,5 @@
-import { Chapter } from "../types/Series";
+
+import Chapter from "./Chapter";
 import ChapterContent from "./ChapterContent";
 import Media from "./Media";
 import MediaExternal from "./MediaExternal";

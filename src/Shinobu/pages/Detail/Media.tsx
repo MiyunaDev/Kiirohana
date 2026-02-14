@@ -1,42 +1,55 @@
 // ShinobuDetail.tsx
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router";
+import { useParams } from "react-router";
 import { motion } from "framer-motion";
 import { shinobuFetch } from "../../../utils/fetchShinobu";
 import { useShinobu } from "../../../hooks/useShinobu";
-import { Chapter } from "../../../types/Series";
+import Chapter from "../../../interfaces/Chapter";
 import Media from "../../../interfaces/Media";
 import MediaExternal from "../../../interfaces/MediaExternal";
 import MultiSourceTree from "../../../interfaces/MultiSourceTree";
 import Source from "../../../interfaces/Source";
 import ChapterContent from "../../../interfaces/ChapterContent";
 import Type from "../../../enums/TypeEnum";
+import { FaArrowLeft, FaHome } from "react-icons/fa";
+import { useShiNavigate } from "../../utils/shiNavigate";
+
+/* ================= Helper ================= */
+
+const normalizeNumber = (v: any, fallback = Infinity) => {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+};
+
+/* ================= ChapterCard ================= */
 
 const ChapterCard = ({
   chapter,
   type
 }: {
   chapter: {
-    chapter: Chapter
-    hasContent: boolean
-    contentId?: string | null
-    content: ChapterContent
-  },
-  type: Type,
+    chapter: Chapter;
+    hasContent: boolean;
+    contentId?: string | null;
+    content: ChapterContent;
+    isRead?: boolean
+  };
+  type: Type;
 }) => {
-  const { service } = useShinobu()
+  const { service } = useShinobu();
+  const navigate = useShiNavigate(service?.id)
 
   const previewUrl =
     typeof chapter.content?.content === "string"
       ? chapter.content.content
-      : undefined
+      : undefined;
 
-  if (!chapter.hasContent || !chapter.contentId) {
+  if (!chapter.hasContent || !chapter.content?._id) {
     return (
       <div className="opacity-50 p-2">
         Chapter {chapter.chapter.chapter} (no content)
       </div>
-    )
+    );
   }
 
   return (
@@ -45,9 +58,9 @@ const ChapterCard = ({
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.35 }}
     >
-      <Link
-        to={`/shinobu/${service?.id}/reader/${type.toLowerCase()}/${chapter.contentId}`}
-        className="relative flex flex-row items-center p-2 h-24 gap-2 group before:absolute before:z-10 before:left-0 before:top-0 before:min-h-full before:rounded-r-full before:transition-all before:duration-500 hover:shadow active:shadow hover:shadow-[#C667F7] active:shadow-[#C667F7] before:w-0 hover:before:w-screen active:before:w-screen before:bg-[#C667F7] overflow-hidden rounded-r-xl"
+      <div
+        onClick={() => navigate(`/reader/${type.toLowerCase()}/${chapter.content._id}`)}
+        className={`relative flex flex-row items-center p-2 h-24 gap-2 group before:absolute before:z-10 before:left-0 before:top-0 before:min-h-full before:rounded-r-full before:transition-all before:duration-500 hover:shadow active:shadow hover:shadow-[#C667F7] active:shadow-[#C667F7] before:w-0 hover:before:w-screen active:before:w-screen before:bg-[#C667F7] overflow-hidden rounded-r-xl ${chapter?.isRead ? "opacity-50" : ""}`}
       >
         {previewUrl && (
           <div className="relative z-10 w-15 aspect-[3/4]">
@@ -59,7 +72,10 @@ const ChapterCard = ({
           </div>
         )}
 
-        <div className={`flex z-10 flex-col ${type === "NOVEL" ? "absolute left-10" : ""}`}>
+        <div
+          className={`flex z-10 flex-col ${type === "NOVEL" ? "absolute left-10" : ""
+            }`}
+        >
           <span>
             {chapter.chapter.volume
               ? `Volume ${chapter.chapter.volume} `
@@ -67,30 +83,31 @@ const ChapterCard = ({
             Chapter {chapter.chapter.chapter}
           </span>
         </div>
-      </Link>
+      </div>
     </motion.div>
-  )
-}
+  );
+};
 
 /* ================= ShinobuDetail ================= */
 
 const ShinobuDetail = () => {
   const { mediaId } = useParams();
   const { service } = useShinobu();
+  const navigate = useShiNavigate(service?.id);
 
   const [media, setMedia] = useState<Media | null>(null);
   const [externals, setExternals] = useState<
     {
-      source: Source
-      mediaExternal: MediaExternal
+      source: Source;
+      mediaExternal: MediaExternal;
       chapters: {
-        chapter: Chapter
-        hasContent: boolean
-        contentId?: string | null
-        content: ChapterContent
-      }[]
+        chapter: Chapter;
+        hasContent: boolean;
+        contentId?: string | null;
+        content: ChapterContent;
+      }[];
     }[]
-  >([])
+  >([]);
 
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -104,8 +121,8 @@ const ShinobuDetail = () => {
         setLoading(true);
 
         const res = await shinobuFetch<{
-          media: Media,
-          tree: MultiSourceTree
+          media: Media;
+          tree: MultiSourceTree;
         }>(`/${service.version?.endpoint}/media/${mediaId}`, {
           auth: true,
           baseUrl: service.url,
@@ -113,13 +130,11 @@ const ShinobuDetail = () => {
         });
 
         setMedia(res.media);
+        setExternals(res.tree.externals);
 
-        const externalData = res.tree.externals
-
-        setExternals(externalData);
-
-        // Default selected source
-        if (externalData.length > 0) setSelectedSource(externalData[0].source.name);
+        if (res.tree.externals.length > 0) {
+          setSelectedSource(res.tree.externals[0].source.name);
+        }
       } catch (err) {
         console.error(err);
         setError("Gagal memuat ShinobuDetail media");
@@ -135,7 +150,37 @@ const ShinobuDetail = () => {
   if (error) return <div className="p-6">{error}</div>;
   if (!media) return null;
 
-  const currentExternal = externals.find((e) => e.source.name === selectedSource);
+  const currentExternal = externals.find(
+    (e) => e.source.name === selectedSource
+  );
+
+  /* ================= SORT & GROUP (FIXED) ================= */
+
+  const sortedChapters = currentExternal
+    ? [...currentExternal.chapters].sort((a, b) => {
+      const volA = normalizeNumber(a.chapter.volume, Infinity);
+      const volB = normalizeNumber(b.chapter.volume, Infinity);
+      if (volA !== volB) return volA - volB;
+
+      const chA = normalizeNumber(a.chapter.chapter, Infinity);
+      const chB = normalizeNumber(b.chapter.chapter, Infinity);
+      return chA - chB;
+    })
+    : [];
+
+  const groupedByVolume = sortedChapters.reduce(
+    (acc, ch) => {
+      const key =
+        ch.chapter.volume !== null && ch.chapter.volume !== undefined
+          ? String(ch.chapter.volume)
+          : "misc";
+
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(ch);
+      return acc;
+    },
+    {} as Record<string, typeof sortedChapters>
+  );
 
   return (
     <motion.div
@@ -144,6 +189,34 @@ const ShinobuDetail = () => {
       transition={{ duration: 0.4 }}
       className="min-h-screen text-white overflow-x-hidden"
     >
+      {/* Floating Navigation */}
+      <div className="fixed top-4 left-4 z-50 flex gap-2">
+        {/* Back */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1 px-3 py-2 rounded-full
+               bg-black/70 backdrop-blur
+               hover:bg-[#C667F7] transition shadow-lg"
+        >
+          <FaArrowLeft size={18} />
+          <span className="text-sm">Back</span>
+        </button>
+
+        {/* Home */}
+        <button
+          onClick={() => {
+            if (!service) return;
+            navigate("/app/home");
+          }}
+          className="flex items-center gap-1 px-3 py-2 rounded-full
+               bg-black/70 backdrop-blur
+               hover:bg-[#C667F7] transition shadow-lg"
+        >
+          <FaHome size={18} />
+          <span className="text-sm">Home</span>
+        </button>
+      </div>
+
       <div className="w-full flex flex-col md:grid md:grid-cols-2">
         {/* Left Panel */}
         <div className="relative w-full overflow-hidden">
@@ -173,8 +246,12 @@ const ShinobuDetail = () => {
               alt={media.title}
             />
             <div className="flex flex-col mt-8 justify-end pb-2">
-              <h1 className="text-xl sm:text-2xl font-semibold">{media.title}</h1>
-              <p className="text-sm opacity-70">Status: {media.status}</p>
+              <h1 className="text-xl sm:text-2xl font-semibold">
+                {media.title}
+              </h1>
+              <p className="text-sm opacity-70">
+                Status: {media.status}
+              </p>
               <p className="text-sm">Type: {media.type}</p>
             </div>
           </motion.div>
@@ -195,7 +272,7 @@ const ShinobuDetail = () => {
             className="p-2 flex flex-row overflow-x-auto items-center"
           >
             {media.genres.map((gen) => {
-              const name = typeof gen === "string" ? gen : gen.name
+              const name = typeof gen === "string" ? gen : gen.name;
               return (
                 <div
                   key={name}
@@ -203,7 +280,7 @@ const ShinobuDetail = () => {
                 >
                   {name}
                 </div>
-              )
+              );
             })}
           </motion.div>
         </div>
@@ -219,7 +296,10 @@ const ShinobuDetail = () => {
                 onChange={(e) => setSelectedSource(e.target.value)}
               >
                 {externals.map((ext) => (
-                  <option key={ext.source.name} value={ext.source.name}>
+                  <option
+                    key={ext.source.name}
+                    value={ext.source.name}
+                  >
                     {ext.source.name}
                   </option>
                 ))}
@@ -227,51 +307,25 @@ const ShinobuDetail = () => {
             </div>
           )}
 
-          {currentExternal ? (
-            Array.from(
-              currentExternal.chapters.reduce(
-                (map: Map<number, {
-                  chapter: Chapter
-                  hasContent: boolean
-                  contentId?: string | null
-                  content: ChapterContent
-                }[]>, ch: {
-                  chapter: Chapter
-                  hasContent: boolean
-                  contentId?: string | null
-                  content: ChapterContent
-                }) => {
-                  const vol = ch.chapter.volume ?? 0;
-                  if (!map.has(vol)) map.set(vol, []);
-                  map.get(vol)!.push(ch);
-                  return map;
-                },
-                new Map<number, {
-                  chapter: Chapter
-                  hasContent: boolean
-                  contentId?: string | null
-                  content: ChapterContent
-                }[]>()
-              )
-            ).map(([volume, chapters]) => (
-              <div key={volume} className="mb-3">
-                <h3 className="font-medium mb-1">
-                  Volume {volume !== 0 ? volume : "Misc"}
-                </h3>
-                <div className="flex flex-col">
-                  {chapters.map((ch) => (
-                    <ChapterCard
-                      key={ch.chapter.id}
-                      chapter={ch}
-                      type={media?.type}
-                    />
-                  ))}
-                </div>
+          {Object.entries(groupedByVolume).map(([volume, chapters]) => (
+            <div key={volume} className="mb-3">
+              <h3 className="font-medium mb-1">
+                {volume === "misc"
+                  ? "Misc / Tanpa Volume"
+                  : `Volume ${volume}`}
+              </h3>
+
+              <div className="flex flex-col">
+                {chapters.filter(ch => ch.hasContent && ch.content?._id).map((ch) => (
+                  <ChapterCard
+                    key={ch.content._id}
+                    chapter={ch}
+                    type={media.type}
+                  />
+                ))}
               </div>
-            ))
-          ) : (
-            <p className="text-sm opacity-60">Pilih source untuk menampilkan chapter</p>
-          )}
+            </div>
+          ))}
         </div>
       </div>
     </motion.div>

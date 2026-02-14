@@ -1,3 +1,4 @@
+import { Chapter } from "../types/Series";
 import MediaExternal from "./MediaExternal";
 import Source from "./Source";
 
@@ -6,8 +7,9 @@ export default interface ChapterContent {
     _id: string,
     _v: number,
 
-    mediaExternal: MediaExternal | string,
-    extension: Source | string,
+    chapter: Chapter;
+    mediaExternal: MediaExternal,
+    extension: Source,
 
     language: string,
     authors?: Array<string>

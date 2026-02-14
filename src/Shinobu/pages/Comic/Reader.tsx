@@ -16,6 +16,13 @@ import { useShiNavigate } from "../../utils/shiNavigate";
 import Media from "../../../interfaces/Media";
 import ChapterContent from "../../../interfaces/ChapterContent";
 
+/* ================= Helper ================= */
+
+const normalizeNumber = (v: any, fallback = Infinity) => {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+};
+
 const ComicReader = () => {
   const { chapterId } = useParams<{ chapterId: string }>();
   const { service } = useShinobu();
@@ -89,19 +96,34 @@ const ComicReader = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* ================= CHAPTER COMPUTATION ================= */
+  /* ================= SORT & CHAPTER COMPUTATION (FIXED) ================= */
+
+  const sortedChapters = useMemo(() => {
+    return [...chapters].sort((a, b) => {
+      const volA = normalizeNumber(a.chapter.volume, Infinity);
+      const volB = normalizeNumber(b.chapter.volume, Infinity);
+      if (volA !== volB) return volA - volB;
+
+      const chA = normalizeNumber(a.chapter.chapter, Infinity);
+      const chB = normalizeNumber(b.chapter.chapter, Infinity);
+      return chA - chB;
+    });
+  }, [chapters]);
+
   const currentIndex = useMemo(() => {
     if (!content) return -1;
-    return chapters.findIndex((ch) => ch._id === content._id);
-  }, [chapters, content]);
+    return sortedChapters.findIndex((ch) => ch._id === content._id);
+  }, [sortedChapters, content]);
 
-  const before = currentIndex > 0 ? chapters[currentIndex - 1] : null;
+  const before =
+    currentIndex > 0 ? sortedChapters[currentIndex - 1] : null;
+
   const after =
-    currentIndex >= 0 && currentIndex < chapters.length - 1
-      ? chapters[currentIndex + 1]
+    currentIndex >= 0 && currentIndex < sortedChapters.length - 1
+      ? sortedChapters[currentIndex + 1]
       : null;
 
-  const allChapters = chapters;
+  const allChapters = sortedChapters;
 
   /* ================= STATES ================= */
   if (loading)
@@ -132,10 +154,11 @@ const ComicReader = () => {
 
           <div className="flex flex-col overflow-hidden">
             <span className="text-sm font-semibold truncate">
-              {content.title ?? "Untitled"}
+              {media?.title ?? "Untitled"}
             </span>
             <span className="text-xs text-gray-400">
-              Chapter {currentIndex + 1}
+              {content.chapter.volume ? `Volume ${content.chapter.volume} ` : ""}
+              Chapter {content.chapter.chapter}
             </span>
           </div>
         </div>
@@ -253,7 +276,10 @@ const ComicReader = () => {
                       : "hover:bg-gray-800"
                   }`}
               >
-                {ch.title ?? `Chapter ${idx + 1}`}
+                {ch.title ??
+                  `${ch.chapter.volume ? `Volume ${ch.chapter.volume} ` : ""}Chapter ${
+                    ch.chapter.chapter
+                  }`}
               </button>
             ))}
           </div>

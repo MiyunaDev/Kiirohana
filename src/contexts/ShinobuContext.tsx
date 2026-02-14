@@ -21,14 +21,15 @@ type ShinobuContextValue = {
   loading: boolean;
 };
 
-export const ShinobuContext = createContext<ShinobuContextValue | null>(
-  null
-);
+export const ShinobuContext =
+  createContext<ShinobuContextValue | null>(null);
 
 export const ShinobuProvider = () => {
-  const { shinobuid } = useParams();
+  const { shinobuid } = useParams<{ shinobuid: string }>();
+
+  // 🔑 scoped navigator → BASE = /shinobu/:shinobuid
   const navigate = useShiNavigate(shinobuid);
-  
+
   const [services] =
     useLocalStorage<ServicesStorage>("services", {
       honoka: null,
@@ -42,24 +43,29 @@ export const ShinobuProvider = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!shinobuid) return;
+    if (!shinobuid) {
+      navigate("..", { replace: true });
+      return;
+    }
 
     const current = services.shinobu.find(
       (s) => s.id === shinobuid
     );
 
     if (!current) {
-      navigate(`/shinobu/`);
+      navigate("..", { replace: true });
       return;
     }
 
-    setService(current)
+    setService(current);
+
+    let cancelled = false;
 
     const run = async () => {
       try {
         setLoading(true);
 
-        // inject credential sekali
+        // inject credential
         localStorage.setItem(
           `${current.id}-x-app-key`,
           current.accessKey!
@@ -69,32 +75,47 @@ export const ShinobuProvider = () => {
           current.secretKey!
         );
 
-        const token =
-          localStorage.getItem(`${current.id}-auth-token`);
+        const token = localStorage.getItem(
+          `${current.id}-auth-token`
+        );
 
         if (!token) {
-          navigate(`/shinobu/${current.id}/login`);
+          // ✅ RELATIVE
+          navigate("login", { replace: true });
           return;
         }
 
-        // fetch user (recommended endpoint)
         const userData =
           await shinobuFetch<ShinobuUser>(
             `/${current.version?.endpoint}/user/me/profile`,
-            { baseUrl: current.url, localId: current.id }
+            {
+              baseUrl: current.url,
+              localId: current.id,
+            }
           );
 
-        setUser(userData);
+        if (!cancelled) {
+          setUser(userData);
+        }
       } catch {
-        localStorage.removeItem(`${current.id}-auth-token`);
-        navigate(`/shinobu/${current.id}/login`);
+        localStorage.removeItem(
+          `${current.id}-auth-token`
+        );
+
+        // ✅ RELATIVE
+        navigate("login", { replace: true });
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     run();
-  }, [shinobuid]);
+    return () => {
+      cancelled = true;
+    };
+  }, [shinobuid, services.shinobu]);
 
   return (
     <ShinobuContext.Provider

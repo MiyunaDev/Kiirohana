@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { FaArrowLeft, FaHome } from "react-icons/fa";
 
 import { shinobuFetch } from "../../../utils/fetchShinobu";
 import type { ShinobuUser } from "../../../interfaces/ShinobuSession";
@@ -44,7 +45,7 @@ export default function UserProfilePage() {
 
         const token = localStorage.getItem(`${service.id}-auth-token`);
         if (!token) {
-            navigate(`/shinobu/${service.id}/login`, { replace: true });
+            navigate(`/shinobu/${service.id}/login`);
             return;
         }
 
@@ -91,7 +92,7 @@ export default function UserProfilePage() {
                 await fetchHistory();
             } catch {
                 localStorage.removeItem(`${service.id}-auth-token`);
-                navigate(`/shinobu/${service.id}/login`, { replace: true });
+                navigate(`/shinobu/${service.id}/login`);
             } finally {
                 setLoading(false);
             }
@@ -164,6 +165,34 @@ export default function UserProfilePage() {
 
     return (
         <div className="min-h-screen w-full bg-slate-950 text-slate-100">
+            {/* Floating Navigation */}
+                  <div className="fixed top-4 left-4 z-50 flex gap-2">
+                    {/* Back */}
+                    <button
+                      onClick={() => navigate(-1)}
+                      className="flex items-center gap-1 px-3 py-2 rounded-full
+                           bg-black/70 backdrop-blur
+                           hover:bg-[#C667F7] transition shadow-lg"
+                    >
+                      <FaArrowLeft size={18} />
+                      <span className="text-sm">Back</span>
+                    </button>
+            
+                    {/* Home */}
+                    <button
+                      onClick={() => {
+                        if (!service) return;
+                        navigate("/app/home");
+                      }}
+                      className="flex items-center gap-1 px-3 py-2 rounded-full
+                           bg-black/70 backdrop-blur
+                           hover:bg-[#C667F7] transition shadow-lg"
+                    >
+                      <FaHome size={18} />
+                      <span className="text-sm">Home</span>
+                    </button>
+                  </div>
+
             {/* HEADER */}
             <div className="border-b border-slate-800">
                 <div className="max-w-7xl mx-auto px-6 py-8 flex items-center gap-6">

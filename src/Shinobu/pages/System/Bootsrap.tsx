@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import { useLocalStorage } from "../../../hooks/useLocalStorage";
 import { shinobuFetch } from "../../../utils/fetchShinobu";
 import ServiceLogo from "../../../components/Settings/Service/ServiceLogo";
 import type { ServiceItem } from "../../../interfaces/Service";
+import { useShiNavigate } from "../../utils/shiNavigate";
 
 /* ================= TYPES ================= */
 
@@ -64,8 +65,10 @@ const ShinobuProgress = ({ step }: { step: BootStep }) => {
 /* ================= BOOTSTRAP ================= */
 
 const ShinobuBootstrap = () => {
-  const navigate = useNavigate();
-  const { shinobuid } = useParams<{ shinobuid?: string }>();
+  const { shinobuid } = useParams<{ shinobuid: string }>();
+
+  // 🔑 scoped navigator → BASE = /shinobu/:shinobuid
+  const navigate = useShiNavigate(shinobuid);
 
   const [services] = useLocalStorage<ServicesStorage>("services", {
     honoka: null,
@@ -80,13 +83,16 @@ const ShinobuBootstrap = () => {
     /* ================= GUARD ================= */
 
     if (!shinobuid) {
-      navigate("/shinobu", { replace: true });
+      navigate("..", { replace: true });
       return;
     }
 
-    const current = services.shinobu.find((s) => s.id === shinobuid);
+    const current = services.shinobu.find(
+      (s) => s.id === shinobuid
+    );
+
     if (!current) {
-      navigate("/shinobu", { replace: true });
+      navigate("..", { replace: true });
       return;
     }
 
@@ -112,7 +118,7 @@ const ShinobuBootstrap = () => {
         );
 
         const info = await shinobuFetch<ServiceItem["info"]>(
-          `/info`,
+          "/info",
           {
             baseUrl: current.url,
             auth: false,
@@ -144,10 +150,8 @@ const ShinobuBootstrap = () => {
         );
 
         if (!token) {
-          navigate(
-            `/shinobu/${current.id}/login`,
-            { replace: true }
-          );
+          // ✅ RELATIVE
+          navigate("login", { replace: true });
           return;
         }
 
@@ -156,10 +160,8 @@ const ShinobuBootstrap = () => {
         await sleep(600);
         if (cancelled) return;
 
-        navigate(
-          `/shinobu/${current.id}/app/home`,
-          { replace: true }
-        );
+        // ✅ RELATIVE
+        navigate("app/home", { replace: true });
       } catch (err) {
         if (cancelled) return;
 
@@ -171,7 +173,7 @@ const ShinobuBootstrap = () => {
         );
 
         await sleep(2000);
-        navigate("/shinobu", { replace: true });
+        navigate("..", { replace: true });
       }
     };
 
@@ -179,7 +181,7 @@ const ShinobuBootstrap = () => {
     return () => {
       cancelled = true;
     };
-  }, [shinobuid, navigate, services.shinobu]);
+  }, [shinobuid, services.shinobu]);
 
   /* ================= RENDER ================= */
 

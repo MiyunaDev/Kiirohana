@@ -12,7 +12,9 @@ type ServicesStorage = {
 };
 
 const ShinobuLogin = () => {
-    const { shinobuid } = useParams();
+    const { shinobuid } = useParams<{ shinobuid: string }>();
+
+    // scoped navigator: BASE = /shinobu/:shinobuid
     const navigate = useShiNavigate(shinobuid);
 
     const [services] =
@@ -30,10 +32,15 @@ const ShinobuLogin = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    /* ================= INVALID SERVICE ================= */
+
     if (!service) {
-        navigate("/shinobu", { replace: true });
+        // ⛔ JANGAN pakai "/shinobu"
+        navigate("..", { replace: true });
         return null;
     }
+
+    /* ================= LOGIN ================= */
 
     const handleLogin = async () => {
         if (!username || !password) {
@@ -54,15 +61,17 @@ const ShinobuLogin = () => {
                 body: {
                     username,
                     password,
-                }, 
-                localId: service.id
+                },
+                localId: service.id,
             });
 
-            localStorage.setItem(`${service.id}-auth-token`, res.token);
+            localStorage.setItem(
+                `${service.id}-auth-token`,
+                res.token
+            );
 
-            navigate(`/shinobu/${service.id}/app`, {
-                replace: true,
-            });
+            // ✅ RELATIVE ke /shinobu/:id
+            navigate("app/home", { replace: true });
         } catch (err) {
             setError(
                 err instanceof Error
@@ -74,15 +83,17 @@ const ShinobuLogin = () => {
         }
     };
 
+    /* ================= RENDER ================= */
+
     return (
         <div className="w-screen h-screen flex items-center justify-center bg-[#101010] text-white">
             <div
                 className="
-          w-full max-w-xs sm:max-w-sm md:max-w-md
-          px-4 sm:px-6
-          flex flex-col items-center gap-4
-          text-center
-        "
+                    w-full max-w-xs sm:max-w-sm md:max-w-md
+                    px-4 sm:px-6
+                    flex flex-col items-center gap-4
+                    text-center
+                "
             >
                 {/* LOGO */}
                 {service.info?.logo && (
@@ -91,7 +102,7 @@ const ShinobuLogin = () => {
                             baseUrl={service.url}
                             logo={service.info.logo}
                             logoData={service.logoData}
-                            onLoad={() => { }}
+                            onLoad={() => {}}
                         />
                     </div>
                 )}
@@ -110,11 +121,11 @@ const ShinobuLogin = () => {
                             setUsername(e.target.value)
                         }
                         className="
-              w-full px-3 py-2 rounded-md
-              bg-[#1f1f1f] border border-[#2a2a2a]
-              text-sm outline-none
-              focus:border-[#C667F7]
-            "
+                            w-full px-3 py-2 rounded-md
+                            bg-[#1f1f1f] border border-[#2a2a2a]
+                            text-sm outline-none
+                            focus:border-[#C667F7]
+                        "
                     />
 
                     <input
@@ -125,11 +136,11 @@ const ShinobuLogin = () => {
                             setPassword(e.target.value)
                         }
                         className="
-              w-full px-3 py-2 rounded-md
-              bg-[#1f1f1f] border border-[#2a2a2a]
-              text-sm outline-none
-              focus:border-[#C667F7]
-            "
+                            w-full px-3 py-2 rounded-md
+                            bg-[#1f1f1f] border border-[#2a2a2a]
+                            text-sm outline-none
+                            focus:border-[#C667F7]
+                        "
                     />
 
                     {error && (
@@ -142,13 +153,14 @@ const ShinobuLogin = () => {
                         onClick={handleLogin}
                         disabled={loading}
                         className={`
-              mt-2 py-2 rounded-md text-sm font-medium
-              transition
-              ${loading
-                                ? "bg-[#303030] text-zinc-500"
-                                : "bg-[#C667F7] text-black hover:brightness-110"
+                            mt-2 py-2 rounded-md text-sm font-medium
+                            transition
+                            ${
+                                loading
+                                    ? "bg-[#303030] text-zinc-500"
+                                    : "bg-[#C667F7] text-black hover:brightness-110"
                             }
-            `}
+                        `}
                     >
                         {loading ? "Masuk…" : "Masuk"}
                     </button>
