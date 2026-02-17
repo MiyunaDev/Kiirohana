@@ -15,6 +15,9 @@ import { useShiNavigate } from "../../utils/shiNavigate";
 
 import Media from "../../../interfaces/Media";
 import ChapterContent from "../../../interfaces/ChapterContent";
+import { FaCommentDots } from "react-icons/fa";
+import { CommentsSection } from "../../../components/CommentSection";
+import useMediaComments from "../../../hooks/useMediaComments";
 
 /* ================= Helper ================= */
 
@@ -22,6 +25,7 @@ const normalizeNumber = (v: any, fallback = Infinity) => {
   const n = Number(v);
   return Number.isFinite(n) ? n : fallback;
 };
+
 
 const ComicReader = () => {
   const { chapterId } = useParams<{ chapterId: string }>();
@@ -37,6 +41,7 @@ const ComicReader = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showActionBar, setShowActionBar] = useState(true);
   const [showChapterPanel, setShowChapterPanel] = useState(false);
+  const [showCommentsFloating, setShowCommentsFloating] = useState(false);
 
   /* ================= FETCH ================= */
   useEffect(() => {
@@ -77,6 +82,24 @@ const ComicReader = () => {
       canceled = true;
     };
   }, [chapterId, service]);
+
+  const {
+    comments,
+    commentLoading,
+    fetchComments,
+    fetchReplies,
+    createComment,
+    replyComment,
+  } = useMediaComments({
+    mediaId: media?._id!,
+    chapterId: content?.chapter._id,
+    service,
+  });
+
+  useEffect(() => {
+    if (!media?._id && !content?.chapter._id) return;
+    fetchComments();
+  }, [media?._id, content?.chapter._id, fetchComments]);
 
   /* ================= SCROLL PROGRESS ================= */
   useEffect(() => {
@@ -139,27 +162,68 @@ const ComicReader = () => {
     <div className="bg-gray-900 text-gray-200 min-h-screen">
       {/* ===== HEADER ===== */}
       {showActionBar && (
-        <div
-          className="fixed top-0 left-0 right-0 z-50
-          bg-gray-900/90 backdrop-blur
-          border-b border-gray-800
-          flex items-center gap-3 px-4 py-3"
-        >
-          <button
-            onClick={() => navigate(`/detail/${media?._id}`)}
-            className="p-2 bg-gray-800 rounded-full hover:bg-gray-700"
-          >
-            <HiArrowLeft size={18} />
-          </button>
+        <div className="fixed top-0 left-0 right-0 z-50
+    bg-gray-900/90 backdrop-blur
+    border-b border-gray-800
+    flex items-center justify-between px-4 py-3">
 
-          <div className="flex flex-col overflow-hidden">
-            <span className="text-sm font-semibold truncate">
-              {media?.title ?? "Untitled"}
-            </span>
-            <span className="text-xs text-gray-400">
-              {content.chapter.volume ? `Volume ${content.chapter.volume} ` : ""}
-              Chapter {content.chapter.chapter}
-            </span>
+          {/* LEFT SIDE: BACK BUTTON + TITLE */}
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              onClick={() => navigate(`/detail/${media?._id}`)}
+              className="p-2 bg-gray-800 rounded-full hover:bg-gray-700 flex-shrink-0"
+            >
+              <HiArrowLeft size={18} />
+            </button>
+
+            {/* TITLE */}
+            <div className="flex flex-col overflow-hidden min-w-0">
+              <span className="text-sm font-semibold truncate">{media?.title ?? "Untitled"}</span>
+              <span className="text-xs text-gray-400 truncate">
+                {content.chapter.volume ? `Volume ${content.chapter.volume} ` : ""}
+                Chapter {content.chapter.chapter}
+              </span>
+            </div>
+          </div>
+
+          {/* RIGHT SIDE: COMMENT ICON */}
+          <button
+            onClick={() => setShowCommentsFloating((v) => !v)}
+            className="p-2 bg-gray-800 rounded-full hover:bg-gray-700 flex-shrink-0 ml-2"
+          >
+            <FaCommentDots size={18} />
+          </button>
+        </div>
+      )}
+
+      {/* ===== FLOATING COMMENTS ===== */}
+      {showCommentsFloating && media?._id && content.chapter && service && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          {/* BACKDROP */}
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowCommentsFloating(false)}
+          />
+
+          {/* WINDOW COMMENTS */}
+          <div className="relative w-full sm:w-96 bg-gray-900 border-l border-gray-800 shadow-lg p-4 overflow-y-auto max-h-full">
+            <div className="flex justify-between items-center mb-4">
+              <span className="font-semibold text-lg">Komentar</span>
+              <button
+                onClick={() => setShowCommentsFloating(false)}
+                className="p-1 hover:bg-gray-800 rounded-full"
+              >
+                <HiX size={20} />
+              </button>
+            </div>
+
+            <CommentsSection
+              comments={comments}
+              commentLoading={commentLoading}
+              replyComment={replyComment}
+              createComment={createComment}
+              fetchReplies={fetchReplies}
+            />
           </div>
         </div>
       )}
@@ -178,6 +242,20 @@ const ComicReader = () => {
             />
           );
         })}
+        {/* ===== CONTENT ===== */}
+        <div className="pt-16">
+          {content.content?.map((ct, i) => {
+            const src = typeof ct === "string" ? ct : undefined;
+            return (
+              <LazyImage
+                key={i}
+                src={src}
+                alt={`Page ${i + 1}`}
+                className="w-full h-auto"
+              />
+            );
+          })}
+        </div>
       </div>
 
       {/* ===== ACTION BAR ===== */}
@@ -270,15 +348,13 @@ const ComicReader = () => {
                   setShowChapterPanel(false);
                 }}
                 className={`w-full text-left px-4 py-3 border-b border-gray-800
-                  ${
-                    idx === currentIndex
-                      ? "bg-blue-700 text-white"
-                      : "hover:bg-gray-800"
+                  ${idx === currentIndex
+                    ? "bg-blue-700 text-white"
+                    : "hover:bg-gray-800"
                   }`}
               >
                 {ch.title ??
-                  `${ch.chapter.volume ? `Volume ${ch.chapter.volume} ` : ""}Chapter ${
-                    ch.chapter.chapter
+                  `${ch.chapter.volume ? `Volume ${ch.chapter.volume} ` : ""}Chapter ${ch.chapter.chapter
                   }`}
               </button>
             ))}

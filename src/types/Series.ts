@@ -28,7 +28,7 @@ export type Chapter = {
     chapter: number,
     title?: string | null,
     url: string,
-    id: string,
+    _id: string,
     content: Array<string> | Array<NovelContent>
 }
 
