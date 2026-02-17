@@ -1,6 +1,7 @@
 import {
   createContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { Outlet, useParams } from "react-router";
@@ -19,6 +20,7 @@ type ShinobuContextValue = {
   service: ServiceItem | null;
   user: ShinobuUser | null;
   loading: boolean;
+  refresh: () => Promise<void>;
 };
 
 export const ShinobuContext =
@@ -26,8 +28,6 @@ export const ShinobuContext =
 
 export const ShinobuProvider = () => {
   const { shinobuid } = useParams<{ shinobuid: string }>();
-
-  // 🔑 scoped navigator → BASE = /shinobu/:shinobuid
   const navigate = useShiNavigate(shinobuid);
 
   const [services] =
@@ -40,86 +40,121 @@ export const ShinobuProvider = () => {
     useState<ServiceItem | null>(null);
   const [user, setUser] =
     useState<ShinobuUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
-  useEffect(() => {
-    if (!shinobuid) {
-      navigate("..", { replace: true });
-      return;
-    }
-
-    const current = services.shinobu.find(
-      (s) => s.id === shinobuid
+  /**
+   * 🔁 selalu resolve service terbaru dari storage
+   */
+  const resolvedService = useMemo(() => {
+    if (!shinobuid) return null;
+    return (
+      services.shinobu.find(
+        (s) => s.id === shinobuid
+      ) ?? null
     );
+  }, [shinobuid, services.shinobu]);
 
-    if (!current) {
+  /**
+   * ⛔ service tidak valid → keluar
+   */
+  useEffect(() => {
+    if (!shinobuid || !resolvedService) {
+      setService(null);
+      setUser(null);
       navigate("..", { replace: true });
       return;
     }
 
-    setService(current);
+    setService(resolvedService);
+  }, [resolvedService, shinobuid]);
 
-    let cancelled = false;
+  /**
+   * 🔄 fetch user profile (reusable)
+   */
+  const refresh = async () => {
+    if (!service) return;
 
-    const run = async () => {
-      try {
-        setLoading(true);
+    setLoading(true);
 
-        // inject credential
-        localStorage.setItem(
-          `${current.id}-x-app-key`,
-          current.accessKey!
-        );
-        localStorage.setItem(
-          `${current.id}-x-app-secret`,
-          current.secretKey!
-        );
+    try {
+      // inject credential terbaru
+      localStorage.setItem(
+        `${service.id}-x-app-key`,
+        service.accessKey!
+      );
+      localStorage.setItem(
+        `${service.id}-x-app-secret`,
+        service.secretKey!
+      );
 
-        const token = localStorage.getItem(
-          `${current.id}-auth-token`
-        );
+      const token = localStorage.getItem(
+        `${service.id}-auth-token`
+      );
 
-        if (!token) {
-          // ✅ RELATIVE
-          navigate("login", { replace: true });
-          return;
-        }
-
-        const userData =
-          await shinobuFetch<ShinobuUser>(
-            `/${current.version?.endpoint}/user/me/profile`,
-            {
-              baseUrl: current.url,
-              localId: current.id,
-            }
-          );
-
-        if (!cancelled) {
-          setUser(userData);
-        }
-      } catch {
-        localStorage.removeItem(
-          `${current.id}-auth-token`
-        );
-
-        // ✅ RELATIVE
+      if (!token) {
+        setUser(null);
         navigate("login", { replace: true });
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        return;
+      }
+
+      const profile =
+        await shinobuFetch<ShinobuUser>(
+          `/${service.version?.endpoint}/user/me/profile`,
+          {
+            baseUrl: service.url,
+            localId: service.id,
+          }
+        );
+
+      setUser(profile);
+    } catch {
+      localStorage.removeItem(
+        `${service.id}-auth-token`
+      );
+      setUser(null);
+      navigate("login", { replace: true });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * 🚀 auto refresh saat service berubah
+   */
+  useEffect(() => {
+    if (service) refresh();
+  }, [service]);
+
+  /**
+   * 🧠 sync antar tab (storage change)
+   */
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (
+        e.key === "services" ||
+        e.key?.includes("-auth-token")
+      ) {
+        refresh();
       }
     };
 
-    run();
-    return () => {
-      cancelled = true;
-    };
-  }, [shinobuid, services.shinobu]);
+    window.addEventListener("storage", onStorage);
+    return () =>
+      window.removeEventListener(
+        "storage",
+        onStorage
+      );
+  }, [service]);
 
   return (
     <ShinobuContext.Provider
-      value={{ service, user, loading }}
+      value={{
+        service,
+        user,
+        loading,
+        refresh,
+      }}
     >
       <Outlet />
     </ShinobuContext.Provider>

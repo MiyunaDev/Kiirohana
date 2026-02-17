@@ -8,7 +8,13 @@ export interface ShinobuUser {
   email: string;
   role: string;
   avatarUrl?: string;
-  bio?: string
+  bio?: string,
+  stats: {
+    level: number,
+    currentXp: number,
+    xpToNextLevel: number,
+    progress: number
+  }
 }
 
 export interface ShinobuSession {

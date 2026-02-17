@@ -4,6 +4,7 @@ import { useParams } from "react-router";
 import { motion } from "framer-motion";
 import { shinobuFetch } from "../../../utils/fetchShinobu";
 import { useShinobu } from "../../../hooks/useShinobu";
+
 import Chapter from "../../../interfaces/Chapter";
 import Media from "../../../interfaces/Media";
 import MediaExternal from "../../../interfaces/MediaExternal";
@@ -13,6 +14,8 @@ import ChapterContent from "../../../interfaces/ChapterContent";
 import Type from "../../../enums/TypeEnum";
 import { FaArrowLeft, FaHome } from "react-icons/fa";
 import { useShiNavigate } from "../../utils/shiNavigate";
+import useMediaComments from "../../../hooks/useMediaComments";
+import { CommentsSection } from "../../../components/CommentSection";
 
 /* ================= Helper ================= */
 
@@ -37,7 +40,7 @@ const ChapterCard = ({
   type: Type;
 }) => {
   const { service } = useShinobu();
-  const navigate = useShiNavigate(service?.id)
+  const navigate = useShiNavigate(service?.id);
 
   const previewUrl =
     typeof chapter.content?.content === "string"
@@ -59,8 +62,16 @@ const ChapterCard = ({
       transition={{ duration: 0.35 }}
     >
       <div
-        onClick={() => navigate(`/reader/${type.toLowerCase()}/${chapter.content._id}`)}
-        className={`relative flex flex-row items-center p-2 h-24 gap-2 group before:absolute before:z-10 before:left-0 before:top-0 before:min-h-full before:rounded-r-full before:transition-all before:duration-500 hover:shadow active:shadow hover:shadow-[#C667F7] active:shadow-[#C667F7] before:w-0 hover:before:w-screen active:before:w-screen before:bg-[#C667F7] overflow-hidden rounded-r-xl ${chapter?.isRead ? "opacity-50" : ""}`}
+        onClick={() =>
+          navigate(`/reader/${type.toLowerCase()}/${chapter.content._id}`)
+        }
+        className={`relative flex flex-row items-center p-2 h-24 gap-2 group
+        before:absolute before:z-10 before:left-0 before:top-0 before:min-h-full
+        before:rounded-r-full before:transition-all before:duration-500
+        hover:shadow active:shadow hover:shadow-[#C667F7] active:shadow-[#C667F7]
+        before:w-0 hover:before:w-screen active:before:w-screen
+        before:bg-[#C667F7] overflow-hidden rounded-r-xl
+        ${chapter?.isRead ? "opacity-50" : ""}`}
       >
         {previewUrl && (
           <div className="relative z-10 w-15 aspect-[3/4]">
@@ -91,7 +102,7 @@ const ChapterCard = ({
 /* ================= ShinobuDetail ================= */
 
 const ShinobuDetail = () => {
-  const { mediaId } = useParams();
+  const { mediaId } = useParams<{ mediaId: string }>();
   const { service } = useShinobu();
   const navigate = useShiNavigate(service?.id);
 
@@ -112,6 +123,23 @@ const ShinobuDetail = () => {
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  /* ================= Comment System ================= */
+
+  const {
+    comments,
+    commentLoading,
+    fetchComments,
+    fetchReplies,
+    createComment,
+    replyComment,
+  } = useMediaComments({
+    mediaId: mediaId!,
+    chapterId: null,
+    service,
+  });
+
+  /* ================= Effects ================= */
 
   useEffect(() => {
     if (!mediaId || !service) return;
@@ -146,6 +174,13 @@ const ShinobuDetail = () => {
     fetchDetail();
   }, [mediaId, service]);
 
+  useEffect(() => {
+    if (!mediaId) return;
+    fetchComments();
+  }, [mediaId, fetchComments]);
+
+  /* ================= Guards ================= */
+
   if (loading) return <div className="p-6">Loading...</div>;
   if (error) return <div className="p-6">{error}</div>;
   if (!media) return null;
@@ -154,33 +189,28 @@ const ShinobuDetail = () => {
     (e) => e.source.name === selectedSource
   );
 
-  /* ================= SORT & GROUP (FIXED) ================= */
-
   const sortedChapters = currentExternal
     ? [...currentExternal.chapters].sort((a, b) => {
-      const volA = normalizeNumber(a.chapter.volume, Infinity);
-      const volB = normalizeNumber(b.chapter.volume, Infinity);
+      const volA = normalizeNumber(a.chapter.volume);
+      const volB = normalizeNumber(b.chapter.volume);
       if (volA !== volB) return volA - volB;
 
-      const chA = normalizeNumber(a.chapter.chapter, Infinity);
-      const chB = normalizeNumber(b.chapter.chapter, Infinity);
+      const chA = normalizeNumber(a.chapter.chapter);
+      const chB = normalizeNumber(b.chapter.chapter);
       return chA - chB;
     })
     : [];
 
-  const groupedByVolume = sortedChapters.reduce(
-    (acc, ch) => {
-      const key =
-        ch.chapter.volume !== null && ch.chapter.volume !== undefined
-          ? String(ch.chapter.volume)
-          : "misc";
+  const groupedByVolume = sortedChapters.reduce((acc, ch) => {
+    const key =
+      ch.chapter.volume !== null && ch.chapter.volume !== undefined
+        ? String(ch.chapter.volume)
+        : "misc";
 
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(ch);
-      return acc;
-    },
-    {} as Record<string, typeof sortedChapters>
-  );
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(ch);
+    return acc;
+  }, {} as Record<string, typeof sortedChapters>);
 
   return (
     <motion.div
@@ -326,6 +356,15 @@ const ShinobuDetail = () => {
               </div>
             </div>
           ))}
+
+          {/* ================= Comments ================= */}
+          <CommentsSection
+            comments={comments}
+            commentLoading={commentLoading}
+            replyComment={replyComment}
+            createComment={createComment}
+            fetchReplies={fetchReplies}
+          />
         </div>
       </div>
     </motion.div>
