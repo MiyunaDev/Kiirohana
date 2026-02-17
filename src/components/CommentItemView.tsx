@@ -78,24 +78,37 @@ export const CommentItemView = ({
             />
 
             <div className="flex-1 min-w-0">
-                {/* Header */}
-                <div className="flex items-center gap-2">
-                    <span className="font-semibold text-[15px]">{comment.user.username}</span>
-                    <span className="text-xs text-white/50">
-                        {new Date(comment.createdAt).toLocaleDateString()}
+                {/* ================= HEADER ================= */}
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="font-semibold text-[15px] leading-none">
+                        {comment.user.username}
+                    </span>
+
+                    <span className="px-1.5 py-0.5 text-[10px] rounded bg-[#707070]/80 text-white/90">
+                        Lv. {comment.user.level}
+                    </span>
+
+                    <span className="text-[11px] text-white/40">
+                        {new Date(comment.createdAt).toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                        })}
                     </span>
                 </div>
 
-                {/* Content */}
-                <div className="mt-1 text-[14px] prose prose-invert prose-sm max-w-none">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{comment.content}</ReactMarkdown>
+                {/* ================= CONTENT ================= */}
+                <div className="mt-2 text-[14px] leading-relaxed prose prose-invert prose-sm max-w-none">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {comment.content}
+                    </ReactMarkdown>
                 </div>
 
-                {/* Actions */}
-                <div className="flex gap-4 mt-2 text-xs text-white/60">
+                {/* ================= ACTIONS ================= */}
+                <div className="flex items-center gap-4 mt-3 text-[12px] text-white/50">
                     <button
                         onClick={handleToggleReplyBox}
-                        className="hover:text-white hover:underline"
+                        className="hover:text-white transition-colors"
                     >
                         Balas
                     </button>
@@ -112,27 +125,28 @@ export const CommentItemView = ({
                     )}
                 </div>
 
-                {/* Reply Box */}
+                {/* ================= REPLY BOX ================= */}
                 {showReplyBox && (
-                    <div className="mt-3 space-y-2">
+                    <div className="mt-4 p-3 rounded-lg bg-white/5 ring-1 ring-white/10 space-y-2">
                         <textarea
                             ref={textareaRef}
                             rows={2}
                             value={replyText}
                             onChange={(e) => setReplyText(e.target.value)}
                             placeholder="Tambahkan balasan…"
-                            className="w-full bg-gray-800 rounded-md p-2 text-sm outline-none ring-1 ring-white/10 focus:ring-[#C667F7]"
+                            className="w-full resize-none bg-transparent text-sm outline-none"
                         />
+
                         <div className="flex justify-end gap-2">
                             <button
                                 onClick={() => setShowReplyBox(false)}
-                                className="px-3 py-1 rounded hover:bg-white/10"
+                                className="px-3 py-1 text-xs rounded hover:bg-white/10"
                             >
                                 Batal
                             </button>
                             <button
                                 onClick={handleSend}
-                                className="px-3 py-1 rounded bg-[#C667F7]"
+                                className="px-3 py-1 text-xs rounded bg-[#C667F7] hover:opacity-90"
                             >
                                 Balas
                             </button>
@@ -140,22 +154,24 @@ export const CommentItemView = ({
                     </div>
                 )}
 
-                {/* Replies */}
+                {/* ================= REPLIES ================= */}
                 {showReplies && (
-                    <div className="mt-4 space-y-4">
+                    <div className="mt-4 space-y-4 pl-4 border-l border-white/10">
                         {loadingReplies && (
-                            <div className="text-xs opacity-50">Memuat balasan...</div>
+                            <div className="text-xs text-white/40">
+                                Memuat balasan...
+                            </div>
                         )}
-                        {replies &&
-                            replies.map((reply) => (
-                                <CommentItemView
-                                    key={reply._id}
-                                    comment={reply}
-                                    onReply={onReply}
-                                    loadReplies={loadReplies}
-                                    depth={depth + 1}
-                                />
-                            ))}
+
+                        {replies?.map((reply) => (
+                            <CommentItemView
+                                key={reply._id}
+                                comment={reply}
+                                onReply={onReply}
+                                loadReplies={loadReplies}
+                                depth={depth + 1}
+                            />
+                        ))}
                     </div>
                 )}
             </div>
