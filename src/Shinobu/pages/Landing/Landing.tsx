@@ -168,7 +168,7 @@ const Landing = () => {
     return (
         <div className="lg:p-10">
             {/* ================= HEADER ================= */}
-            <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-4 gap-4 bg-gray-900 rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-4 gap-4 rounded-lg">
                 {/* ===== USER INFO ===== */}
                 <div className="flex flex-row items-center gap-4 w-full sm:w-auto">
                     <div onClick={() => navigate(`/profile`)} className="flex-shrink-0">
