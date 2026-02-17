@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useShinobu } from "../../../hooks/useShinobu";
-import { Link } from "react-router";
 import { ServiceItem } from "../../../interfaces/Service";
 import { shinobuFetch } from "../../../utils/fetchShinobu";
 import { useShiNavigate } from "../../utils/shiNavigate";
@@ -199,9 +198,9 @@ const Landing = () => {
             <section>
                 <div className="flex flex-row gap-5 items-center">
                     <a className="text-lg font-semibold">Terbaru</a>
-                    <Link className="py-2 px-3 rounded-xl bg-[#202020]" to={"search/latest"}>
+                    <div className="py-2 px-3 rounded-xl bg-[#202020]" onClick={() => navigate("search/latest")}>
                         Cek lainnya
-                    </Link>
+                    </div>
                 </div>
                 <div className="w-full flex flex-row overflow-y-scroll gap-3 mt-4">
                     {(service && latestData.length > 0) &&
