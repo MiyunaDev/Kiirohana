@@ -66,15 +66,14 @@ type UserHistoryItem = {
 /* ===================== Manga Card ===================== */
 const MangaCard = ({ manga, service }: { manga: MangaItem; service: ServiceItem }) => {
     const navigate = useShiNavigate(service.id);
-
     return (
         <div
             onClick={() => navigate(`/detail/${manga.id}`)}
-            className="flex flex-col min-w-[120px] max-w-[180px] mx-auto cursor-pointer"
+            className="flex flex-col min-w-[120px] max-w-[180px] mx-auto"
         >
             <div className="relative w-full">
                 <img
-                    src={manga.cover ?? `${service.url}/assets/noimage.png`}
+                    src={manga?.cover ?? `${service.url}/assets/noimage.png`}
                     alt={manga.title}
                     className="w-full aspect-[2/3] object-cover bg-gray-300 rounded-xl"
                     loading="lazy"
@@ -84,9 +83,11 @@ const MangaCard = ({ manga, service }: { manga: MangaItem; service: ServiceItem 
                 </span>
             </div>
 
-            <span className="mt-1 text-xs font-semibold text-center line-clamp-2">
-                {manga.title}
-            </span>
+            <a className="w-1/2 rounded-br-2xl px-0.5 py-1 text-xs text-center bg-[#C667F7]">
+                {manga.type}
+            </a>
+
+            <span className="mt-1 text-xs font-semibold text-center line-clamp-2">{manga.title}</span>
         </div>
     );
 };

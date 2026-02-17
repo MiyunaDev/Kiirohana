@@ -37,6 +37,8 @@ import Advance from './Shinobu/pages/Browse/Advance.tsx';
 import HistoryPage from './Shinobu/pages/History/History.tsx';
 import AccountCenterPage from './Shinobu/pages/System/AccountCenter.tsx';
 import MainSetting from './Shinobu/Settings/MainSetting.tsx';
+import LibraryPage from './Shinobu/pages/Library/Library.tsx';
+import CollectionDetailPage from './Shinobu/pages/Library/CollectionDetailPage.tsx';
 
 const router = createHashRouter([
   {
@@ -89,6 +91,12 @@ const router = createHashRouter([
                   { path: "account-center", Component: AccountCenterPage },
                   { path: "settings", Component: MainSetting },
                   { path: "home", Component: Landing },
+                  {
+                    path: "library", children: [
+                      { index: true, Component: LibraryPage },
+                      { path: "collection/:id", Component: CollectionDetailPage }
+                    ]
+                  },
                   { path: "history", Component: HistoryPage },
                   {
                     path: "search", Component: SearchLayout, children: [
