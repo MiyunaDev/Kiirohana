@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
 import { Link, useSearchParams } from 'react-router';
 import { Chapter, SeriesEnum, SeriesType } from "./../../types/Series.ts"
-import { library } from "../../../demo"
 import { motion } from "framer-motion";
+
+const library: SeriesType[] = []
 
 const ChapterCard = ({
     chapter,
@@ -45,9 +46,9 @@ const ChapterCard = ({
         setPreview(previewUrl);
 
         if (type === "comic") {
-            setDestination(`/detail/reader/comic?title=${encodeURIComponent(detail.title)}&chapterid=${encodeURIComponent(chapter.id)}`)
+            setDestination(`/detail/reader/comic?title=${encodeURIComponent(detail.title)}&chapterid=${encodeURIComponent(chapter._id)}`)
         } else if (type === "novel") {
-            setDestination(`/detail/reader/novel?title=${encodeURIComponent(detail.title)}&chapterid=${encodeURIComponent(chapter.id)}`)
+            setDestination(`/detail/reader/novel?title=${encodeURIComponent(detail.title)}&chapterid=${encodeURIComponent(chapter._id)}`)
         }
 
     }, [chapter, type]);
@@ -178,7 +179,7 @@ const Detail = () => {
                         const isComic = detail.type === SeriesEnum.Manga || detail.type === SeriesEnum.Manhwa || detail.type === SeriesEnum.Manhua;
                         const type = isComic ? "comic" : isNovel ? "novel" : undefined;
 
-                        return <ChapterCard key={ch.id} chapter={ch} type={type} detail={detail} />;
+                        return <ChapterCard key={ch._id} chapter={ch} type={type} detail={detail} />;
                     })}
                 </div>
             </div>
