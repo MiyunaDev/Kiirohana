@@ -12,10 +12,11 @@ import MultiSourceTree from "../../../interfaces/MultiSourceTree";
 import Source from "../../../interfaces/Source";
 import ChapterContent from "../../../interfaces/ChapterContent";
 import Type from "../../../enums/TypeEnum";
-import { FaArrowLeft, FaHome } from "react-icons/fa";
+import { FaArrowLeft, FaHome, FaBookmark, FaPlus, FaTimes } from "react-icons/fa";
 import { useShiNavigate } from "../../utils/shiNavigate";
 import useMediaComments from "../../../hooks/useMediaComments";
 import { CommentsSection } from "../../../components/CommentSection";
+
 
 /* ================= Helper ================= */
 
@@ -23,6 +24,12 @@ const normalizeNumber = (v: any, fallback = Infinity) => {
   const n = Number(v);
   return Number.isFinite(n) ? n : fallback;
 };
+
+interface Collection {
+  _id: string;
+  name: string;
+  media: string[]
+}
 
 /* ================= ChapterCard ================= */
 
@@ -120,6 +127,8 @@ const ShinobuDetail = () => {
     }[]
   >([]);
 
+  /* ================= UserCollection ================= */
+
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -138,6 +147,122 @@ const ShinobuDetail = () => {
     chapterId: null,
     service,
   });
+
+
+  /* ================= Guards ================= */
+
+  const currentExternal = externals.find(
+    (e) => e.source.name === selectedSource
+  );
+
+  const sortedChapters = currentExternal
+    ? [...currentExternal.chapters].sort((a, b) => {
+      const volA = normalizeNumber(a.chapter.volume);
+      const volB = normalizeNumber(b.chapter.volume);
+      if (volA !== volB) return volA - volB;
+
+      const chA = normalizeNumber(a.chapter.chapter);
+      const chB = normalizeNumber(b.chapter.chapter);
+      return chA - chB;
+    })
+    : [];
+
+  const groupedByVolume = sortedChapters.reduce((acc, ch) => {
+    const key =
+      ch.chapter.volume !== null && ch.chapter.volume !== undefined
+        ? String(ch.chapter.volume)
+        : "misc";
+
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(ch);
+    return acc;
+  }, {} as Record<string, typeof sortedChapters>);
+
+  // Bookmark
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState<boolean>(false);
+
+
+  // Show/hide modal/floating panel untuk collection
+  const [showCollectionModal, setShowCollectionModal] = useState<boolean>(false);
+
+  // Nama collection baru (input)
+  const [newCollectionName, setNewCollectionName] = useState<string>("");
+
+  // Pilihan collection (jika kita ingin select default saat menambahkan)
+  const [collections, setCollections] = useState<Collection[]>([])
+  const [_, setSelectedCollection] = useState<string | null>(null);
+
+  // Optional: loading/error state
+  const [collectionLoading, setCollectionLoading] = useState<boolean>(false);
+  const [collectionError, setCollectionError] = useState<string | null>(null);
+
+  const fetchBookmarkStatus = async () => {
+    if (!service || !mediaId) return;
+
+    try {
+      const res = await shinobuFetch<{ media: Media; _id: string }[]>(`/${service.version?.endpoint}/bookmarks`, {
+        auth: true,
+        baseUrl: service.url,
+        localId: service.id,
+      });
+
+      const exists = res.some(b => b.media._id === mediaId);
+      setIsBookmarked(exists);
+    } catch (err) {
+      console.error("Gagal fetch bookmark", err);
+    }
+  };
+
+
+  // Function create collection baru
+  const createNewCollection = async () => {
+    if (!service || !newCollectionName) return;
+    try {
+      setCollectionLoading(true);
+
+      await shinobuFetch<Collection>(`/${service.version?.endpoint}/collections`, {
+        method: "POST",
+        auth: true,
+        baseUrl: service.url,
+        localId: service.id,
+        body: {
+          name: newCollectionName,
+          media: [],                 // awalnya kosong
+        },
+      });
+
+      // Refresh collections & select baru dibuat
+      fetchCollections();
+      setNewCollectionName(""); // reset input
+    } catch (err) {
+      console.error(err);
+      setCollectionError("Gagal membuat koleksi baru");
+    } finally {
+      setCollectionLoading(false);
+    }
+  };
+
+
+  /* ================= Fetch User Collections ================= */
+  const fetchCollections = async () => {
+    if (!service) return;
+    try {
+      setCollectionLoading(true);
+      const res = await shinobuFetch<Collection[]>(`/${service.version?.endpoint}/collections`, {
+        auth: true,
+        baseUrl: service.url,
+        localId: service.id,
+      });
+      setCollections(res);
+      if (res.length > 0) setSelectedCollection(res[0]._id);
+    } catch (err) {
+      console.error(err);
+      setCollectionError("Gagal memuat koleksi");
+    } finally {
+      setCollectionLoading(false);
+    }
+  };
 
   /* ================= Effects ================= */
 
@@ -172,45 +297,95 @@ const ShinobuDetail = () => {
     };
 
     fetchDetail();
+    fetchCollections();
+    fetchBookmarkStatus();
+
   }, [mediaId, service]);
+
+  const toggleCollection = async (collectionId: string) => {
+    if (!service || !media?._id) return;
+
+    const collectionIndex = collections.findIndex(c => c._id === collectionId);
+    if (collectionIndex === -1) return;
+
+    const collection = collections[collectionIndex];
+
+    // pastikan media array hanya berisi string ID
+    const mediaIds = collection.media.map((m: any) => (typeof m === "string" ? m : m._id));
+
+    const isInCollection = mediaIds.includes(media._id);
+
+    // Update local state dulu
+    const updatedCollections = [...collections];
+    updatedCollections[collectionIndex] = {
+      ...collection,
+      media: isInCollection
+        ? mediaIds.filter(id => id !== media._id) // hapus
+        : [...mediaIds, media._id],              // tambah
+    };
+    setCollections(updatedCollections);
+
+    // Kirim ke backend
+    try {
+      setCollectionLoading(true);
+      await shinobuFetch(`/${service.version?.endpoint}/collections/${collectionId}`, {
+        method: "PUT",
+        auth: true,
+        baseUrl: service.url,
+        localId: service.id,
+        body: { media: updatedCollections[collectionIndex].media },
+      });
+    } catch (err) {
+      console.error(err);
+      setCollectionError("Gagal mengubah collection");
+      // rollback state
+      setCollections(collections);
+    } finally {
+      setCollectionLoading(false);
+    }
+  };
+
+  const toggleBookmark = async () => {
+    if (!service || !mediaId) return;
+
+    setBookmarkLoading(true);
+
+    try {
+      if (isBookmarked) {
+        // Hapus bookmark
+        await shinobuFetch(`/${service.version?.endpoint}/bookmarks/${mediaId}`, {
+          method: "DELETE",
+          auth: true,
+          baseUrl: service.url,
+          localId: service.id,
+        });
+        setIsBookmarked(false);
+      } else {
+        // Tambah bookmark
+        await shinobuFetch(`/${service.version?.endpoint}/bookmarks`, {
+          method: "POST",
+          auth: true,
+          baseUrl: service.url,
+          localId: service.id,
+          body: { media: mediaId },
+        });
+        setIsBookmarked(true);
+      }
+    } catch (err) {
+      console.error("Gagal toggle bookmark", err);
+    } finally {
+      setBookmarkLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!mediaId) return;
     fetchComments();
-  }, [mediaId, fetchComments]);
-
-  /* ================= Guards ================= */
+  }, [mediaId]);
 
   if (loading) return <div className="p-6">Loading...</div>;
   if (error) return <div className="p-6">{error}</div>;
   if (!media) return null;
-
-  const currentExternal = externals.find(
-    (e) => e.source.name === selectedSource
-  );
-
-  const sortedChapters = currentExternal
-    ? [...currentExternal.chapters].sort((a, b) => {
-      const volA = normalizeNumber(a.chapter.volume);
-      const volB = normalizeNumber(b.chapter.volume);
-      if (volA !== volB) return volA - volB;
-
-      const chA = normalizeNumber(a.chapter.chapter);
-      const chB = normalizeNumber(b.chapter.chapter);
-      return chA - chB;
-    })
-    : [];
-
-  const groupedByVolume = sortedChapters.reduce((acc, ch) => {
-    const key =
-      ch.chapter.volume !== null && ch.chapter.volume !== undefined
-        ? String(ch.chapter.volume)
-        : "misc";
-
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(ch);
-    return acc;
-  }, {} as Record<string, typeof sortedChapters>);
 
   return (
     <motion.div
@@ -285,6 +460,113 @@ const ShinobuDetail = () => {
               <p className="text-sm">Type: {media.type}</p>
             </div>
           </motion.div>
+
+
+
+          {/* ================= Floating Collection / Bookmark Buttons ================= */}
+          <div className="grid grid-cols-2 gap-3 m-4">
+            {/* Tombol Bookmark */}
+            <button
+              onClick={toggleBookmark}
+              disabled={bookmarkLoading}
+              className={`flex items-center gap-2 justify-center text-sm p-3 rounded-full shadow-md border-2 transition
+    border-[#C667F7] ${isBookmarked ? "bg-[#C667F7] text-white" : "text-[#C667F7] hover:bg-[#C667F7] hover:text-white"}
+    ${bookmarkLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              <FaBookmark className="h-5 w-5" />
+              {isBookmarked ? "Bookmarked" : "Bookmark"}
+            </button>
+            {/* Tombol Collection */}
+            <button
+              onClick={() => setShowCollectionModal(true)}
+              className={`flex items-center gap-3 justify-center text-sm p-3 rounded-full shadow-md border-2 transition
+  border-[#C667F7] text-[#C667F7] hover:bg-[#C667F7] hover:text-white
+  ${collections.some(c => c.media.some(
+                (m: any) => (typeof m === "string" ? m : m._id.toString()) === media?._id
+              )) ? "bg-[#C667F7] text-white" : ""}
+`}
+            >
+              <FaPlus className="h-5 w-5" />
+              <p>Add to Collection</p>
+            </button>
+          </div>
+
+          {/* ================= Modal / Floating Panel untuk Collections ================= */}
+          {showCollectionModal && (
+            <div className="absolute z-50 top-16 left-0 w-full sm:w-80 p-4 bg-gray-900 rounded-xl shadow-lg border border-gray-800">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-md font-semibold text-[#C667F7]">Pilih Koleksi</h3>
+                <button
+                  onClick={() => setShowCollectionModal(false)}
+                  className="text-gray-400 hover:text-white transition"
+                  title="Close"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+
+              {collectionError && (
+                <p className="text-red-500 text-sm mb-2">{collectionError}</p>
+              )}
+
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                {collections.map((c) => {
+                  const isInCollection = c.media.some(
+                    (m: any) => (typeof m === "string" ? m : m._id.toString()) === media?._id
+                  );
+
+                  return (
+                    <button
+                      key={c._id}
+                      onClick={() => toggleCollection(c._id)}
+                      disabled={collectionLoading}
+                      className={`
+        flex items-center justify-center p-2 rounded-lg shadow-sm text-sm font-medium transition
+        ${isInCollection
+                          ? "bg-[#C667F7] text-white"
+                          : "bg-gray-800 text-gray-200 border border-[#C667F7] hover:bg-[#C667F7] hover:text-white"
+                        }
+        ${collectionLoading ? "opacity-50 cursor-not-allowed" : ""}
+      `}
+                    >
+                      {c.name}
+                    </button>
+                  );
+                })}
+
+              </div>
+
+              {/* Input untuk buat collection baru */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Nama koleksi baru"
+                  value={newCollectionName}
+                  onChange={(e) => setNewCollectionName(e.target.value)}
+                  className="flex-1 p-2 rounded-lg bg-gray-800 border border-gray-700 placeholder-gray-400 text-sm focus:ring-2 focus:ring-green-500 transition"
+                />
+                <button
+                  onClick={async () => {
+                    await createNewCollection();
+                    setNewCollectionName("");
+                  }}
+                  disabled={collectionLoading || !newCollectionName.trim()}
+                  className={`
+          bg-green-600 hover:bg-green-500 text-white px-3 py-2 rounded-lg text-sm transition
+          ${collectionLoading || !newCollectionName.trim() ? "opacity-50 cursor-not-allowed" : ""}
+        `}
+                >
+                  Buat
+                </button>
+              </div>
+
+              {collectionLoading && (
+                <p className="text-gray-400 text-sm mt-2">Sedang memuat...</p>
+              )}
+            </div>
+          )}
+
+
 
           <motion.div
             initial={{ opacity: 0 }}
