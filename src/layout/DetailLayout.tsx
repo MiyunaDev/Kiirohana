@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
 import { Outlet, useNavigate, useSearchParams } from 'react-router';
 import { Chapter, SeriesType } from "./../types/Series"
-import { library } from "../../demo"
 import { FaArrowLeft } from "react-icons/fa";
+
+const library: SeriesType[] = []
 
 const DetailLayout = () => {
     const [searchParams] = useSearchParams();
@@ -18,7 +19,7 @@ const DetailLayout = () => {
         const info: SeriesType = library.find((x: SeriesType) => x.title === title) as SeriesType;
         setDetail(info);
         if (chapterid) {
-            const chapter: Chapter | undefined = info.chapters.find(x => x.id === chapterid)
+            const chapter: Chapter | undefined = info.chapters.find(x => x._id === chapterid)
             if (!chapter) return;
             setCh(chapter)
         }
