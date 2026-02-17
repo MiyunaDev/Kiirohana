@@ -166,32 +166,32 @@ export default function UserProfilePage() {
     return (
         <div className="min-h-screen w-full bg-slate-950 text-slate-100">
             {/* Floating Navigation */}
-                  <div className="fixed top-4 left-4 z-50 flex gap-2">
-                    {/* Back */}
-                    <button
-                      onClick={() => navigate(-1)}
-                      className="flex items-center gap-1 px-3 py-2 rounded-full
+            <div className="fixed top-4 left-4 z-50 flex gap-2">
+                {/* Back */}
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center gap-1 px-3 py-2 rounded-full
                            bg-black/70 backdrop-blur
                            hover:bg-[#C667F7] transition shadow-lg"
-                    >
-                      <FaArrowLeft size={18} />
-                      <span className="text-sm">Back</span>
-                    </button>
-            
-                    {/* Home */}
-                    <button
-                      onClick={() => {
+                >
+                    <FaArrowLeft size={18} />
+                    <span className="text-sm">Back</span>
+                </button>
+
+                {/* Home */}
+                <button
+                    onClick={() => {
                         if (!service) return;
                         navigate("/app/home");
-                      }}
-                      className="flex items-center gap-1 px-3 py-2 rounded-full
+                    }}
+                    className="flex items-center gap-1 px-3 py-2 rounded-full
                            bg-black/70 backdrop-blur
                            hover:bg-[#C667F7] transition shadow-lg"
-                    >
-                      <FaHome size={18} />
-                      <span className="text-sm">Home</span>
-                    </button>
-                  </div>
+                >
+                    <FaHome size={18} />
+                    <span className="text-sm">Home</span>
+                </button>
+            </div>
 
             {/* HEADER */}
             <div className="border-b border-slate-800">
@@ -232,6 +232,26 @@ export default function UserProfilePage() {
                             </span>
                         )}
 
+                        {/* LEVEL / PROGRESS BAR */}
+                        {user.stats && (
+                            <div className="mt-3 w-full">
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="text-xs text-slate-300 font-medium">
+                                        Level {user.stats.level}
+                                    </span>
+                                    <span className="text-xs text-slate-400 font-medium">
+                                        {user.stats.currentXp} / {user.stats.xpToNextLevel} XP
+                                    </span>
+                                </div>
+                                <div className="w-full bg-slate-800 rounded-full h-3">
+                                    <div
+                                        className="bg-[#C667F7] h-3 rounded-full transition-all duration-300"
+                                        style={{ width: `${Math.min(user.stats.progress * 100, 100)}%` }}
+                                    ></div>
+                                </div>
+                            </div>
+                        )}
+
                         {!editMode && (
                             <button
                                 onClick={() => setEditMode(true)}
@@ -242,6 +262,7 @@ export default function UserProfilePage() {
                         )}
                     </div>
                 </div>
+
             </div>
 
             {/* CONTENT */}

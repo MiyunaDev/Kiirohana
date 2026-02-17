@@ -66,14 +66,15 @@ type UserHistoryItem = {
 /* ===================== Manga Card ===================== */
 const MangaCard = ({ manga, service }: { manga: MangaItem; service: ServiceItem }) => {
     const navigate = useShiNavigate(service.id);
+
     return (
         <div
             onClick={() => navigate(`/detail/${manga.id}`)}
-            className="flex flex-col min-w-[120px] max-w-[180px] mx-auto"
+            className="flex flex-col min-w-[120px] max-w-[180px] mx-auto cursor-pointer"
         >
             <div className="relative w-full">
                 <img
-                    src={manga?.cover ?? `${service.url}/assets/noimage.png`}
+                    src={manga.cover ?? `${service.url}/assets/noimage.png`}
                     alt={manga.title}
                     className="w-full aspect-[2/3] object-cover bg-gray-300 rounded-xl"
                     loading="lazy"
@@ -83,11 +84,9 @@ const MangaCard = ({ manga, service }: { manga: MangaItem; service: ServiceItem 
                 </span>
             </div>
 
-            <a className="w-1/2 rounded-br-2xl px-0.5 py-1 text-xs text-center bg-[#C667F7]">
-                {manga.type}
-            </a>
-
-            <span className="mt-1 text-xs font-semibold text-center line-clamp-2">{manga.title}</span>
+            <span className="mt-1 text-xs font-semibold text-center line-clamp-2">
+                {manga.title}
+            </span>
         </div>
     );
 };
@@ -95,6 +94,8 @@ const MangaCard = ({ manga, service }: { manga: MangaItem; service: ServiceItem 
 /* ===================== Landing Page ===================== */
 const Landing = () => {
     const { service, user } = useShinobu();
+    const navigate = useShiNavigate(service?.id);
+
     const [time, setTime] = useState<string>();
     const [latestData, setLatestData] = useState<MangaItem[]>([]);
     const [latestLoading, setLatestLoading] = useState(false);
@@ -103,8 +104,6 @@ const Landing = () => {
     const [historyLoading, setHistoryLoading] = useState(false);
 
     const [_, setError] = useState<string | null>(null);
-
-    const navigate = useShiNavigate(service?.id);
 
     /* ===== Fetch Latest Media ===== */
     const fetchLatest = async () => {
@@ -122,8 +121,7 @@ const Landing = () => {
                 { baseUrl: service.url, localId: service.id, auth: true }
             );
 
-            const mapped = res.result.map(mapApiMediaWrapperToManga);
-            setLatestData(mapped);
+            setLatestData(res.result.map(mapApiMediaWrapperToManga));
         } catch {
             setError("Gagal memuat data");
         } finally {
@@ -142,8 +140,7 @@ const Landing = () => {
                 { baseUrl: service.url, localId: service.id, auth: true }
             );
             setHistoryData(res.data);
-        } catch (err) {
-            console.error("Failed to fetch history", err);
+        } catch {
             setHistoryData([]);
         } finally {
             setHistoryLoading(false);
@@ -162,81 +159,114 @@ const Landing = () => {
     /* ===== Clock ===== */
     useEffect(() => {
         const interval = setInterval(() => {
-            const dateObject = new Date();
-            setTime(
-                `${dateObject.getHours()} : ${dateObject.getMinutes()} : ${dateObject.getSeconds()}`
-            );
+            const d = new Date();
+            setTime(`${d.getHours()} : ${d.getMinutes()} : ${d.getSeconds()}`);
         }, 1000);
-
         return () => clearInterval(interval);
     }, []);
 
     return (
         <div className="lg:p-10">
-            {/* HEADER */}
-            <div className="grid grid-cols-2">
-                <div className="flex flex-row items-center p-4 gap-4">
-                    <div onClick={() => navigate(`/profile`)}>
+            {/* ================= HEADER ================= */}
+            <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-4 gap-4 bg-gray-900 rounded-lg">
+                {/* ===== USER INFO ===== */}
+                <div className="flex flex-row items-center gap-4 w-full sm:w-auto">
+                    <div onClick={() => navigate(`/profile`)} className="flex-shrink-0">
                         <img
-                            className="min-w-10 min-h-10 w-10 h-10 aspect-square rounded-full object-cover"
+                            className="w-12 h-12 sm:w-10 sm:h-10 rounded-full object-cover cursor-pointer"
                             src={
                                 user?.avatarUrl ??
                                 `https://api.dicebear.com/8.x/identicon/svg?seed=${user?.username}`
                             }
+                            alt={`${user?.username}'s avatar`}
                         />
                     </div>
-                    <a className="lg:text-lg font-bold">
-                        Wellcome Kak {user?.displayName ?? user?.username}!
-                    </a>
+
+                    <div className="flex flex-col gap-1 flex-1 min-w-0">
+                        <span className="font-bold text-base sm:text-lg truncate">
+                            Welcome Kak {user?.displayName ?? user?.username}!
+                        </span>
+
+                        {/* ===== LEVEL & XP ===== */}
+                        {user?.stats && (
+                            <div className="flex flex-col gap-1 text-xs text-slate-300">
+                                <div className="flex flex-row items-center gap-2 truncate">
+                                    <span className="font-semibold text-purple-400">
+                                        Lv. {user.stats.level}
+                                    </span>
+                                    <span className="truncate">
+                                        {user.stats.currentXp} / {user.stats.xpToNextLevel} XP
+                                    </span>
+                                </div>
+
+                                <div className="w-full sm:w-48 h-2 bg-[#2a2a2a] rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-gradient-to-r from-purple-500 to-fuchsia-500 transition-all duration-300"
+                                        style={{
+                                            width: `${Math.min(Math.max(user.stats.progress * 100, 0), 100)}%`,
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
-                <div className="hidden lg:flex flex-row items-center justify-end gap-4">
-                    <a className="text-lg font-bold">{time}</a>
+
+                {/* ===== TIME ===== */}
+                <div className="mt-2 sm:mt-0 flex justify-center md:justify-start sm:justify-end w-full sm:w-auto">
+                    <span className="text-lg font-bold">{time}</span>
                 </div>
             </div>
 
-            {/* TERBARU */}
+
+            {/* ================= TERBARU ================= */}
             <section>
                 <div className="flex flex-row gap-5 items-center">
-                    <a className="text-lg font-semibold">Terbaru</a>
-                    <div className="py-2 px-3 rounded-xl bg-[#202020]" onClick={() => navigate("search/latest")}>
+                    <span className="text-lg font-semibold">Terbaru</span>
+                    <div
+                        className="py-2 px-3 rounded-xl bg-[#202020] cursor-pointer"
+                        onClick={() => navigate("/app/search/latest")}
+                    >
                         Cek lainnya
                     </div>
                 </div>
+
                 <div className="w-full flex flex-row overflow-y-scroll gap-3 mt-4">
-                    {(service && latestData.length > 0) &&
-                        latestData.slice(0, 7).map((m) => <MangaCard manga={m} service={service} />)
-                    }
+                    {service &&
+                        latestData.slice(0, 7).map((m) => (
+                            <MangaCard key={m.id} manga={m} service={service} />
+                        ))}
                 </div>
             </section>
 
-            {/* LANJUTKAN MEMBACA */}
+            {/* ================= LANJUTKAN MEMBACA ================= */}
             <section className="mt-10">
-                <div className="flex flex-row gap-5 items-center">
-                    <a className="text-lg font-semibold">Lanjutkan Membaca</a>
-                </div>
+                <span className="text-lg font-semibold">Lanjutkan Membaca</span>
 
-                {historyLoading && <div className="text-slate-400 text-sm mt-2">Loading...</div>}
-                {!historyLoading && historyData.length === 0 && (
-                    <div className="text-slate-500 text-sm mt-2">Tidak ada riwayat membaca.</div>
+                {historyLoading && (
+                    <div className="text-slate-400 text-sm mt-2">Loading...</div>
                 )}
 
-                {/* Responsive: mobile scroll, desktop grid 3 kolom */}
+                {!historyLoading && historyData.length === 0 && (
+                    <div className="text-slate-500 text-sm mt-2">
+                        Tidak ada riwayat membaca.
+                    </div>
+                )}
+
                 {!historyLoading && historyData.length > 0 && service && (
                     <div className="w-full flex flex-row overflow-y-scroll gap-3 mt-4">
-                        {historyData
-                            .slice(0, 7)
-                            .map((item) => (
-                                <MangaCard
-                                    key={item.media._id}
-                                    manga={{
-                                        id: item.media._id as string,
-                                        title: item.media.title,
-                                        cover: item.media.coverImage ?? undefined,
-                                        type: item.media.type,
-                                    }}
-                                    service={service}
-                                />
-                            ))}
+                        {historyData.slice(0, 7).map((item) => (
+                            <MangaCard
+                                key={item.media._id}
+                                manga={{
+                                    id: item.media._id as string,
+                                    title: item.media.title,
+                                    cover: item.media.coverImage ?? undefined,
+                                    type: item.media.type,
+                                }}
+                                service={service}
+                            />
+                        ))}
                     </div>
                 )}
             </section>
