@@ -7,7 +7,7 @@ import { useShinobu } from '../../hooks/useShinobu';
 const navItems = [
     { to: "/app/search/latest", icon: <FaSearch size={18} />, label: "Browse" },
     { to: "/app/library", icon: <FaBook size={18} />, label: "Library" },
-    { to: "/app/home", icon: <FaHome size={18} />, label: "Account" },
+    { to: "/app/home", icon: <FaHome size={18} />, label: "Home" },
     { to: "/app/history", icon: <FaHistory size={18} />, label: "History" },
     { to: "/app/settings", icon: <FaCog size={18} />, label: "Settings" },
 ];
