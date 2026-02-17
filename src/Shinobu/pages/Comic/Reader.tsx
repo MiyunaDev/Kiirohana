@@ -43,6 +43,8 @@ const ComicReader = () => {
   const [showChapterPanel, setShowChapterPanel] = useState(false);
   const [showCommentsFloating, setShowCommentsFloating] = useState(false);
 
+  const [chapterSearch, setChapterSearch] = useState("")
+
   /* ================= FETCH ================= */
   useEffect(() => {
     if (!chapterId || !service) return;
@@ -262,57 +264,61 @@ const ComicReader = () => {
       {showActionBar && (
         <div
           className="fixed bottom-4 left-1/2 -translate-x-1/2
-          bg-gray-800/90 backdrop-blur
-          rounded-xl shadow-xl
-          flex items-center gap-4 px-5 py-3 z-50"
+      bg-gray-900/80 backdrop-blur-md
+      rounded-xl shadow-xl
+      flex items-center gap-4 px-5 py-3 z-50"
         >
+          {/* Previous Chapter */}
           <button
             disabled={!before}
-            onClick={() =>
-              before && navigate(`/reader/comic/${before._id}`)
-            }
-            className="p-2 bg-gray-700 rounded-full disabled:opacity-40"
+            onClick={() => before && navigate(`/reader/comic/${before._id}`)}
+            className="p-2 bg-gray-800 rounded-full hover:bg-[#C667F7] text-gray-200 disabled:opacity-40 transition"
+            title="Previous Chapter"
           >
-            <HiArrowLeft />
+            <HiArrowLeft size={20} />
           </button>
 
-          <div className="w-24 text-center">
-            <div className="text-xs mb-1">
-              {Math.round(scrollProgress)}%
-            </div>
-            <div className="h-2 bg-gray-600 rounded overflow-hidden">
+          {/* Progress */}
+          <div className="w-28 flex flex-col items-center text-center">
+            <div className="text-xs text-gray-300 mb-1">{Math.round(scrollProgress)}%</div>
+            <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
               <div
-                className="h-2 bg-blue-400 transition-all"
+                className="h-2 bg-[#C667F7] transition-all"
                 style={{ width: `${scrollProgress}%` }}
               />
             </div>
           </div>
 
+          {/* Next Chapter */}
           <button
             disabled={!after}
-            onClick={() =>
-              after && navigate(`/reader/comic/${after._id}`)
-            }
-            className="p-2 bg-gray-700 rounded-full disabled:opacity-40"
+            onClick={() => after && navigate(`/reader/comic/${after._id}`)}
+            className="p-2 bg-gray-800 rounded-full hover:bg-[#C667F7] text-gray-200 disabled:opacity-40 transition"
+            title="Next Chapter"
           >
-            <HiArrowRight />
+            <HiArrowRight size={20} />
           </button>
 
+          {/* Chapter Panel */}
           <button
             onClick={() => setShowChapterPanel(true)}
-            className="p-2 bg-gray-700 rounded-full"
+            className="p-2 bg-gray-800 rounded-full hover:bg-[#C667F7] text-gray-200 transition"
+            title="Chapters List"
           >
-            <HiViewList />
+            <HiViewList size={20} />
           </button>
 
+          {/* Close Action Bar */}
           <button
             onClick={() => setShowActionBar(false)}
-            className="p-2 bg-gray-700 rounded-full"
+            className="p-2 bg-gray-800 rounded-full hover:bg-red-600 text-gray-200 transition"
+            title="Close"
           >
-            <HiX />
+            <HiX size={20} />
           </button>
         </div>
       )}
+
 
       {/* ===== SHOW BUTTON ===== */}
       {!showActionBar && (
@@ -328,36 +334,64 @@ const ComicReader = () => {
 
       {/* ===== CHAPTER PANEL ===== */}
       {showChapterPanel && (
-        <div
-          className="fixed inset-y-0 right-0 w-full sm:w-64
-          bg-gray-900 border-l border-gray-800 z-50"
-        >
-          <div className="flex justify-between items-center p-4 border-b border-gray-800">
-            <span className="font-semibold">Chapters</span>
-            <button onClick={() => setShowChapterPanel(false)}>
-              <HiX size={20} />
-            </button>
-          </div>
+        <div className="fixed inset-0 z-50 flex">
+          {/* Overlay */}
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowChapterPanel(false)}
+          />
 
-          <div className="overflow-y-auto">
-            {allChapters.map((ch, idx) => (
+          {/* Panel */}
+          <div className="ml-auto relative w-full sm:w-80 max-w-xs bg-gray-900 border-l border-gray-800 shadow-xl flex flex-col">
+            {/* Header */}
+            <div className="flex justify-between items-center p-4 border-b border-gray-800">
+              <span className="font-semibold text-lg">Chapters</span>
               <button
-                key={ch._id}
-                onClick={() => {
-                  navigate(`/reader/comic/${ch._id}`);
-                  setShowChapterPanel(false);
-                }}
-                className={`w-full text-left px-4 py-3 border-b border-gray-800
-                  ${idx === currentIndex
-                    ? "bg-blue-700 text-white"
-                    : "hover:bg-gray-800"
-                  }`}
+                onClick={() => setShowChapterPanel(false)}
+                className="text-gray-400 hover:text-white transition"
               >
-                {ch.title ??
-                  `${ch.chapter.volume ? `Volume ${ch.chapter.volume} ` : ""}Chapter ${ch.chapter.chapter
-                  }`}
+                <HiX size={24} />
               </button>
-            ))}
+            </div>
+
+            {/* Search */}
+            <div className="p-3 border-b border-gray-800">
+              <input
+                type="text"
+                placeholder="Cari chapter..."
+                className="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#C667F7] transition"
+                value={chapterSearch}
+                onChange={(e) => setChapterSearch(e.target.value)}
+              />
+            </div>
+
+            {/* Chapter List */}
+            <div className="flex-1 overflow-y-auto max-h-screen">
+              {allChapters
+                .filter((ch) => {
+                  if (!chapterSearch) return true;
+                  const title = ch.title ?? `${ch.chapter.volume ? `Vol ${ch.chapter.volume} ` : ""}Ch ${ch.chapter.chapter}`;
+                  return title.toLowerCase().includes(chapterSearch.toLowerCase());
+                })
+                .map((ch, idx) => (
+                  <button
+                    key={ch._id}
+                    onClick={() => {
+                      navigate(`/reader/comic/${ch._id}`);
+                      setShowChapterPanel(false);
+                    }}
+                    className={`w-full text-left px-4 py-3 border-b border-gray-800 transition
+                ${idx === currentIndex
+                        ? "bg-[#C667F7] text-white font-medium"
+                        : "hover:bg-gray-800 text-gray-200"
+                      }`}
+                  >
+                    {ch.title ??
+                      `${ch.chapter.volume ? `Vol ${ch.chapter.volume} ` : ""}Ch ${ch.chapter.chapter}`
+                    }
+                  </button>
+                ))}
+            </div>
           </div>
         </div>
       )}
