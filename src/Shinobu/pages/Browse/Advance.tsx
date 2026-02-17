@@ -3,18 +3,39 @@ import { Link } from "react-router";
 import { FaMagnifyingGlass, FaXmark, FaFilter } from "react-icons/fa6";
 
 import { ServiceItem } from "../../../interfaces/Service";
+import { shinobuFetch } from "../../../utils/fetchShinobu";
 import { useShinobu } from "../../../hooks/useShinobu";
 
 /* ===================== Types ===================== */
 
+interface ApiMediaWrapper {
+  _id: string;
+  title: string;
+  description?: string | null;
+  genres?: { name: string }[];
+  coverImage?: string;
+  type: "COMIC" | "NOVEL" | "TV";
+}
+
+interface BrowseMediaResponseWrapper {
+  success: boolean;
+  fetchedAt: string;
+  source: string[];
+  status: {
+    refreshed: number;
+    cooldown: number;
+    fail: number;
+  };
+  result: ApiMediaWrapper[];
+}
+
 export interface MangaItem {
   id: string;
   title: string;
-  thumbnail: string;
+  cover?: string;
   genres: string[];
-  description: string | null;
+  description?: string | null;
   type: "COMIC" | "NOVEL" | "TV";
-  lastUploadedAt?: string;
 }
 
 export interface SearchFilter {
@@ -29,6 +50,202 @@ export interface SearchFilter {
   year?: number;
 }
 
+/* ===================== Helpers ===================== */
+
+const mapApiToManga = (m: ApiMediaWrapper): MangaItem => ({
+  id: m._id,
+  title: m.title,
+  cover: m.coverImage,
+  genres: m.genres?.map(g => g.name) ?? [],
+  description: m.description,
+  type: m.type,
+});
+
+const appendIfNotEmpty = (
+  params: URLSearchParams,
+  key: string,
+  value?: string | number
+) => {
+  if (value !== undefined && value !== "") {
+    params.append(key, String(value));
+  }
+};
+
+/* ===================== Advance Search Modal ===================== */
+
+interface AdvanceSearchModalProps {
+  open: boolean;
+  filter: SearchFilter;
+  onClose: () => void;
+  onApply: (filter: SearchFilter) => void;
+}
+
+const AdvanceSearchModal: React.FC<AdvanceSearchModalProps> = ({
+  open,
+  filter,
+  onClose,
+  onApply,
+}) => {
+  const [local, setLocal] = useState<SearchFilter>(filter);
+
+  useEffect(() => setLocal(filter), [filter]);
+  if (!open) return null;
+
+  const GENRES = [
+    "Action", "Adventure", "Comedy", "Drama", "Fantasy", "Romance", "Horror",
+    "Mystery", "Slice of Life", "Sci-Fi", "Supernatural", "Psychological",
+    "Seinen", "Shounen", "Shoujo", "Josei"
+  ];
+  const COUNTRIES = ["JP", "KR", "CN"];
+  const FORMATS = ["manga", "manhwa", "manhua", "oneshot", "doujinshi"];
+  const STATUS = ["ONGOING", "COMPLETED", "HIATUS", "CANCELLED"];
+  const LANGUAGES = ["id", "en", "jp", "kr", "cn"];
+
+  const renderMultiSelect = (
+    label: string,
+    options: string[],
+    value: string[],
+    onChange: (v: string[]) => void
+  ) => (
+    <div className="flex flex-col gap-1">
+      <span className="text-xs text-gray-400">{label}</span>
+      <div className="flex flex-wrap gap-2 bg-[#1e1e1e] p-2 rounded-lg max-h-28 overflow-y-auto">
+        {options.map(opt => {
+          const active = value.includes(opt);
+          return (
+            <button
+              key={opt}
+              type="button"
+              onClick={() =>
+                active
+                  ? onChange(value.filter(v => v !== opt))
+                  : onChange([...value, opt])
+              }
+              className={`px-2 py-1 text-xs rounded border transition
+                ${active
+                  ? "bg-purple-600 border-purple-500 text-white"
+                  : "bg-[#2a2a2a] border-[#333] text-gray-300 hover:bg-[#333]"
+                }`}
+            >
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      <div className="relative w-full max-w-lg bg-[#121212] rounded-2xl shadow-xl p-6 max-h-[85vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-4 sticky top-0 bg-[#121212] z-10">
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
+            <FaFilter /> Advance Search
+          </h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
+            <FaXmark size={20} />
+          </button>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <input
+            className="w-full px-3 py-2 rounded bg-[#1e1e1e] text-sm"
+            placeholder="Judul / Query"
+            value={local.query}
+            onChange={e => setLocal({ ...local, query: e.target.value })}
+          />
+
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              className="px-3 py-2 rounded bg-[#1e1e1e] text-sm"
+              placeholder="Author"
+              value={local.author}
+              onChange={e => setLocal({ ...local, author: e.target.value })}
+            />
+            <input
+              className="px-3 py-2 rounded bg-[#1e1e1e] text-sm"
+              placeholder="Artist"
+              value={local.artist}
+              onChange={e => setLocal({ ...local, artist: e.target.value })}
+            />
+          </div>
+
+          {renderMultiSelect("Genres", GENRES, local.genres, v =>
+            setLocal({ ...local, genres: v })
+          )}
+          {renderMultiSelect("Country", COUNTRIES, local.country, v =>
+            setLocal({ ...local, country: v })
+          )}
+          {renderMultiSelect("Format", FORMATS, local.format, v =>
+            setLocal({ ...local, format: v })
+          )}
+          {renderMultiSelect("Status", STATUS, local.status, v =>
+            setLocal({ ...local, status: v })
+          )}
+
+          <div className="grid grid-cols-2 gap-2">
+            <select
+              className="px-3 py-2 rounded bg-[#1e1e1e] text-sm"
+              value={local.language}
+              onChange={e =>
+                setLocal({ ...local, language: e.target.value })
+              }
+            >
+              {LANGUAGES.map(l => (
+                <option key={l} value={l}>{l}</option>
+              ))}
+            </select>
+
+            <input
+              type="number"
+              className="px-3 py-2 rounded bg-[#1e1e1e] text-sm"
+              placeholder="Year"
+              value={local.year ?? ""}
+              onChange={e =>
+                setLocal({
+                  ...local,
+                  year: Number(e.target.value) || undefined,
+                })
+              }
+            />
+          </div>
+        </div>
+
+        <div className="mt-5 flex gap-2">
+          <button
+            onClick={() =>
+              setLocal({
+                ...filter,
+                genres: [...filter.genres],
+                country: [...filter.country],
+                format: [...filter.format],
+                status: [...filter.status],
+              })
+            }
+            className="flex-1 py-2 rounded bg-[#2a2a2a] text-sm"
+          >
+            Reset
+          </button>
+          <button
+            onClick={() => {
+              onApply(local);
+              onClose();
+            }}
+            className="flex-1 py-2 rounded bg-purple-600 hover:bg-purple-700 text-sm font-semibold"
+          >
+            Terapkan
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /* ===================== Manga Card ===================== */
 
 const MangaCard = ({ manga, service }: { manga: MangaItem; service: ServiceItem }) => (
@@ -36,165 +253,23 @@ const MangaCard = ({ manga, service }: { manga: MangaItem; service: ServiceItem 
     to={`/shinobu/${service.id}/detail/${manga.id}`}
     className="flex flex-col w-full min-w-[120px] max-w-[180px] mx-auto"
   >
-    <div className="relative w-full">
-      <img
-        src={manga.thumbnail ?? "/assets/noimage.png"}
-        alt={manga.title}
-        className="w-full aspect-[2/3] object-cover bg-gray-300 rounded-xl"
-        loading="lazy"
-      />
-      <span className="absolute bottom-0 w-full text-xs text-center py-1 bg-gradient-to-t from-black/80 to-transparent">
-        Shinobu
-      </span>
-    </div>
-
-    <a className="w-1/2 rounded-br-2xl px-0.5 py-1 text-xs text-center bg-[#C667F7]">
-      {manga.type}
-    </a>
-
+    <img
+      src={manga.cover ?? `${service.url}/assets/noimage.png`}
+      alt={manga.title}
+      className="w-full aspect-[2/3] object-cover rounded-xl"
+      loading="lazy"
+    />
     <span className="mt-1 text-xs font-semibold text-center line-clamp-2">
       {manga.title}
     </span>
   </Link>
 );
 
-/* ===================== Advance Search Modal ===================== */
-
-interface AdvanceSearchModalProps {
-  open: boolean;
-  onClose: () => void;
-  onApply: (filter: SearchFilter) => void;
-  filter: SearchFilter;
-}
-
-const AdvanceSearchModal: React.FC<AdvanceSearchModalProps> = ({
-  open,
-  onClose,
-  onApply,
-  filter
-}) => {
-  const [local, setLocal] = useState<SearchFilter>(filter);
-
-  useEffect(() => setLocal(filter), [filter]);
-
-  if (!open) return null;
-
-  // Contoh options
-  const GENRES = ["Action","Adventure","Comedy","Drama","Ecchi","Fantasy","Horror","Romance","Sci-Fi","Slice of Life","Supernatural","Thriller","Mystery","Sports","Josei","Seinen","Psychological","Music","Shoujo","Shounen"];
-  const COUNTRIES = ["JP","KR","CN"];
-  const FORMATS = ["doujinshi","oneshot"];
-  const STATUS = ["completed","ongoing","upcoming","cancelled","hiatus"];
-  const LANGUAGES = ["id","en","jp","kr","cn"];
-
-  const renderMultiSelect = (label: string, options: string[], selected: string[], onChange: (v: string[]) => void) => (
-    <div className="flex flex-col gap-1">
-      <span className="text-sm text-gray-300">{label}</span>
-      <div className="flex flex-wrap gap-2 bg-[#2a2a2a] p-2 rounded max-h-32 overflow-y-auto">
-        {options.map(opt => (
-          <label
-            key={opt}
-            className="flex items-center gap-1 cursor-pointer px-2 py-1 rounded bg-[#1e1e1e] hover:bg-[#333] text-white"
-          >
-            <input
-              type="checkbox"
-              checked={selected.includes(opt)}
-              onChange={() => {
-                if (selected.includes(opt)) {
-                  onChange(selected.filter(s => s !== opt));
-                } else {
-                  onChange([...selected, opt]);
-                }
-              }}
-            />
-            {opt}
-          </label>
-        ))}
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-[#1e1e1e] rounded-2xl p-6 shadow-xl max-h-[80vh] overflow-y-auto">
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-300 hover:text-white transition"
-        >
-          <FaXmark size={20} />
-        </button>
-
-        <h2 className="flex items-center gap-2 mb-4 text-lg font-semibold text-white sticky top-0 bg-[#1e1e1e] pt-1">
-          <FaFilter /> Advance Search
-        </h2>
-
-        <div className="flex flex-col gap-3">
-          {/* Basic inputs */}
-          <input
-            className="w-full px-3 py-2 rounded bg-[#2a2a2a] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            placeholder="Query"
-            value={local.query}
-            onChange={e => setLocal({ ...local, query: e.target.value })}
-          />
-          <input
-            className="w-full px-3 py-2 rounded bg-[#2a2a2a] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            placeholder="Author"
-            value={local.author}
-            onChange={e => setLocal({ ...local, author: e.target.value })}
-          />
-          <input
-            className="w-full px-3 py-2 rounded bg-[#2a2a2a] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            placeholder="Artist"
-            value={local.artist}
-            onChange={e => setLocal({ ...local, artist: e.target.value })}
-          />
-
-          {/* Multi-selects */}
-          {renderMultiSelect("Genres", GENRES, local.genres, v => setLocal({ ...local, genres: v }))}
-          {renderMultiSelect("Country", COUNTRIES, Array.isArray(local.country) ? local.country : [local.country], v => setLocal({ ...local, country: v }))}
-          {renderMultiSelect("Format", FORMATS, local.format, v => setLocal({ ...local, format: v }))}
-          {renderMultiSelect("Status", STATUS, local.status, v => setLocal({ ...local, status: v }))}
-          
-          <div className="flex flex-col gap-1">
-            <span className="text-sm text-gray-300">Language</span>
-            <select
-              className="w-full px-3 py-2 rounded bg-[#2a2a2a] text-white"
-              value={local.language}
-              onChange={e => setLocal({ ...local, language: e.target.value })}
-            >
-              {LANGUAGES.map(l => <option key={l} value={l}>{l}</option>)}
-            </select>
-          </div>
-
-          <input
-            type="number"
-            className="w-full px-3 py-2 rounded bg-[#2a2a2a] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            placeholder="Year"
-            value={local.year ?? ""}
-            onChange={e => setLocal({ ...local, year: Number(e.target.value) || undefined })}
-          />
-        </div>
-
-        <button
-          onClick={() => {
-            onApply(local);
-            onClose();
-          }}
-          className="mt-4 w-full py-2 rounded bg-purple-600 hover:bg-purple-700 transition text-white font-semibold"
-        >
-          Terapkan
-        </button>
-      </div>
-    </div>
-  );
-};
-
-
 /* ===================== Main Page ===================== */
 
 const Advance: React.FC = () => {
   const { service } = useShinobu();
+
   const [data, setData] = useState<MangaItem[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -207,103 +282,119 @@ const Advance: React.FC = () => {
     author: "",
     artist: "",
     genres: [],
-    country: ["JP"],
+    country: [],
     format: [],
     status: [],
-    language: "id"
+    language: "id",
   });
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  /* ===== Fetch Search ===== */
-  const fetchSearch = async (targetPage: number) => {
+  /* ===== Fetch ===== */
+  const fetchBrowse = async (targetPage: number) => {
     if (!service || loading || !hasMore) return;
 
     try {
       setLoading(true);
       setError(null);
 
-      localStorage.setItem(`${service.id}-x-app-key`, service.accessKey!);
-      localStorage.setItem(`${service.id}-x-app-secret`, service.secretKey!);
+      const params = new URLSearchParams();
+      params.append("page", String(targetPage));
 
-      // Panggil searchMedia jika ada
-      let res: MangaItem[] = [];
-      // @ts-ignore
-      if (service.searchMedia) res = await service.searchMedia({ ...filter, page: targetPage });
+      appendIfNotEmpty(params, "query", filter.query);
+      appendIfNotEmpty(params, "author", filter.author);
+      appendIfNotEmpty(params, "artist", filter.artist);
+      appendIfNotEmpty(params, "language", filter.language);
+      appendIfNotEmpty(params, "year", filter.year);
 
-      const mapped = res
-        .sort((a, b) => (new Date(b.lastUploadedAt ?? 0).getTime() - new Date(a.lastUploadedAt ?? 0).getTime()))
-        .map(item => ({
-          id: item.id,
-          title: item.title,
-          thumbnail: item.thumbnail ?? "/assets/noimage.png",
-          genres: item.genres ?? [],
-          description: item.description,
-          type: item.type ?? "COMIC",
-          lastUploadedAt: item.lastUploadedAt
-        }));
+      filter.genres.forEach(g => params.append("genres", g));
+      filter.country.forEach(c => params.append("country", c));
+      filter.format.forEach(f => params.append("format", f));
+      filter.status.forEach(s => params.append("status", s));
 
-      setData(prev => targetPage === 1 ? mapped : [...prev, ...mapped]);
-      setPage(targetPage);
-      setHasMore(mapped.length === 20);
-    } catch (err: any) {
-      console.error(err);
+      const res = await shinobuFetch<BrowseMediaResponseWrapper>(
+        `/${service.version?.endpoint}/media/browse?${params.toString()}`,
+        { baseUrl: service.url, localId: service.id, auth: true }
+      );
+
+      const mapped = res.result.map(mapApiToManga);
+
+      setData(prev =>
+        targetPage === 1 ? mapped : [...prev, ...mapped]
+      );
+
+      // Backend tidak memberi info total → pakai panjang result
+      setHasMore(res.result.length > 0);
+
+    } catch {
       setError("Gagal memuat data");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ===== Reset on Filter / Service Change ===== */
+  /* ===== Initial Load / Reset ===== */
   useEffect(() => {
     if (!service) return;
+
     setData([]);
     setPage(1);
     setHasMore(true);
-    fetchSearch(1);
+
+    fetchBrowse(1);
   }, [service, filter]);
 
-  /* ===== Infinite Scroll ===== */
+  /* ===== Fetch on Page Change ===== */
   useEffect(() => {
-    const current = loadMoreRef.current;
-    if (!current) return;
+    if (page === 1) return;
+    fetchBrowse(page);
+  }, [page]);
+
+  /* ===== Infinite Scroll (observer hanya naikkan page) ===== */
+  const handleNextPage = () => {
+    if (!loading && hasMore) {
+      setPage(prev => prev + 1);
+    }
+  };
+
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !loading && hasMore) {
-          fetchSearch(page + 1);
+      entries => {
+        if (entries[0].isIntersecting) {
+          handleNextPage();
         }
       },
       { rootMargin: "200px" }
     );
 
-    observer.observe(current);
+    observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [service, filter, page, loading, hasMore]);
+  }, [loading, hasMore]);
 
   /* ===== Render ===== */
   return (
     <>
       <div className="max-w-screen-xl mx-auto px-3 mb-4 flex justify-between">
-        <h1 className="text-lg font-semibold">Manga Library</h1>
+        <h1 className="text-lg font-semibold">Advance Search</h1>
         <button
           onClick={() => setModalOpen(true)}
           className="flex gap-2 px-3 py-2 rounded bg-[#2a2a2a]"
         >
-          <FaMagnifyingGlass /> Advance Search
+          <FaMagnifyingGlass /> Filter
         </button>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 max-w-screen-xl mx-auto px-2">
-        {service && data.map(m => <MangaCard key={m.id} manga={m} service={service} />)}
+        {service &&
+          data.map(m => (
+            <MangaCard key={m.id} manga={m} service={service} />
+          ))}
 
         <div ref={loadMoreRef} className="col-span-full flex justify-center py-6">
-          {loading && <span className="text-sm animate-pulse">Memuat data...</span>}
-          {error && (
-            <button onClick={() => fetchSearch(page)} className="px-4 py-2 text-sm rounded bg-red-500/20">
-              Gagal memuat · Coba lagi
-            </button>
-          )}
+          {loading && <span className="text-sm">Memuat data...</span>}
+          {error && <span className="text-sm text-red-400">{error}</span>}
           {!hasMore && !loading && (
             <span className="text-xs text-gray-500">Tidak ada data lagi</span>
           )}
@@ -312,9 +403,9 @@ const Advance: React.FC = () => {
 
       <AdvanceSearchModal
         open={modalOpen}
+        filter={filter}
         onClose={() => setModalOpen(false)}
         onApply={setFilter}
-        filter={filter}
       />
     </>
   );
