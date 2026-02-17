@@ -35,6 +35,8 @@ import Landing from './Shinobu/pages/Landing/Landing.tsx';
 import SearchLayout from './Shinobu/layout/Search.layout.tsx';
 import Advance from './Shinobu/pages/Browse/Advance.tsx';
 import HistoryPage from './Shinobu/pages/History/History.tsx';
+import AccountCenterPage from './Shinobu/pages/System/AccountCenter.tsx';
+import MainSetting from './Shinobu/Settings/MainSetting.tsx';
 
 const router = createHashRouter([
   {
@@ -84,6 +86,8 @@ const router = createHashRouter([
               },
               {
                 path: "app", Component: MainLayout, children: [
+                  { path: "account-center", Component: AccountCenterPage },
+                  { path: "settings", Component: MainSetting },
                   { path: "home", Component: Landing },
                   { path: "history", Component: HistoryPage },
                   {

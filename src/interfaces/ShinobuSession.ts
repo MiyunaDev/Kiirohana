@@ -2,7 +2,7 @@
 import type { ServiceItem } from "./Service";
 
 export interface ShinobuUser {
-  id: string;
+  _id: string;
   username: string;
   displayName?: string,
   email: string;
