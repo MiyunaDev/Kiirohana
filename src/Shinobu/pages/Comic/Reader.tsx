@@ -244,20 +244,6 @@ const ComicReader = () => {
             />
           );
         })}
-        {/* ===== CONTENT ===== */}
-        <div className="pt-16">
-          {content.content?.map((ct, i) => {
-            const src = typeof ct === "string" ? ct : undefined;
-            return (
-              <LazyImage
-                key={i}
-                src={src}
-                alt={`Page ${i + 1}`}
-                className="w-full h-auto"
-              />
-            );
-          })}
-        </div>
       </div>
 
       {/* ===== ACTION BAR ===== */}
