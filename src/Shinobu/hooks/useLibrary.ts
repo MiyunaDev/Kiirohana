@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import type { BookmarkItem, CollectionItem } from "../interfaces/Library";
 import { shinobuFetch } from "../../utils/fetchShinobu";
-import { useShinobu } from "../../hooks/useShinobu";
+import { useShinobu } from "./useShinobu";
 
 export const useBookmarks = () => {
     const { service } = useShinobu()

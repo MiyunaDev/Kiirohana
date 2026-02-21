@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { storage, StorageValue } from "../utils/storage";
+import { storage, StorageValue } from "../../utils/storage";
 
 type SetStateAction<T> = T | ((prev: T) => T);
 
@@ -24,5 +24,5 @@ export function useLocalStorage<T extends StorageValue>(
     });
   };
 
-  return [state, setValue];
+  return [state, setValue]
 }

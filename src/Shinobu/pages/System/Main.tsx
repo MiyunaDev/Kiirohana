@@ -1,225 +1,309 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import { useLocalStorage } from "../../../hooks/useLocalStorage";
-import type { ServiceItem } from "../../../interfaces/Service";
-import ServiceLogo from "../../../components/Settings/Service/ServiceLogo";
-import { shinobuFetch } from "../../../utils/fetchShinobu";
+import { FaPlus } from "react-icons/fa6";
+import { v4 as uuid } from "uuid";
+
+import ServiceLogo from "../../components/Settings/Service/ServiceLogo";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { shinobuFetch } from "../../utils/fetchShinobu";
+import type { ServiceItem } from "../../interfaces/Service";
+
+type ServiceKind = "honoka" | "shinobu";
 
 type ServicesStorage = {
-    honoka: ServiceItem | null;
-    shinobu: ServiceItem[];
+  honoka: ServiceItem | null;
+  shinobu: ServiceItem[];
 };
 
-const InstalledShinobu = () => {
-    const navigate = useNavigate();
+const ServicesManager = () => {
+  const navigate = useNavigate();
+  const fetchedRef = useRef<Set<string>>(new Set());
 
-    const [services, setServices] =
-        useLocalStorage<ServicesStorage>("services", {
-            honoka: null,
-            shinobu: [],
-        });
+  const [services, setServices] = useLocalStorage<ServicesStorage>("services", {
+    honoka: null,
+    shinobu: [],
+  });
 
-    const [loading, setLoading] = useState(false);
+  const [loadingIds, setLoadingIds] = useState<Set<string>>(new Set());
 
-    /* ================= UPDATE HELPER ================= */
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedKind, _] = useState<ServiceKind>("shinobu");
+  const [urlInput, setUrlInput] = useState("");
+  const [accessKeyInput, setAccessKeyInput] = useState("");
+  const [secretKeyInput, setSecretKeyInput] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-    const updateService = (updated: ServiceItem) => {
-        setServices((prev) => {
-            if (!prev) return prev;
-            return {
-                ...prev,
-                shinobu: prev.shinobu.map((s) =>
-                    s.id === updated.id ? updated : s
-                ),
-            };
-        });
+  /* ================= SAFE FETCH ================= */
+
+  useEffect(() => {
+    services.shinobu.forEach((service) => {
+      if (
+        fetchedRef.current.has(service.id) ||
+        service.info ||
+        !service.enabled
+      )
+        return;
+
+      fetchedRef.current.add(service.id);
+      setLoadingIds((prev) => new Set(prev).add(service.id));
+
+      (async () => {
+        try {
+          localStorage.setItem(`${service.id}-x-app-key`, service.accessKey!);
+          localStorage.setItem(
+            `${service.id}-x-app-secret`,
+            service.secretKey!
+          );
+
+          const info = await shinobuFetch<ServiceItem["info"]>("/info", {
+            baseUrl: service.url,
+            auth: false,
+            localId: service.id,
+          });
+
+          setServices((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  shinobu: prev.shinobu.map((s) =>
+                    s.id === service.id
+                      ? {
+                          ...s,
+                          info,
+                          version: s.version ?? info?.versions?.[0],
+                          error: undefined,
+                        }
+                      : s
+                  ),
+                }
+              : prev
+          );
+        } catch (err) {
+          setServices((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  shinobu: prev.shinobu.map((s) =>
+                    s.id === service.id
+                      ? {
+                          ...s,
+                          error:
+                            err instanceof Error
+                              ? err.message
+                              : "Gagal mengambil info",
+                        }
+                      : s
+                  ),
+                }
+              : prev
+          );
+        } finally {
+          setLoadingIds((prev) => {
+            const next = new Set(prev);
+            next.delete(service.id);
+            return next;
+          });
+        }
+      })();
+    });
+  }, [services.shinobu.length]); // 🔥 hanya tergantung jumlah
+
+  /* ================= ADD SERVICE ================= */
+
+  const submitService = () => {
+    if (!urlInput.trim()) {
+      setError("URL wajib diisi");
+      return;
+    }
+
+    if (selectedKind === "shinobu") {
+      if (!accessKeyInput.trim() || !secretKeyInput.trim()) {
+        setError("Access Key & Secret Key wajib diisi");
+        return;
+      }
+    }
+
+    const newService: ServiceItem = {
+      id: uuid(),
+      url: urlInput.trim(),
+      kind: selectedKind,
+      enabled: true,
+      ...(selectedKind === "shinobu"
+        ? {
+            accessKey: accessKeyInput.trim(),
+            secretKey: secretKeyInput.trim(),
+          }
+        : {}),
     };
 
-    /* ================= FETCH INFO ================= */
-
-    useEffect(() => {
-        if (!services || services.shinobu.length === 0) return;
-
-        let cancelled = false;
-        setLoading(true);
-
-        const run = async () => {
-            const updated = await Promise.all(
-                services.shinobu.map(async (service) => {
-                    try {
-                        if (!service.accessKey || !service.secretKey) {
-                            throw new Error("Credential Shinobu tidak lengkap");
-                        }
-
-                        // inject credential sementara
-                        localStorage.setItem(
-                            `${service.id}-x-app-key`,
-                            service.accessKey
-                        );
-                        localStorage.setItem(
-                            `${service.id}-x-app-secret`,
-                            service.secretKey
-                        );
-
-                        const info = await shinobuFetch<ServiceItem["info"]>(
-                            "/info",
-                            {
-                                baseUrl: service.url,
-                                auth: false,
-                                localId: service.id,
-                            }
-                        );
-
-                        if (cancelled) return service;
-
-                        return {
-                            ...service,
-                            info,
-                            version:
-                                service.version ?? info?.versions?.[0],
-                            error: undefined,
-                        };
-                    } catch (err) {
-                        if (cancelled) return service;
-
-                        return {
-                            ...service,
-                            info: undefined,
-                            error:
-                                err instanceof Error
-                                    ? err.message
-                                    : "Gagal mengambil info Shinobu",
-                        };
-                    }
-                })
-            );
-
-            if (!cancelled) {
-                setServices({
-                    ...services,
-                    shinobu: updated,
-                });
-                setLoading(false);
-            }
-        };
-
-        run();
-        return () => {
-            cancelled = true;
-        };
-    }, [services.shinobu]);
-
-    /* ================= RENDER ================= */
-
-    return (
-        <div className="w-full max-w-5xl mx-auto p-4 sm:p-6 flex flex-col gap-6">
-            <header className="flex flex-col gap-1">
-                <div className="flex items-center gap-5 my-4">
-                    <button
-                        className="bg-[#202020] py-2 px-3 rounded-lg"
-                        onClick={() => navigate(-1)}
-                    >
-                        Kembali
-                    </button>
-                    <h2 className="text-lg font-semibold">
-                        Shinobu Services Mode
-                    </h2>
-                </div>
-
-                <p className="text-xs opacity-60">
-                    Daftar service Shinobu Media Server yang telah terhubung
-                </p>
-            </header>
-
-            {loading && (
-                <p className="text-xs opacity-60">
-                    Memuat informasi Shinobu...
-                </p>
-            )}
-
-            {services.shinobu.length === 0 && (
-                <div
-                    className="bg-[#404040] rounded p-4 text-sm text-zinc-400
-                    border border-dashed border-[#C667F7]/40"
-                >
-                    Belum ada Shinobu yang terpasang
-                </div>
-            )}
-
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {services.shinobu.map((service) => {
-                    const hasError = Boolean(service.error);
-
-                    return (
-                        <div
-                            key={service.id}
-                            className="bg-[#1f1f1f] border border-[#2a2a2a]
-                            rounded-xl p-4 flex flex-col gap-3"
-                        >
-                            {/* HEADER */}
-                            <div className="flex items-center gap-3">
-                                {service.info?.logo && (
-                                    <ServiceLogo
-                                        baseUrl={service.url}
-                                        logo={service.info.logo}
-                                        logoData={service.logoData}
-                                        onLoad={(data) =>
-                                            updateService({
-                                                ...service,
-                                                logoData: data,
-                                            })
-                                        }
-                                    />
-                                )}
-
-                                <div className="flex-1 min-w-0">
-                                    <p className="font-semibold text-sm truncate">
-                                        {service.info?.name ?? "Unknown Shinobu"}
-                                    </p>
-                                    {service.version && (
-                                        <span className="text-xs opacity-70">
-                                            v{service.version.version}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* DESCRIPTION */}
-                            <p className="text-xs opacity-70 line-clamp-2">
-                                {service.info?.description}
-                            </p>
-
-                            {/* ERROR */}
-                            {service.error && (
-                                <span className="text-xs text-red-400">
-                                    {service.error}
-                                </span>
-                            )}
-
-                            {/* ACTION */}
-                            <button
-                                disabled={hasError}
-                                onClick={() =>
-                                    navigate(
-                                        `/shinobu/${service.id}`,
-                                        { replace: true } // 🔴 FIX PENTING
-                                    )
-                                }
-                                className={`mt-auto text-xs px-3 py-2 rounded-md transition
-                                ${
-                                    hasError
-                                        ? "bg-[#303030] text-zinc-500 cursor-not-allowed"
-                                        : "bg-[#C667F7] text-black hover:brightness-110"
-                                }`}
-                            >
-                                Masuk Shinobu
-                            </button>
-                        </div>
-                    );
-                })}
-            </div>
-        </div>
+    setServices((prev) =>
+      prev
+        ? {
+            ...prev,
+            shinobu: [...prev.shinobu, newService],
+          }
+        : prev
     );
+
+    setModalOpen(false);
+  };
+
+  /* ================= UI ================= */
+
+  return (
+    <div className="w-full min-h-screen px-4 sm:px-8 py-8 bg-[#121212] text-white">
+      {/* HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <h1 className="text-2xl font-semibold">Services Manager</h1>
+
+        <button
+          onClick={() => setModalOpen(true)}
+          className="flex items-center gap-2 bg-[#C667F7]
+          text-black px-4 py-2 rounded-lg font-medium
+          hover:brightness-110 transition"
+        >
+          <FaPlus /> Tambah Service
+        </button>
+      </div>
+
+      {/* GRID FULL WIDTH RESPONSIVE */}
+      <div
+        className="
+        grid gap-6
+        grid-cols-1
+        sm:grid-cols-2
+        lg:grid-cols-3
+        xl:grid-cols-4
+      "
+      >
+        {services.shinobu.map((service) => {
+          const loading = loadingIds.has(service.id);
+
+          return (
+            <div
+              key={service.id}
+              className="
+                bg-[#1b1b1b]
+                border border-white/5
+                rounded-2xl
+                p-5
+                flex flex-col
+                gap-4
+                hover:border-[#C667F7]/40
+                transition
+              "
+            >
+              <div className="flex items-center gap-4">
+                {service.info?.logo && (
+                  <ServiceLogo
+                    baseUrl={service.url}
+                    logo={service.info.logo}
+                    logoData={service.logoData}
+                  />
+                )}
+
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold truncate">
+                    {service.info?.name ?? service.url}
+                  </p>
+
+                  {service.version && (
+                    <p className="text-xs opacity-60">
+                      v{service.version.version}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {loading && (
+                <p className="text-xs opacity-60 animate-pulse">
+                  Mengambil info...
+                </p>
+              )}
+
+              {service.error && (
+                <p className="text-xs text-red-400">
+                  {service.error}
+                </p>
+              )}
+
+              <button
+                disabled={!!service.error}
+                onClick={() =>
+                  navigate(`/shinobu/${service.id}`, { replace: true })
+                }
+                className={`
+                  mt-auto
+                  py-2
+                  rounded-lg
+                  text-sm
+                  font-medium
+                  transition
+                  ${
+                    service.error
+                      ? "bg-[#303030] text-zinc-500"
+                      : "bg-[#C667F7] text-black hover:brightness-110"
+                  }
+                `}
+              >
+                Masuk
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* MODAL */}
+      {modalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-[#1e1e1e] rounded-2xl p-6 space-y-4">
+            <h2 className="text-lg font-semibold">Tambah Shinobu</h2>
+
+            <input
+              type="url"
+              placeholder="URL Service"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              className="w-full bg-[#2a2a2a] p-3 rounded-lg text-sm"
+            />
+
+            <input
+              type="text"
+              placeholder="Access Key"
+              value={accessKeyInput}
+              onChange={(e) => setAccessKeyInput(e.target.value)}
+              className="w-full bg-[#2a2a2a] p-3 rounded-lg text-sm"
+            />
+
+            <input
+              type="password"
+              placeholder="Secret Key"
+              value={secretKeyInput}
+              onChange={(e) => setSecretKeyInput(e.target.value)}
+              className="w-full bg-[#2a2a2a] p-3 rounded-lg text-sm"
+            />
+
+            {error && (
+              <p className="text-sm text-red-400">{error}</p>
+            )}
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button onClick={() => setModalOpen(false)}>
+                Batal
+              </button>
+
+              <button
+                onClick={submitService}
+                className="bg-[#C667F7] text-black px-4 py-2 rounded-lg"
+              >
+                Simpan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
-export default InstalledShinobu;
+export default ServicesManager;

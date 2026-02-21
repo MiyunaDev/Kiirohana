@@ -8,16 +8,16 @@ import {
   HiViewList,
 } from "react-icons/hi";
 
-import LazyImage from "../../../components/LazyImage";
-import { useShinobu } from "../../../hooks/useShinobu";
-import { shinobuFetch } from "../../../utils/fetchShinobu";
+import LazyImage from "../../components/LazyImage";
+import { useShinobu } from "../../hooks/useShinobu";
+import { shinobuFetch } from "../../utils/fetchShinobu";
 import { useShiNavigate } from "../../utils/shiNavigate";
 
-import Media from "../../../interfaces/Media";
-import ChapterContent from "../../../interfaces/ChapterContent";
+import Media from "../../interfaces/Media";
+import ChapterContent from "../../interfaces/ChapterContent";
 import { FaCommentDots } from "react-icons/fa";
-import { CommentsSection } from "../../../components/CommentSection";
-import useMediaComments from "../../../hooks/useMediaComments";
+import { CommentsSection } from "../../components/CommentSection";
+import useMediaComments from "../../hooks/useMediaComments";
 
 /* ================= Helper ================= */
 

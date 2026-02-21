@@ -1,4 +1,5 @@
 import {
+  FaCode,
 //   FaPalette,
 //   FaBook,
 //   FaBookOpen,
@@ -11,8 +12,8 @@ import {
   FaShieldHeart,
   FaUser
 } from "react-icons/fa6";
-import { useShiNavigate } from "../../Shinobu/utils/shiNavigate";
-import { useShinobu } from "../../hooks/useShinobu";
+import { useShiNavigate } from "../../utils/shiNavigate";
+import { useShinobu } from "../../../hooks/useShinobu";
 
 interface SettingMenuProps {
   isActive?: boolean;
@@ -26,7 +27,7 @@ const SettingMenu = ({ icon, name, path }: SettingMenuProps) => {
   const navigate = useShiNavigate(service?.id)
   return (
     <div
-      className={`relative bg-[#404040] group overflow-hidden flex flex-row gap-4 p-4 items-center z-20
+      className={`relative group overflow-hidden flex flex-row gap-4 p-4 items-center z-20
         before:absolute before:z-10 before:left-0 before:top-0
         before:min-h-full before:rounded-r-full before:transition-all before:duration-500
         hover:shadow active:shadow hover:shadow-[#C667F7] active:shadow-[#C667F7]
@@ -47,7 +48,7 @@ const MainSetting = () => {
   return (
     <div className="min-h-full flex flex-col md:grid md:grid-cols-2">
       {/* ================= LEFT PANEL ================= */}
-      <div className="py-4 md:min-h-full flex flex-col justify-center items-center bg-[#121212]">
+      <div className="py-4 md:min-h-full flex flex-col justify-center items-center">
         <div className="flex flex-col items-center">
           <img
             src="/icon.png"
@@ -58,7 +59,7 @@ const MainSetting = () => {
       </div>
 
       {/* ================= RIGHT PANEL ================= */}
-      <div className="flex flex-col gap-3 justify-center p-4 md:p-6 bg-[#1A1A1A]">
+      <div className="flex flex-col gap-3 justify-center p-4 md:p-6">
         {/* <SettingMenu icon={<FaPalette />} name="Appearance" path="/app/settings/appearance" />
         <SettingMenu icon={<FaTv />} name="Watch" path="/app/settings/watch" />
         <SettingMenu icon={<FaBook />} name="Novel" path="/app/settings/novel" />
@@ -69,6 +70,12 @@ const MainSetting = () => {
           icon={<FaUser />}
           name="Account Center"
           path="/app/account-center"
+        />
+        {/* Account Center */}
+        <SettingMenu
+          icon={<FaCode />}
+          name="Developer Portal"
+          path="/app/developer-portal"
         />
 
         {/* Security & Privacy */}

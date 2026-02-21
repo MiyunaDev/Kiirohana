@@ -1,4 +1,4 @@
-import LanguageEnum from "../enums/LanguageEnum"
+
 
 export enum SeriesEnum {
     LightNovel = "Light Novel",
@@ -27,9 +27,7 @@ export type Chapter = {
     volume: number,
     chapter: number,
     title?: string | null,
-    url: string,
-    _id: string,
-    content: Array<string> | Array<NovelContent>
+    _id: string
 }
 
 export type SeriesType = {
@@ -38,7 +36,6 @@ export type SeriesType = {
     id: string,
     cover: string,
     type: SeriesEnum,
-    language: LanguageEnum,
     genres?: Array<string>,
     status: StatusEnum,
     author: Array<string>,

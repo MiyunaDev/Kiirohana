@@ -3,7 +3,7 @@
  * =============================== */
 
 import axios, { AxiosRequestConfig } from "axios";
-import { ShinobuAuthError, ShinobuBackendError, ShinobuNetworkError } from "../Shinobu/utils/handleShinobu";
+import { ShinobuAuthError, ShinobuBackendError, ShinobuNetworkError } from "./handleShinobu";
 
 export interface ShinobuFetchOptions<TBody = unknown> {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";

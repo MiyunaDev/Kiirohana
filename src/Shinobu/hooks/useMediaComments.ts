@@ -1,7 +1,7 @@
 // hooks/useMediaComments.ts
 import { useCallback, useEffect, useState } from "react";
 import { shinobuFetch } from "../utils/fetchShinobu";
-import type { ServiceItem } from "../Shinobu/interfaces/Service";
+import type { ServiceItem } from "../interfaces/Service";
 
 export interface CommentUser {
   _id: string;

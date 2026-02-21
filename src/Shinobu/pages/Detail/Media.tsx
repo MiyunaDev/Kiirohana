@@ -2,20 +2,20 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { motion } from "framer-motion";
-import { shinobuFetch } from "../../../utils/fetchShinobu";
-import { useShinobu } from "../../../hooks/useShinobu";
+import { shinobuFetch } from "../../utils/fetchShinobu";
+import { useShinobu } from "../../hooks/useShinobu";
 
-import Chapter from "../../../interfaces/Chapter";
-import Media from "../../../interfaces/Media";
-import MediaExternal from "../../../interfaces/MediaExternal";
-import MultiSourceTree from "../../../interfaces/MultiSourceTree";
-import Source from "../../../interfaces/Source";
-import ChapterContent from "../../../interfaces/ChapterContent";
-import Type from "../../../enums/TypeEnum";
+import Chapter from "../../interfaces/Chapter";
+import Media from "../../interfaces/Media";
+import MediaExternal from "../../interfaces/MediaExternal";
+import MultiSourceTree from "../../interfaces/MultiSourceTree";
+import Source from "../../interfaces/Source";
+import ChapterContent from "../../interfaces/ChapterContent";
+import Type from "../../enums/TypeEnum";
 import { FaArrowLeft, FaHome, FaBookmark, FaPlus, FaTimes } from "react-icons/fa";
 import { useShiNavigate } from "../../utils/shiNavigate";
-import useMediaComments from "../../../hooks/useMediaComments";
-import { CommentsSection } from "../../../components/CommentSection";
+import useMediaComments from "../../hooks/useMediaComments";
+import { CommentsSection } from "../../components/CommentSection";
 
 
 /* ================= Helper ================= */
@@ -57,7 +57,13 @@ const ChapterCard = ({
   if (!chapter.hasContent || !chapter.content?._id) {
     return (
       <div className="opacity-50 p-2">
-        Chapter {chapter.chapter.chapter} (no content)
+        {!["ANIME", "TV", "MOVIE"].includes(type) && chapter.chapter.volume && (
+          <>Volume {chapter.chapter.volume} </>
+        )}
+        {["ANIME", "TV", "MOVIE"].includes(type)
+          ? `Episode ${chapter.chapter.chapter}`
+          : `Chapter ${chapter.chapter.chapter}`}
+        (no content)
       </div>
     );
   }
@@ -69,9 +75,13 @@ const ChapterCard = ({
       transition={{ duration: 0.35 }}
     >
       <div
-        onClick={() =>
-          navigate(`/reader/${type.toLowerCase()}/${chapter.content._id}`)
-        }
+        onClick={() => {
+          if (["ANIME", "TV", "MOVIE"].includes(type)) {
+            navigate(`/player/${chapter.content._id}`);
+          } else {
+            navigate(`/reader/${type.toLowerCase()}/${chapter.content._id}`);
+          }
+        }}
         className={`relative flex flex-row items-center p-2 h-24 gap-2 group
         before:absolute before:z-10 before:left-0 before:top-0 before:min-h-full
         before:rounded-r-full before:transition-all before:duration-500
@@ -95,10 +105,12 @@ const ChapterCard = ({
             }`}
         >
           <span>
-            {chapter.chapter.volume
-              ? `Volume ${chapter.chapter.volume} `
-              : ""}
-            Chapter {chapter.chapter.chapter}
+            {!["ANIME", "TV", "MOVIE"].includes(type) && chapter.chapter.volume && (
+              <>Volume {chapter.chapter.volume} </>
+            )}
+            {["ANIME", "TV", "MOVIE"].includes(type)
+              ? `Episode ${chapter.chapter.chapter}`
+              : `Chapter ${chapter.chapter.chapter}`}
           </span>
         </div>
       </div>

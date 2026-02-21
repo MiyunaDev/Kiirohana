@@ -3,9 +3,9 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { FaArrowLeft, FaHome } from "react-icons/fa";
 
-import { shinobuFetch } from "../../../utils/fetchShinobu";
-import type { ShinobuUser } from "../../../interfaces/ShinobuSession";
-import { useShinobu } from "../../../hooks/useShinobu";
+import { shinobuFetch } from "../../utils/fetchShinobu";
+import type { ShinobuUser } from "../../interfaces/ShinobuSession";
+import { useShinobu } from "../../hooks/useShinobu";
 import { useShiNavigate } from "../../utils/shiNavigate";
 
 type UserHistoryItem = {

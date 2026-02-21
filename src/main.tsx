@@ -39,6 +39,8 @@ import AccountCenterPage from './Shinobu/pages/System/AccountCenter.tsx';
 import MainSetting from './Shinobu/Settings/MainSetting.tsx';
 import LibraryPage from './Shinobu/pages/Library/Library.tsx';
 import CollectionDetailPage from './Shinobu/pages/Library/CollectionDetailPage.tsx';
+import Player from './Shinobu/pages/Player/Player.tsx';
+import DeveloperApplicationsPage from './Shinobu/pages/Developer/DeveloperPortal.tsx';
 
 const router = createHashRouter([
   {
@@ -89,6 +91,7 @@ const router = createHashRouter([
               {
                 path: "app", Component: MainLayout, children: [
                   { path: "account-center", Component: AccountCenterPage },
+                  { path: "developer-portal", Component: DeveloperApplicationsPage },
                   { path: "settings", Component: MainSetting },
                   { path: "home", Component: Landing },
                   {
@@ -120,6 +123,10 @@ const router = createHashRouter([
               {
                 path: "reader/comic/:chapterId",
                 Component: ComicReader,
+              },
+              {
+                path: "player/:chapterId",
+                Component: Player,
               },
             ]
           }
