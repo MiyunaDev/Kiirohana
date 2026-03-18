@@ -35,6 +35,8 @@ jobs:
   build-android:
     runs-on: ubuntu-latest
     needs: build-react
+    env:
+      BUILD_ENV: dev
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
@@ -219,3 +221,46 @@ jobs:
           name: electron-macos
           path: |
             cordova/platforms/electron/build/*.dmg
+  notify-telegram:
+    runs-on: ubuntu-latest
+    needs:
+      - build-android
+      - build-electron-linux
+      - build-electron-windows
+      - build-electron-macos
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Determine Telegram Target
+        id: chat
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            echo "chat_id=${{ secrets.TELEGRAM_CHAT_ID_RELEASE }}" >> $GITHUB_OUTPUT
+            echo "mode=RELEASE" >> $GITHUB_OUTPUT
+          else
+            echo "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" >> $GITHUB_OUTPUT
+            echo "mode=DEV" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send files to Telegram
+        run: |
+          BOT_TOKEN="${{ secrets.TELEGRAM_BOT_TOKEN }}"
+          CHAT_ID="${{ steps.chat.outputs.chat_id }}"
+          MODE="${{ steps.chat.outputs.mode }}"
+
+          echo "Sending to $CHAT_ID ($MODE)"
+
+          find artifacts -type f | while read file; do
+            echo "Sending $file"
+
+            curl -s -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendDocument" \
+              -F chat_id="$CHAT_ID" \
+              -F document=@"$file" \
+              -F caption="📦 [$MODE] ${{ github.ref_name }} - $(basename $file)"
+
+            sleep 2
+          done

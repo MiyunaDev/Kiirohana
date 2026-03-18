@@ -1,7 +1,33 @@
 // switch-build-config.js
 const fs = require('node:fs');
-const os = require('node:os');
 const path = require('node:path');
+
+const manifestPath = path.join(
+  __dirname,
+  'platforms/android/app/src/main/AndroidManifest.xml'
+);
+
+const env = process.env.BUILD_ENV || 'dev';
+
+let xml = fs.readFileSync(manifestPath, 'utf-8');
+
+if (env === 'dev') {
+  console.log('Applying DEV config (allow HTTP)');
+
+  xml = xml.replace(
+    /<application([^>]*)>/,
+    `<application$1 android:usesCleartextTraffic="true" android:networkSecurityConfig="@xml/network_security_config">`
+  );
+
+} else {
+  console.log('Applying PROD config (HTTPS only)');
+
+  xml = xml.replace(/\sandroid:usesCleartextTraffic="true"/g, '');
+  xml = xml.replace(/\sandroid:networkSecurityConfig="@xml\/network_security_config"/g, '');
+}
+
+fs.writeFileSync(manifestPath, xml);
+console.log('AndroidManifest.xml updated');
 
 const baseDir = path.join(__dirname);
 let configFile = '';
