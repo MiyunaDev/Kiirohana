@@ -6,5 +6,7 @@ export default interface Source {
     type: string,
     language: string,
     url?: string,
+    code: string,
+    disable: boolean,
     categories: Category
 }
