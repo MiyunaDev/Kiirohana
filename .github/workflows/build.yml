@@ -95,7 +95,6 @@ jobs:
         run: cordova build android
 
       - name: Build Signed Release AAB
-        if: ${{ secrets.ANDROID_P12_BASE64 != '' }}
         working-directory: ./cordova
         run: |
           cordova build android --release
@@ -108,7 +107,6 @@ jobs:
           if-no-files-found: warn
 
       - name: Upload AAB
-        if: ${{ secrets.ANDROID_P12_BASE64 != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: android-aab
