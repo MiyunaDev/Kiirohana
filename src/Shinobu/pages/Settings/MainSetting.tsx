@@ -13,7 +13,7 @@ import {
   FaUser
 } from "react-icons/fa6";
 import { useShiNavigate } from "../../utils/shiNavigate";
-import { useShinobu } from "../../../hooks/useShinobu";
+import { useShinobu } from "../../hooks/useShinobu";
 
 interface SettingMenuProps {
   isActive?: boolean;
