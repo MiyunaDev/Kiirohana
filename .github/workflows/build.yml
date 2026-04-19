@@ -90,12 +90,6 @@ jobs:
         working-directory: ./cordova
         run: cordova platform add android@latest
 
-      - name: Decode Android Keystore
-        if: ${{ secrets.ANDROID_P12_BASE64 != '' }}
-        working-directory: ./cordova
-        run: |
-          echo "${{ secrets.ANDROID_P12_BASE64 }}" | base64 -d > android-key.p12
-
       - name: Build Debug APK
         working-directory: ./cordova
         run: cordova build android
@@ -104,13 +98,7 @@ jobs:
         if: ${{ secrets.ANDROID_P12_BASE64 != '' }}
         working-directory: ./cordova
         run: |
-          cordova build android --release -- \
-            --packageType=bundle \
-            --keystore=android-key.p12 \
-            --storeType=pkcs12 \
-            --storePassword=${{ secrets.ANDROID_STORE_PASSWORD }} \
-            --alias=${{ secrets.ANDROID_KEY_ALIAS }} \
-            --password=${{ secrets.ANDROID_KEY_PASSWORD }}
+          cordova build android --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
