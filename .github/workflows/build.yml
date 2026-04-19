@@ -95,7 +95,6 @@ jobs:
         run: cordova build android
 
       - name: Build Signed Release AAB
-        if: ${{ secrets.ANDROID_P12_BASE64 != '' }}
         working-directory: ./cordova
         run: |
           cordova build android --release
