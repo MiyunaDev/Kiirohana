@@ -19,7 +19,7 @@ env:
 jobs:
 
   # =====================================================
-  # BUILD REACT -> cordova/www
+  # BUILD REACT
   # =====================================================
   build-react:
     name: Build React
@@ -49,7 +49,7 @@ jobs:
           if-no-files-found: error
 
   # =====================================================
-  # ANDROID RELEASE
+  # BUILD ANDROID RELEASE
   # =====================================================
   build-android:
     name: Build Android
@@ -70,10 +70,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            cordova/package-lock.json
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -97,17 +93,12 @@ jobs:
 
       - name: Decode Signing Key
         working-directory: ./cordova
-        run: echo "${{ secrets.ANDROID_P12_BASE64 }}" | base64 -d > android-key.p12
+        run: |
+          echo "${{ secrets.ANDROID_P12_BASE64 }}" | base64 -d > android-key.p12
 
       - name: Build Debug APK
         working-directory: ./cordova
-        run: cordova build android -- \
-            --packageType=bundle \
-            --keystore=android-key.p12 \
-            --storeType=pkcs12 \
-            --storePassword=${{ secrets.ANDROID_STORE_PASSWORD }} \
-            --alias=${{ secrets.ANDROID_KEY_ALIAS }} \
-            --password=${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: cordova build android
 
       - name: Build Signed Release AAB
         working-directory: ./cordova
@@ -137,7 +128,7 @@ jobs:
             cordova/platforms/android/app/build/outputs/bundle/release/*.aab
 
   # =====================================================
-  # ELECTRON RELEASE (MATRIX)
+  # BUILD ELECTRON RELEASE
   # =====================================================
   build-electron:
     name: Electron (${{ matrix.os }})
@@ -169,7 +160,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
 
       - name: Linux Dependencies
         if: matrix.os == 'linux'
@@ -210,11 +200,9 @@ jobs:
   notify-telegram:
     name: Notify Telegram
     runs-on: ubuntu-latest
-
     needs:
       - build-android
       - build-electron
-
     if: always()
 
     steps:
@@ -246,12 +234,16 @@ jobs:
           CHAT="${{ steps.chat.outputs.chat_id }}"
           MODE="${{ steps.chat.outputs.mode }}"
 
-          TEXT="🚀 Release Build Finished
+          TEXT=$(cat <<EOF
+🚀 Release Build Finished
+
 Mode: $MODE
 Repo: ${{ steps.meta.outputs.repo }}
 Branch: ${{ steps.meta.outputs.branch }}
 Commit: ${{ steps.meta.outputs.sha }}
-Run: ${{ steps.meta.outputs.run_url }}"
+Run: ${{ steps.meta.outputs.run_url }}
+EOF
+)
 
           curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
             -d chat_id="$CHAT" \
@@ -264,7 +256,6 @@ Run: ${{ steps.meta.outputs.run_url }}"
           CHAT="${{ steps.chat.outputs.chat_id }}"
 
           shopt -s globstar nullglob
-
           COUNT=0
 
           for file in artifacts/**/*; do
@@ -280,7 +271,7 @@ Run: ${{ steps.meta.outputs.run_url }}"
                 -F document=@"$file" \
                 -F caption="📦 [RELEASE] $NAME ($SIZE)"
 
-              COUNT=$((COUNT+1))
+              COUNT=$((COUNT + 1))
               sleep 2
             fi
           done

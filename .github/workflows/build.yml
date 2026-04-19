@@ -7,7 +7,6 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Hindari job paralel bentrok di branch sama
 concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
@@ -19,7 +18,7 @@ env:
 jobs:
 
   # =====================================================
-  # BUILD REACT -> cordova/www
+  # BUILD REACT
   # =====================================================
   build-react:
     name: Build React
@@ -49,7 +48,7 @@ jobs:
           if-no-files-found: error
 
   # =====================================================
-  # ANDROID
+  # BUILD ANDROID
   # =====================================================
   build-android:
     name: Build Android
@@ -70,10 +69,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            cordova/package-lock.json
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -87,7 +82,7 @@ jobs:
       - name: Install Cordova CLI
         run: npm install -g cordova
 
-      - name: Install Cordova Dependencies
+      - name: Install Dependencies
         working-directory: ./cordova
         run: npm ci || npm install
 
@@ -95,21 +90,15 @@ jobs:
         working-directory: ./cordova
         run: cordova platform add android@latest
 
-      # Jika secret signing ada -> signed release
-      - name: Decode Keystore
+      - name: Decode Signing Key
         if: ${{ secrets.ANDROID_P12_BASE64 != '' }}
         working-directory: ./cordova
-        run: echo "${{ secrets.ANDROID_P12_BASE64 }}" | base64 -d > android-key.p12
+        run: |
+          echo "${{ secrets.ANDROID_P12_BASE64 }}" | base64 -d > android-key.p12
 
       - name: Build Debug APK
         working-directory: ./cordova
-        run: cordova build android -- \
-            --packageType=bundle \
-            --keystore=android-key.p12 \
-            --storeType=pkcs12 \
-            --storePassword=${{ secrets.ANDROID_STORE_PASSWORD }} \
-            --alias=${{ secrets.ANDROID_KEY_ALIAS }} \
-            --password=${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: cordova build android
 
       - name: Build Signed Release AAB
         if: ${{ secrets.ANDROID_P12_BASE64 != '' }}
@@ -139,7 +128,7 @@ jobs:
           if-no-files-found: warn
 
   # =====================================================
-  # ELECTRON MATRIX
+  # BUILD ELECTRON
   # =====================================================
   build-electron:
     name: Electron (${{ matrix.os }})
@@ -171,7 +160,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
 
       - name: Linux Dependencies
         if: matrix.os == 'linux'
@@ -198,8 +186,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: electron-${{ matrix.os }}
-          path: |
-            cordova/platforms/electron/build/**
+          path: cordova/platforms/electron/build/**
           if-no-files-found: warn
 
   # =====================================================
@@ -211,7 +198,6 @@ jobs:
     needs:
       - build-android
       - build-electron
-
     if: always()
 
     steps:
@@ -225,16 +211,19 @@ jobs:
         run: |
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
           CHAT="${{ secrets.TELEGRAM_CHAT_ID }}"
-
           STATUS="${{ job.status }}"
           URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-          TEXT="🚀 Build Finished
+          TEXT=$(cat <<EOF
+🚀 Build Finished
+
 Repository: ${{ github.repository }}
 Branch: ${{ github.ref_name }}
 Commit: ${GITHUB_SHA::7}
 Status: $STATUS
-Run: $URL"
+Run: $URL
+EOF
+)
 
           curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
             -d chat_id="$CHAT" \
@@ -251,10 +240,12 @@ Run: $URL"
           for file in artifacts/**/*; do
             if [[ -f "$file" ]]; then
               echo "Sending $file"
+
               curl -s \
                 -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
                 -F chat_id="$CHAT" \
                 -F document=@"$file"
+
               sleep 2
             fi
           done
