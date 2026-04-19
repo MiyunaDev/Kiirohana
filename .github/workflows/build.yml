@@ -18,17 +18,17 @@ env:
 jobs:
 
   # =====================================================
-  # BUILD REACT
+  # BUILD REACT -> cordova/www
   # =====================================================
   build-react:
     name: Build React
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -37,10 +37,10 @@ jobs:
       - name: Install Root Dependencies
         run: npm ci
 
-      - name: Build React
+      - name: Build React App
         run: npm run build
 
-      - name: Upload WWW
+      - name: Upload WWW Artifact
         uses: actions/upload-artifact@v4
         with:
           name: cordova-www
@@ -56,16 +56,16 @@ jobs:
     needs: build-react
 
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Download WWW
+      - name: Download WWW Artifact
         uses: actions/download-artifact@v4
         with:
           name: cordova-www
           path: cordova/www
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -82,7 +82,7 @@ jobs:
       - name: Install Cordova CLI
         run: npm install -g cordova
 
-      - name: Install Dependencies
+      - name: Install Cordova Dependencies
         working-directory: ./cordova
         run: npm ci || npm install
 
@@ -90,7 +90,7 @@ jobs:
         working-directory: ./cordova
         run: cordova platform add android@latest
 
-      - name: Decode Signing Key
+      - name: Decode Android Keystore
         if: ${{ secrets.ANDROID_P12_BASE64 != '' }}
         working-directory: ./cordova
         run: |
@@ -128,12 +128,12 @@ jobs:
           if-no-files-found: warn
 
   # =====================================================
-  # BUILD ELECTRON
+  # BUILD ELECTRON MATRIX
   # =====================================================
   build-electron:
     name: Electron (${{ matrix.os }})
-    needs: build-react
     runs-on: ${{ matrix.runner }}
+    needs: build-react
 
     strategy:
       fail-fast: false
@@ -147,21 +147,21 @@ jobs:
             runner: macos-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Download WWW
+      - name: Download WWW Artifact
         uses: actions/download-artifact@v4
         with:
           name: cordova-www
           path: cordova/www
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Linux Dependencies
+      - name: Install Linux Build Tools
         if: matrix.os == 'linux'
         run: |
           sudo apt update
@@ -170,7 +170,7 @@ jobs:
       - name: Install Cordova CLI
         run: npm install -g cordova
 
-      - name: Install Dependencies
+      - name: Install Cordova Dependencies
         working-directory: ./cordova
         run: npm ci || npm install
 
@@ -182,7 +182,7 @@ jobs:
         working-directory: ./cordova
         run: npm run build
 
-      - name: Upload Electron Artifacts
+      - name: Upload Electron Artifact
         uses: actions/upload-artifact@v4
         with:
           name: electron-${{ matrix.os }}
@@ -190,7 +190,7 @@ jobs:
           if-no-files-found: warn
 
   # =====================================================
-  # TELEGRAM NOTIFY
+  # TELEGRAM NOTIFICATION
   # =====================================================
   notify-telegram:
     name: Notify Telegram
@@ -206,7 +206,7 @@ jobs:
         with:
           path: artifacts
 
-      - name: Send Summary
+      - name: Send Summary Message
         shell: bash
         run: |
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
@@ -214,38 +214,37 @@ jobs:
           STATUS="${{ job.status }}"
           URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-          TEXT=$(cat <<EOF
-🚀 Build Finished
-
-Repository: ${{ github.repository }}
-Branch: ${{ github.ref_name }}
-Commit: ${GITHUB_SHA::7}
-Status: $STATUS
-Run: $URL
-EOF
-)
+          TEXT="🚀 Build Finished\n\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nCommit: ${GITHUB_SHA::7}\nStatus: $STATUS\nRun: $URL"
 
           curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
             -d chat_id="$CHAT" \
             --data-urlencode text="$TEXT"
 
-      - name: Send Files
+      - name: Send Artifact Files
         shell: bash
         run: |
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
           CHAT="${{ secrets.TELEGRAM_CHAT_ID }}"
 
           shopt -s globstar nullglob
+          COUNT=0
 
           for file in artifacts/**/*; do
             if [[ -f "$file" ]]; then
-              echo "Sending $file"
+              NAME=$(basename "$file")
+              SIZE=$(du -h "$file" | cut -f1)
 
-              curl -s \
+              echo "Sending $NAME ($SIZE)"
+
+              curl -s --retry 3 --retry-delay 5 \
                 -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
                 -F chat_id="$CHAT" \
-                -F document=@"$file"
+                -F document=@"$file" \
+                -F caption="📦 $NAME ($SIZE)"
 
+              COUNT=$((COUNT + 1))
               sleep 2
             fi
           done
+
+          echo "Sent $COUNT files"
