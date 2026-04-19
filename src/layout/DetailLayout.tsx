@@ -16,7 +16,6 @@ const DetailLayout = () => {
         const title = searchParams.get('title');
         const chapterid = searchParams.get('chapterid');
 
-
         const info: SeriesType = library.find((x: SeriesType) => x.title === title) as SeriesType;
         setDetail(info);
         if (chapterid) {

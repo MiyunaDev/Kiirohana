@@ -36,7 +36,9 @@ jobs:
           cache: npm
 
       - name: Install Root Dependencies
-        run: npm ci
+        run: |
+          npm install
+          npm rebuild
 
       - name: Build React
         run: npm run build
@@ -85,7 +87,9 @@ jobs:
 
       - name: Install Cordova Dependencies
         working-directory: ./cordova
-        run: npm ci || npm install
+        run: |
+          npm install
+          npm rebuild
 
       - name: Add Android Platform
         working-directory: ./cordova
@@ -161,7 +165,9 @@ jobs:
 
       - name: Install Cordova Dependencies
         working-directory: ./cordova
-        run: npm ci || npm install
+        run: |
+          npm install
+          npm rebuild
 
       - name: Add Electron Platform
         working-directory: ./cordova
