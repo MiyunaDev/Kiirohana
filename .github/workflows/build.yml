@@ -294,7 +294,7 @@ jobs:
             case "$NAME" in
               elevate.exe|uninstall.exe|Uninstall.exe)
                 echo "Skip helper file: $NAME"
-                continue
+                return
                 ;;
             esac
 
