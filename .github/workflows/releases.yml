@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "18"
+  NODE_VERSION: "24"
   JAVA_VERSION: "21"
 
 jobs:
@@ -37,7 +37,9 @@ jobs:
       
       - name: Clean install
         run: |
-          rm -rf node_modules package-lock.json
+          rm -rf node_modules
+          npm ci
+          npm rebuild @tailwindcss/oxide || true
 
       - name: Install Root Dependencies
         run: |
