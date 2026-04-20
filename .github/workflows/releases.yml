@@ -249,12 +249,76 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
+          pattern: |
+            android-*
+            electron-*
           path: artifacts
+          merge-multiple: true
 
+      # =====================================================
+      # FILTER ONLY FINAL INSTALLER / PORTABLE FILES
+      # =====================================================
+      - name: Select release files only
+        shell: bash
+        run: |
+          mkdir -p release-files
+
+          find artifacts -type f | while read file; do
+            NAME=$(basename "$file")
+
+            case "$NAME" in
+              # Android
+              *.apk|*.aab|
+
+              # Windows
+              *.exe|*.msi|*.zip|
+
+              # Linux
+              *.AppImage|*.deb|*.rpm|*.tar.gz|
+
+              # macOS
+              *.dmg|*.pkg)
+
+                # skip helper / junk files
+                case "$NAME" in
+                  elevate.exe|uninstall.exe|Uninstall.exe)
+                    echo "Skip helper file: $NAME"
+                    continue
+                    ;;
+                esac
+
+                cp "$file" release-files/
+                echo "Accepted: $NAME"
+                ;;
+
+              *)
+                echo "Rejected: $NAME"
+                ;;
+            esac
+          done
+
+          echo "Final files:"
+          ls -lah release-files
+
+      # =====================================================
+      # FAIL IF NOTHING VALID
+      # =====================================================
+      - name: Validate release files
+        shell: bash
+        run: |
+          COUNT=$(find release-files -type f | wc -l)
+          if [ "$COUNT" -eq 0 ]; then
+            echo "No valid release files found."
+            exit 1
+          fi
+
+      # =====================================================
+      # UPLOAD SAFE FILES ONLY
+      # =====================================================
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/**/*
+          files: release-files/*
 
 # =====================================================
 # TELEGRAM NOTIFICATION + CHANGELOG

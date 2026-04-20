@@ -230,7 +230,11 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
+          pattern: |
+            android-*
+            electron-*
           path: artifacts
+          merge-multiple: true
 
       - name: Send Summary
         shell: bash
