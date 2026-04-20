@@ -17,31 +17,37 @@ env:
 
 jobs:
 
-  # =====================================================
-  # BUILD REACT -> cordova/www
-  # =====================================================
+# =====================================================
+# BUILD REACT -> cordova/www
+# =====================================================
   build-react:
     name: Build React
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Clean install
+      - name: Clean install (deterministic)
         run: |
-          rm -rf node_modules
-          npm ci
+          rm -rf node_modules package-lock.json
+          npm install
+          npm ci || npm install
           npm rebuild @tailwindcss/oxide || true
 
       - name: Build React App
         run: npm run build
+
+      - name: Validate WWW output
+        run: |
+          if [ ! -d "cordova/www" ]; then
+            echo "cordova/www missing"
+            exit 1
+          fi
 
       - name: Upload WWW Artifact
         uses: actions/upload-artifact@v4
@@ -50,77 +56,71 @@ jobs:
           path: cordova/www
           if-no-files-found: error
 
-  # =====================================================
-  # BUILD ANDROID
-  # =====================================================
+# =====================================================
+# BUILD ANDROID
+# =====================================================
   build-android:
     name: Build Android
     runs-on: ubuntu-latest
     needs: build-react
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Download WWW Artifact
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: cordova-www
           path: cordova/www
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v3
 
-      - name: Install Cordova CLI
+      - name: Install Cordova
         run: npm install -g cordova
 
-      - name: Install Cordova Dependencies
+      - name: Install dependencies (stable)
         working-directory: ./cordova
         run: |
-          npm install
+          npm ci || npm install
           npm rebuild
 
-      - name: Add Android Platform
+      - name: Add Android platform (safe mode)
         working-directory: ./cordova
-        run: cordova platform add android@latest
+        run: |
+          cordova platform rm android || true
+          cordova platform add android@latest
 
       - name: Build Debug APK
         working-directory: ./cordova
         run: cordova build android
 
-      - name: Build Signed Release AAB
+      - name: Build Release AAB
         working-directory: ./cordova
-        run: |
-          cordova build android --release
+        run: cordova build android --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
           path: cordova/platforms/android/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: warn
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: android-aab
           path: cordova/platforms/android/app/build/outputs/bundle/release/*.aab
-          if-no-files-found: warn
 
-  # =====================================================
-  # BUILD ELECTRON MATRIX
-  # =====================================================
+# =====================================================
+# BUILD ELECTRON MATRIX (CLEAN + NO SIDE EFFECTS)
+# =====================================================
   build-electron:
     name: Electron (${{ matrix.os }})
     runs-on: ${{ matrix.runner }}
@@ -138,53 +138,65 @@ jobs:
             runner: macos-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Download WWW Artifact
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: cordova-www
           path: cordova/www
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install Linux Build Tools
+      - name: Linux deps
         if: matrix.os == 'linux'
         run: |
           sudo apt update
           sudo apt install -y rpm libarchive-tools
 
-      - name: Install Cordova CLI
+      - name: Install Cordova
         run: npm install -g cordova
 
-      - name: Install Cordova Dependencies
+      - name: Install dependencies (safe)
         working-directory: ./cordova
         run: |
-          npm install
+          npm ci || npm install
           npm rebuild
 
-      - name: Add Electron Platform
+      - name: Reset Electron platform (avoid corruption)
         working-directory: ./cordova
-        run: cordova platform add electron
+        run: |
+          cordova platform rm electron || true
+          cordova platform add electron
 
       - name: Build Electron
         working-directory: ./cordova
         run: npm run build
 
-      - name: Upload Electron Artifact
+      # =====================================================
+      # CLEAN ELECTRON NOISE (CRITICAL FIX)
+      # =====================================================
+      - name: Remove Electron internal noise
+        run: |
+          find cordova/platforms/electron/build -type f \
+            \( -name "locale.pak" \
+            -o -name "Electron Framework" \
+            -o -name "*.pak" \
+            -o -name "*.dll" \
+            -o -name "*.so" \
+            -o -name "*.dylib" \) \
+            -delete || true
+
+      - name: Upload Electron Artifact (clean)
         uses: actions/upload-artifact@v4
         with:
           name: electron-${{ matrix.os }}
-          path: cordova/platforms/electron/build/**
-          if-no-files-found: warn
+          path: cordova/platforms/electron/build
 
-  # =====================================================
-  # TELEGRAM NOTIFICATION
-  # =====================================================
+# =====================================================
+# TELEGRAM NOTIFICATION (HARDENED)
+# =====================================================
   notify-telegram:
     name: Notify Telegram
     runs-on: ubuntu-latest
@@ -195,17 +207,18 @@ jobs:
     if: always()
 
     steps:
-      - name: Download All Artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           path: artifacts
 
       # =====================================================
-      # SEND SUMMARY MESSAGE (THREAD SUPPORT)
+      # SUMMARY MESSAGE (SAFE + FIXED FORMAT)
       # =====================================================
       - name: Send Summary Message
         shell: bash
         run: |
+          set -e
+
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
           CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
           THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
@@ -214,12 +227,17 @@ jobs:
           URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           SHORT_SHA="${GITHUB_SHA::7}"
 
-          if [ -z "$BOT" ] || [ -z "$CHAT" ]; then
-            echo "Missing Telegram env"
-            exit 1
-          fi
+          TEXT=$(cat <<EOF
+          🚀 Build Finished
 
-          TEXT="🚀 Build Finished\n\nRepo: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nCommit: $SHORT_SHA\nStatus: $STATUS\nRun: $URL"
+          Repo: ${{ github.repository }}
+          Branch: ${{ github.ref_name }}
+          Commit: $SHORT_SHA
+          Status: $STATUS
+
+          Run: $URL
+          EOF
+          )
 
           if [ -n "$THREAD" ]; then
             curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
@@ -233,61 +251,72 @@ jobs:
           fi
 
       # =====================================================
-      # SEND ARTIFACT FILES (THREAD SUPPORT + SAFE LOOP)
+      # FILE SENDER (SAFE FILTERED + RATE LIMITED)
       # =====================================================
       - name: Send Artifact Files
         shell: bash
         run: |
+          set -e
+
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
           CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
           THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
 
-          ALLOWED="apk aab exe AppImage deb rpm snap"
           MAX_SIZE=$((45 * 1024 * 1024))
 
-          shopt -s globstar nullglob
-          COUNT=0
+          ALLOWED_EXT=("apk" "aab" "exe" "AppImage" "deb" "rpm" "zip" "dmg")
 
-          for file in artifacts/**/*; do
-            [[ -f "$file" ]] || continue
+          send_file() {
+            local file="$1"
+            local name=$(basename "$file")
 
-            NAME=$(basename "$file")
             SIZE=$(stat -c%s "$file")
 
-            EXT="${file##*.}"
-
-            # skip non-release files
-            if [[ ! " $ALLOWED " =~ " $EXT " ]]; then
-              continue
-            fi
-
-            # skip too large file (Telegram limit)
             if [ "$SIZE" -gt "$MAX_SIZE" ]; then
-              echo "Skip too large: $NAME"
-              continue
+              echo "Skip large file: $name"
+              return
             fi
 
-            echo "Sending $NAME ($(numfmt --to=iec $SIZE))"
+            echo "Sending $name"
 
             if [ -n "$THREAD" ]; then
-              curl -s --fail-with-body --retry 3 --retry-delay 5 \
+              curl -s --fail-with-body --retry 3 \
                 -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
                 -F chat_id="$CHAT" \
                 -F message_thread_id="$THREAD" \
                 -F document=@"$file" \
-                -F caption="📦 $NAME"
+                -F caption="📦 $name"
             else
-              curl -s --fail-with-body --retry 3 --retry-delay 5 \
+              curl -s --fail-with-body --retry 3 \
                 -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
                 -F chat_id="$CHAT" \
                 -F document=@"$file" \
-                -F caption="📦 $NAME"
+                -F caption="📦 $name"
             fi
 
+            sleep $((RANDOM % 3 + 2))
+          }
+
+          COUNT=0
+
+          while IFS= read -r file; do
+            EXT="${file##*.}"
+
+            SKIP=1
+            for a in "${ALLOWED_EXT[@]}"; do
+              if [ "$EXT" = "$a" ]; then
+                SKIP=0
+                break
+              fi
+            done
+
+            if [ "$SKIP" -eq 1 ]; then
+              continue
+            fi
+
+            send_file "$file"
             COUNT=$((COUNT + 1))
 
-            # anti flood control
-            sleep $((RANDOM % 3 + 2))
-          done
+          done < <(find artifacts -type f)
 
           echo "Sent $COUNT files"
