@@ -177,16 +177,28 @@ jobs:
       # =====================================================
       # CLEAN ELECTRON NOISE (CRITICAL FIX)
       # =====================================================
-      - name: Remove Electron internal noise
+      - name: Remove Electron internal noise (cross-platform safe)
+        shell: bash
         run: |
-          find cordova/platforms/electron/build -type f \
-            \( -name "locale.pak" \
-            -o -name "Electron Framework" \
-            -o -name "*.pak" \
-            -o -name "*.dll" \
-            -o -name "*.so" \
-            -o -name "*.dylib" \) \
-            -delete || true
+          TARGET="cordova/platforms/electron/build"
+
+          echo "Cleaning Electron noise safely..."
+
+          # safer than find with parentheses (works cross-platform via bash layer)
+          if [ -d "$TARGET" ]; then
+            for f in $(find "$TARGET" -type f); do
+
+              case "$f" in
+                *locale.pak) rm -f "$f" ;;
+                *"Electron Framework") rm -f "$f" ;;
+                *.pak) rm -f "$f" ;;
+                *.dll) rm -f "$f" ;;
+                *.so) rm -f "$f" ;;
+                *.dylib) rm -f "$f" ;;
+              esac
+
+            done
+          fi
 
       - name: Upload Electron Artifact (clean)
         uses: actions/upload-artifact@v4
