@@ -199,44 +199,76 @@ jobs:
         with:
           path: artifacts
 
+      # =====================================================
+      # SEND SUMMARY MESSAGE (THREAD SUPPORT)
+      # =====================================================
       - name: Send Summary Message
         shell: bash
         run: |
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
-          CHAT="${{ secrets.TELEGRAM_CHAT_ID }}"
+          CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
+          THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
+
           STATUS="${{ job.status }}"
           URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          SHORT_SHA="${GITHUB_SHA::7}"
 
-          TEXT="🚀 Build Finished\n\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nCommit: ${GITHUB_SHA::7}\nStatus: $STATUS\nRun: $URL"
+          if [ -z "$BOT" ] || [ -z "$CHAT" ]; then
+            echo "Missing Telegram env"
+            exit 1
+          fi
 
-          curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
-            -d chat_id="$CHAT" \
-            --data-urlencode text="$TEXT"
+          TEXT="🚀 Build Finished\n\nRepo: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nCommit: $SHORT_SHA\nStatus: $STATUS\nRun: $URL"
 
+          if [ -n "$THREAD" ]; then
+            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+              -d chat_id="$CHAT" \
+              -d message_thread_id="$THREAD" \
+              --data-urlencode text="$TEXT"
+          else
+            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+              -d chat_id="$CHAT" \
+              --data-urlencode text="$TEXT"
+          fi
+
+      # =====================================================
+      # SEND ARTIFACT FILES (THREAD SUPPORT + SAFE LOOP)
+      # =====================================================
       - name: Send Artifact Files
         shell: bash
         run: |
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
-          CHAT="${{ secrets.TELEGRAM_CHAT_ID }}"
+          CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
+          THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
 
           shopt -s globstar nullglob
           COUNT=0
 
           for file in artifacts/**/*; do
             if [[ -f "$file" ]]; then
+
               NAME=$(basename "$file")
               SIZE=$(du -h "$file" | cut -f1)
 
               echo "Sending $NAME ($SIZE)"
 
-              curl -s --retry 3 --retry-delay 5 \
-                -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
-                -F chat_id="$CHAT" \
-                -F document=@"$file" \
-                -F caption="📦 $NAME ($SIZE)"
+              if [ -n "$THREAD" ]; then
+                curl -s --fail-with-body --retry 3 --retry-delay 5 \
+                  -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+                  -F chat_id="$CHAT" \
+                  -F message_thread_id="$THREAD" \
+                  -F document=@"$file" \
+                  -F caption="📦 $NAME ($SIZE)"
+              else
+                curl -s --fail-with-body --retry 3 --retry-delay 5 \
+                  -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+                  -F chat_id="$CHAT" \
+                  -F document=@"$file" \
+                  -F caption="📦 $NAME ($SIZE)"
+              fi
 
               COUNT=$((COUNT + 1))
-              sleep 2
+              sleep 1
             fi
           done
 

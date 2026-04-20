@@ -196,10 +196,10 @@ jobs:
           files: cordova/platforms/electron/build/**
 
   # =====================================================
-  # TELEGRAM NOTIFICATION
+  # TELEGRAM RELEASE NOTIFICATION
   # =====================================================
   notify-telegram:
-    name: Notify Telegram
+    name: Notify Telegram Release
     runs-on: ubuntu-latest
     needs:
       - build-android
@@ -212,45 +212,120 @@ jobs:
         with:
           path: artifacts
 
-      - name: Send Summary Message
+      # =====================================================
+      # SEND RELEASE SUMMARY
+      # =====================================================
+      - name: Send Release Summary
         shell: bash
         run: |
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
-          CHAT="${{ secrets.TELEGRAM_CHAT_ID_RELEASE }}"
+          CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
+          THREAD="${{ secrets.TELEGRAM_BOT_THREAD_RELEASE }}"
+
+          if [ -z "$BOT" ] || [ -z "$CHAT" ]; then
+            echo "Missing Telegram config"
+            exit 1
+          fi
+
           STATUS="${{ job.status }}"
-          URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          REPO="${{ github.repository }}"
+          BRANCH="${{ github.ref_name }}"
+          SHA="${GITHUB_SHA::7}"
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-          TEXT="🚀 Release Build Finished\n\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nCommit: ${GITHUB_SHA::7}\nStatus: $STATUS\nRun: $URL"
+          TEXT="🚀 *RELEASE BUILD FINISHED*
 
-          curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
-            -d chat_id="$CHAT" \
-            --data-urlencode text="$TEXT"
+          📦 Repo: $REPO
+          🌿 Branch: $BRANCH
+          🔖 Commit: $SHA
+          📊 Status: $STATUS
 
-      - name: Send Artifact Files
+          🔗 [GitHub Run]($RUN_URL)"
+
+          if [ -n "$THREAD" ]; then
+            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+              -d chat_id="$CHAT" \
+              -d message_thread_id="$THREAD" \
+              -d parse_mode="Markdown" \
+              --data-urlencode text="$TEXT"
+          else
+            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+              -d chat_id="$CHAT" \
+              -d parse_mode="Markdown" \
+              --data-urlencode text="$TEXT"
+          fi
+
+      # =====================================================
+      # SEND RELEASE FILES (GROUPED)
+      # =====================================================
+      - name: Send Release Artifacts
         shell: bash
         run: |
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
-          CHAT="${{ secrets.TELEGRAM_CHAT_ID_RELEASE }}"
+          CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
+          THREAD="${{ secrets.TELEGRAM_BOT_THREAD_RELEASE }}"
 
-          shopt -s globstar nullglob
-          COUNT=0
+          send_file () {
+            local file=$1
+            local caption=$2
 
-          for file in artifacts/**/*; do
-            if [[ -f "$file" ]]; then
-              NAME=$(basename "$file")
-              SIZE=$(du -h "$file" | cut -f1)
-
-              echo "Sending $NAME ($SIZE)"
-
-              curl -s --retry 3 --retry-delay 5 \
+            if [ -n "$THREAD" ]; then
+              curl -s --fail-with-body \
+                -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+                -F chat_id="$CHAT" \
+                -F message_thread_id="$THREAD" \
+                -F document=@"$file" \
+                -F caption="$caption"
+            else
+              curl -s --fail-with-body \
                 -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
                 -F chat_id="$CHAT" \
                 -F document=@"$file" \
-                -F caption="📦 [RELEASE] $NAME ($SIZE)"
-
-              COUNT=$((COUNT + 1))
-              sleep 2
+                -F caption="$caption"
             fi
-          done
+          }
 
-          echo "Sent $COUNT files"
+          echo "📦 Collecting release artifacts..."
+
+          APK_FILES=$(find artifacts -type f -name "*.apk")
+          AAB_FILES=$(find artifacts -type f -name "*.aab")
+          ELECTRON_FILES=$(find artifacts -type f -not -name "*.apk" -not -name "*.aab")
+
+          # =========================
+          # ANDROID APK
+          # =========================
+          if [ ! -z "$APK_FILES" ]; then
+            echo "Sending APK..."
+            for file in $APK_FILES; do
+              SIZE=$(du -h "$file" | cut -f1)
+              send_file "$file" "📱 Android APK ($SIZE)"
+              sleep 1
+            done
+          fi
+
+          # =========================
+          # ANDROID AAB
+          # =========================
+          if [ ! -z "$AAB_FILES" ]; then
+            echo "Sending AAB..."
+            for file in $AAB_FILES; do
+              SIZE=$(du -h "$file" | cut -f1)
+              send_file "$file" "📦 Android AAB ($SIZE)"
+              sleep 1
+            done
+          fi
+
+          # =========================
+          # ELECTRON
+          # =========================
+          if [ ! -z "$ELECTRON_FILES" ]; then
+            echo "Sending Electron builds..."
+            for file in $ELECTRON_FILES; do
+              SIZE=$(du -h "$file" | cut -f1)
+              NAME=$(basename "$file")
+              send_file "$file" "🖥 Electron: $NAME ($SIZE)"
+              sleep 1
+            done
+          fi
+
+          echo "✅ Release artifacts sent"
