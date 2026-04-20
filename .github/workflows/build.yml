@@ -236,6 +236,54 @@ jobs:
           path: artifacts
           merge-multiple: true
 
+      # =====================================================
+      # FILTER ONLY INSTALLER / PORTABLE FILES
+      # =====================================================
+      - name: Select valid files only
+        shell: bash
+        run: |
+          mkdir -p telegram-files
+
+          find artifacts -type f | while read file; do
+            NAME=$(basename "$file")
+
+            case "$NAME" in
+              # Android
+              *.apk|*.aab|
+
+              # Windows
+              *.exe|*.msi|*.zip|
+
+              # Linux
+              *.AppImage|*.deb|*.rpm|*.tar.gz|
+
+              # macOS
+              *.dmg|*.pkg)
+
+                # block helper / uninstall / junk
+                case "$NAME" in
+                  elevate.exe|uninstall.exe|Uninstall.exe)
+                    echo "Skip helper: $NAME"
+                    continue
+                    ;;
+                esac
+
+                cp "$file" telegram-files/
+                echo "Accepted: $NAME"
+                ;;
+
+              *)
+                echo "Rejected: $NAME"
+                ;;
+            esac
+          done
+
+          echo "Selected files:"
+          ls -lah telegram-files || true
+
+      # =====================================================
+      # SUMMARY MESSAGE
+      # =====================================================
       - name: Send Summary
         shell: bash
         run: |
@@ -265,6 +313,9 @@ jobs:
               --data-urlencode text="$TEXT"
           fi
 
+      # =====================================================
+      # SEND SAFE FILES ONLY
+      # =====================================================
       - name: Send Files
         shell: bash
         run: |
@@ -273,20 +324,17 @@ jobs:
           THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
           MAX=$((45 * 1024 * 1024))
 
+          COUNT=0
+
           while IFS= read -r file; do
-            SIZE=$(stat -c%s "$file")
             NAME=$(basename "$file")
 
+            SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
+
             if [ "$SIZE" -gt "$MAX" ]; then
-              echo "Skip large file $NAME"
+              echo "Skip large file: $NAME"
               continue
             fi
-
-            case "$NAME" in
-              elevate.exe|uninstall.exe|Uninstall.exe)
-                continue
-                ;;
-            esac
 
             echo "Sending $NAME"
 
@@ -305,5 +353,9 @@ jobs:
                 -F caption="📦 $NAME"
             fi
 
+            COUNT=$((COUNT + 1))
             sleep 2
-          done < <(find artifacts -type f)
+
+          done < <(find telegram-files -type f)
+
+          echo "Sent $COUNT files"
