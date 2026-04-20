@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "24"
+  NODE_VERSION: "22"
   JAVA_VERSION: "21"
 
 jobs:
@@ -32,24 +32,17 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Clean install (deterministic)
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install
-          npm ci || npm install
-          npm rebuild @tailwindcss/oxide || true
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Build React App
+      - name: Build frontend
         run: npm run build
 
-      - name: Validate WWW output
+      - name: Validate output
         run: |
-          if [ ! -d "cordova/www" ]; then
-            echo "cordova/www missing"
-            exit 1
-          fi
+          test -d cordova/www || (echo "cordova/www missing" && exit 1)
 
-      - name: Upload WWW Artifact
+      - name: Upload WWW
         uses: actions/upload-artifact@v4
         with:
           name: cordova-www
@@ -84,26 +77,24 @@ jobs:
       - uses: android-actions/setup-android@v3
 
       - name: Install Cordova
-        run: npm install -g cordova
+        run: npm i -g cordova
 
-      - name: Install dependencies (stable)
-        working-directory: ./cordova
-        run: |
-          npm ci || npm install
-          npm rebuild
+      - name: Install Cordova deps
+        working-directory: cordova
+        run: npm ci || npm install
 
-      - name: Add Android platform (safe mode)
-        working-directory: ./cordova
+      - name: Reset Android platform
+        working-directory: cordova
         run: |
           cordova platform rm android || true
           cordova platform add android@latest
 
-      - name: Build Debug APK
-        working-directory: ./cordova
+      - name: Build APK
+        working-directory: cordova
         run: cordova build android
 
-      - name: Build Release AAB
-        working-directory: ./cordova
+      - name: Build AAB
+        working-directory: cordova
         run: cordova build android --release
 
       - name: Upload APK
@@ -119,23 +110,48 @@ jobs:
           path: cordova/platforms/android/app/build/outputs/bundle/release/*.aab
 
 # =====================================================
-# BUILD ELECTRON MATRIX (CLEAN + NO SIDE EFFECTS)
+# BUILD ELECTRON MULTI OS + MULTI ARCH
 # =====================================================
   build-electron:
-    name: Electron (${{ matrix.os }})
-    runs-on: ${{ matrix.runner }}
+    name: Electron ${{ matrix.os }}-${{ matrix.arch }}
     needs: build-react
+    runs-on: ${{ matrix.runner }}
 
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: linux
-            runner: ubuntu-latest
+
+          # ---------------- Windows ----------------
           - os: windows
             runner: windows-latest
+            arch: x64
+
+          - os: windows
+            runner: windows-latest
+            arch: ia32
+
+          - os: windows
+            runner: windows-latest
+            arch: arm64
+
+          # ---------------- Linux ----------------
+          - os: linux
+            runner: ubuntu-latest
+            arch: x64
+
+          - os: linux
+            runner: ubuntu-latest
+            arch: arm64
+
+          - os: linux
+            runner: ubuntu-latest
+            arch: armv7l
+
+          # ---------------- macOS ----------------
           - os: macos
             runner: macos-latest
+            arch: universal
 
     steps:
       - uses: actions/checkout@v4
@@ -149,65 +165,58 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Linux deps
+      - name: Linux package deps
         if: matrix.os == 'linux'
         run: |
           sudo apt update
-          sudo apt install -y rpm libarchive-tools
+          sudo apt install -y rpm libarchive-tools fakeroot dpkg
 
       - name: Install Cordova
-        run: npm install -g cordova
+        run: npm i -g cordova
 
-      - name: Install dependencies (safe)
-        working-directory: ./cordova
-        run: |
-          npm ci || npm install
-          npm rebuild
+      - name: Install Cordova deps
+        working-directory: cordova
+        run: npm ci || npm install
 
-      - name: Reset Electron platform (avoid corruption)
-        working-directory: ./cordova
+      - name: Reset Electron platform
+        working-directory: cordova
         run: |
           cordova platform rm electron || true
           cordova platform add electron
 
       - name: Build Electron
-        working-directory: ./cordova
-        run: npm run build
-
-      # =====================================================
-      # CLEAN ELECTRON NOISE (CRITICAL FIX)
-      # =====================================================
-      - name: Remove Electron internal noise (cross-platform safe)
+        working-directory: cordova
         shell: bash
         run: |
-          TARGET="cordova/platforms/electron/build"
+          cordova build electron -- --${{ matrix.arch }}
 
-          echo "Cleaning Electron noise safely..."
+      # SAFE CLEANUP ONLY
+      - name: Remove junk only
+        shell: bash
+        run: |
+          find cordova -name "*.map" -type f -delete || true
+          find cordova -name ".DS_Store" -type f -delete || true
+          find cordova -name "Thumbs.db" -type f -delete || true
+          find cordova -name "*.tsbuildinfo" -type f -delete || true
 
-          # safer than find with parentheses (works cross-platform via bash layer)
-          if [ -d "$TARGET" ]; then
-            for f in $(find "$TARGET" -type f); do
-
-              case "$f" in
-                *locale.pak) rm -f "$f" ;;
-                *"Electron Framework") rm -f "$f" ;;
-                *.pak) rm -f "$f" ;;
-                *.dll) rm -f "$f" ;;
-                *.so) rm -f "$f" ;;
-                *.dylib) rm -f "$f" ;;
-              esac
-
-            done
-          fi
-
-      - name: Upload Electron Artifact (clean)
+      - name: Upload Electron Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: electron-${{ matrix.os }}
-          path: cordova/platforms/electron/build
+          name: electron-${{ matrix.os }}-${{ matrix.arch }}
+          path: |
+            cordova/**/*.exe
+            cordova/**/*.msi
+            cordova/**/*.zip
+            cordova/**/*.AppImage
+            cordova/**/*.deb
+            cordova/**/*.rpm
+            cordova/**/*.tar.gz
+            cordova/**/*.dmg
+            cordova/**/*.pkg
+          if-no-files-found: warn
 
 # =====================================================
-# TELEGRAM NOTIFICATION (HARDENED)
+# TELEGRAM NOTIFICATION
 # =====================================================
   notify-telegram:
     name: Notify Telegram
@@ -223,33 +232,23 @@ jobs:
         with:
           path: artifacts
 
-      # =====================================================
-      # SUMMARY MESSAGE (SAFE + FIXED FORMAT)
-      # =====================================================
-      - name: Send Summary Message
+      - name: Send Summary
         shell: bash
         run: |
-          set -e
-
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
           CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
           THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
 
-          STATUS="${{ job.status }}"
           URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          SHORT_SHA="${GITHUB_SHA::7}"
 
-          TEXT=$(cat <<EOF
-          🚀 Build Finished
+          TEXT="🚀 Build Finished
 
           Repo: ${{ github.repository }}
           Branch: ${{ github.ref_name }}
-          Commit: $SHORT_SHA
-          Status: $STATUS
+          Commit: ${GITHUB_SHA::7}
 
-          Run: $URL
-          EOF
-          )
+          Run:
+          $URL"
 
           if [ -n "$THREAD" ]; then
             curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
@@ -262,82 +261,45 @@ jobs:
               --data-urlencode text="$TEXT"
           fi
 
-      # =====================================================
-      # FILE SENDER (SAFE FILTERED + RATE LIMITED)
-      # =====================================================
-      - name: Send Artifact Files
+      - name: Send Files
         shell: bash
         run: |
-          set -e
-
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
           CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
           THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
+          MAX=$((45 * 1024 * 1024))
 
-          MAX_SIZE=$((45 * 1024 * 1024))
-
-          ALLOWED_EXT=("apk" "aab" "exe" "AppImage" "deb" "rpm" "zip" "dmg")
-
-          send_file() {
-            local file="$1"
-            local name=$(basename "$file")
-
+          while IFS= read -r file; do
             SIZE=$(stat -c%s "$file")
-
-            if [ "$SIZE" -gt "$MAX_SIZE" ]; then
-              echo "Skip large file: $name"
-              return
-            fi
-
             NAME=$(basename "$file")
+
+            if [ "$SIZE" -gt "$MAX" ]; then
+              echo "Skip large file $NAME"
+              continue
+            fi
 
             case "$NAME" in
               elevate.exe|uninstall.exe|Uninstall.exe)
-                echo "Skip helper file: $NAME"
-                return
+                continue
                 ;;
             esac
 
-            echo "Sending $name"
+            echo "Sending $NAME"
 
             if [ -n "$THREAD" ]; then
-              curl -s --fail-with-body --retry 3 \
+              curl -s --retry 3 \
                 -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
                 -F chat_id="$CHAT" \
                 -F message_thread_id="$THREAD" \
                 -F document=@"$file" \
-                -F caption="📦 $name"
+                -F caption="📦 $NAME"
             else
-              curl -s --fail-with-body --retry 3 \
+              curl -s --retry 3 \
                 -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
                 -F chat_id="$CHAT" \
                 -F document=@"$file" \
-                -F caption="📦 $name"
+                -F caption="📦 $NAME"
             fi
 
-            sleep $((RANDOM % 3 + 2))
-          }
-
-          COUNT=0
-
-          while IFS= read -r file; do
-            EXT="${file##*.}"
-
-            SKIP=1
-            for a in "${ALLOWED_EXT[@]}"; do
-              if [ "$EXT" = "$a" ]; then
-                SKIP=0
-                break
-              fi
-            done
-
-            if [ "$SKIP" -eq 1 ]; then
-              continue
-            fi
-
-            send_file "$file"
-            COUNT=$((COUNT + 1))
-
+            sleep 2
           done < <(find artifacts -type f)
-
-          echo "Sent $COUNT files"

@@ -13,13 +13,14 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "24"
+  NODE_VERSION: "22"
   JAVA_VERSION: "21"
+  APP_NAME: "Kiirohana"
 
 jobs:
 
 # =====================================================
-# BUILD REACT -> cordova/www
+# BUILD REACT
 # =====================================================
   build-react:
     name: Build React
@@ -33,25 +34,22 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Clean install
-        run: |
-          rm -rf node_modules
-          npm ci
-          npm rebuild @tailwindcss/oxide || true
+      - name: Install root deps
+        run: npm ci
 
-      - name: Install Root Dependencies
-        run: |
-          npm install
-          npm rebuild
-
-      - name: Build React
+      - name: Build frontend
         run: npm run build
 
-      - name: Upload WWW Artifact
+      - name: Validate output
+        run: |
+          test -d cordova/www || (echo "cordova/www missing" && exit 1)
+
+      - name: Upload WWW
         uses: actions/upload-artifact@v4
         with:
           name: cordova-www
           path: cordova/www
+          if-no-files-found: error
 
 # =====================================================
 # BUILD ANDROID
@@ -81,35 +79,51 @@ jobs:
       - uses: android-actions/setup-android@v3
 
       - name: Install Cordova
-        run: npm install -g cordova
+        run: npm i -g cordova
 
-      - name: Install dependencies
-        working-directory: ./cordova
+      - name: Install Cordova deps
+        working-directory: cordova
+        run: npm ci || npm install
+
+      - name: Reset Android platform
+        working-directory: cordova
         run: |
-          npm install
-          npm rebuild
+          cordova platform rm android || true
+          cordova platform add android@latest
 
-      - name: Add Android platform
-        working-directory: ./cordova
-        run: cordova platform add android@latest
+      - name: Build APK + AAB
+        working-directory: cordova
+        run: |
+          cordova build android
+          cordova build android --release
 
-      - name: Build Android
-        working-directory: ./cordova
-        run: cordova build android
+      - name: Rename Android outputs
+        shell: bash
+        run: |
+          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
+          mkdir -p release-files
 
-      - name: Upload Android Artifact
+          find cordova -type f \( -name "*.apk" -o -name "*.aab" \) | while read f; do
+            EXT="${f##*.}"
+            if [ "$EXT" = "apk" ]; then
+              cp "$f" "release-files/${APP_NAME} (Android) ${VERSION}.apk"
+            fi
+            if [ "$EXT" = "aab" ]; then
+              cp "$f" "release-files/${APP_NAME} (Android Bundle) ${VERSION}.aab"
+            fi
+          done
+
+      - name: Upload Android artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-release
-          path: |
-            cordova/platforms/android/app/build/outputs/apk/**/*.apk
-            cordova/platforms/android/app/build/outputs/bundle/**/*.aab
+          path: release-files/*
 
 # =====================================================
-# BUILD ELECTRON MATRIX (NO RELEASE UPLOAD HERE)
+# BUILD ELECTRON MULTI OS + MULTI ARCH
 # =====================================================
   build-electron:
-    name: Electron (${{ matrix.os }})
+    name: Electron ${{ matrix.os }}-${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
     needs: build-react
 
@@ -117,12 +131,37 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: linux
-            runner: ubuntu-latest
+
+          # Windows
           - os: windows
             runner: windows-latest
+            arch: x64
+
+          - os: windows
+            runner: windows-latest
+            arch: ia32
+
+          - os: windows
+            runner: windows-latest
+            arch: arm64
+
+          # Linux
+          - os: linux
+            runner: ubuntu-latest
+            arch: x64
+
+          - os: linux
+            runner: ubuntu-latest
+            arch: arm64
+
+          - os: linux
+            runner: ubuntu-latest
+            arch: armv7l
+
+          # macOS
           - os: macos
             runner: macos-latest
+            arch: universal
 
     steps:
       - uses: actions/checkout@v4
@@ -136,74 +175,89 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install Linux deps
+      - name: Linux deps
         if: matrix.os == 'linux'
         run: |
           sudo apt update
-          sudo apt install -y rpm libarchive-tools
+          sudo apt install -y rpm libarchive-tools fakeroot dpkg
 
       - name: Install Cordova
-        run: npm install -g cordova
+        run: npm i -g cordova
 
-      - name: Install dependencies
-        working-directory: ./cordova
+      - name: Install Cordova deps
+        working-directory: cordova
+        run: npm ci || npm install
+
+      - name: Reset Electron platform
+        working-directory: cordova
         run: |
-          npm install
-          npm rebuild
-
-      - name: Add Electron platform
-        working-directory: ./cordova
-        run: cordova platform add electron
+          cordova platform rm electron || true
+          cordova platform add electron
 
       - name: Build Electron
-        working-directory: ./cordova
-        run: npm run build
+        working-directory: cordova
+        shell: bash
+        run: |
+          cordova build electron -- --${{ matrix.arch }}
 
-      - name: Upload Electron Artifact
+      - name: Remove junk only
+        shell: bash
+        run: |
+          find cordova -name "*.map" -type f -delete || true
+          find cordova -name ".DS_Store" -type f -delete || true
+          find cordova -name "Thumbs.db" -type f -delete || true
+
+      - name: Rename release files
+        shell: bash
+        run: |
+          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
+          mkdir -p release-files
+
+          find cordova -type f \
+            \( -name "*.exe" -o -name "*.msi" -o -name "*.zip" -o \
+               -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" -o \
+               -name "*.tar.gz" -o -name "*.dmg" -o -name "*.pkg" \) \
+            | while read f; do
+
+              BASE=$(basename "$f")
+              EXT="${BASE##*.}"
+
+              # tar.gz preserve extension
+              case "$BASE" in
+                *.tar.gz) EXT="tar.gz" ;;
+              esac
+
+              cp "$f" "release-files/${APP_NAME} (${{ matrix.os }}-${{ matrix.arch }}) ${VERSION}.${EXT}"
+            done
+
+      - name: Upload Electron artifact
         uses: actions/upload-artifact@v4
         with:
-          name: electron-${{ matrix.os }}
-          path: cordova/platforms/electron/build
+          name: electron-${{ matrix.os }}-${{ matrix.arch }}
+          path: release-files/*
 
 # =====================================================
-# SINGLE RELEASE UPLOADER (FIX ALL RACE CONDITIONS)
+# RELEASE UPLOAD
 # =====================================================
   release-all:
-    name: Publish GitHub Release Assets
+    name: Publish Release Assets
     runs-on: ubuntu-latest
     needs:
       - build-android
       - build-electron
 
     steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           path: artifacts
 
-      - name: Clean Electron noise files
-        run: |
-          echo "Cleaning unsafe Electron internal assets..."
-
-          find artifacts -type f \
-            \( -name "locale.pak" \
-            -o -name "Electron Framework" \
-            -o -name "*.dylib" \
-            -o -name "*.so" \
-            -o -name "*.dll" \
-            -o -name "*.pak" \) \
-            -delete || true
-
-      - name: Stabilization delay
-        run: sleep 8
-
-      - name: Upload ALL to GitHub Release (single atomic step)
+      - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: artifacts/**/*
 
 # =====================================================
-# TELEGRAM NOTIFICATION (NOW SAFE AFTER RELEASE)
+# TELEGRAM NOTIFICATION + CHANGELOG
 # =====================================================
   notify-telegram:
     name: Notify Telegram
@@ -217,30 +271,76 @@ jobs:
         with:
           path: artifacts
 
-      - name: Generate Release Notes
-        id: notes
-        run: |
-          NOTES=$(git log -5 --pretty=format:"- %s")
-          echo "notes<<EOF" >> $GITHUB_OUTPUT
-          echo "$NOTES" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Send Telegram Summary
+      - name: Send Release Summary
+        shell: bash
         run: |
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
           CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
-          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
 
-          TEXT="🚀 RELEASE COMPLETE
+          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
+          URL="${{ github.event.release.html_url || format('https://github.com/{0}/releases', github.repository) }}"
+          NOTES="${{ github.event.release.body }}"
 
+          if [ -z "$NOTES" ]; then
+            NOTES="No changelog provided."
+          fi
+
+          TEXT="🚀 ${APP_NAME} Released
+
+          Version: $VERSION
           Repo: ${{ github.repository }}
-          Status: ${{ job.status }}
 
-          📜 Notes:
-          ${{ steps.notes.outputs.notes }}
+          📜 Changelog:
+          $NOTES
 
-          🔗 Run: $RUN_URL"
+          🔗 Release:
+          $URL"
 
-          curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
-            -d chat_id="$CHAT" \
-            --data-urlencode text="$TEXT"
+          if [ -n "$THREAD" ]; then
+            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+              -d chat_id="$CHAT" \
+              -d message_thread_id="$THREAD" \
+              --data-urlencode text="$TEXT"
+          else
+            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+              -d chat_id="$CHAT" \
+              --data-urlencode text="$TEXT"
+          fi
+
+      - name: Send Release Files
+        shell: bash
+        run: |
+          BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
+          CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
+          THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
+          MAX=$((45 * 1024 * 1024))
+
+          find artifacts -type f | while read file; do
+            SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
+            NAME=$(basename "$file")
+
+            if [ "$SIZE" -gt "$MAX" ]; then
+              echo "Skip large file: $NAME"
+              continue
+            fi
+
+            echo "Sending $NAME"
+
+            if [ -n "$THREAD" ]; then
+              curl -s --retry 3 \
+                -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+                -F chat_id="$CHAT" \
+                -F message_thread_id="$THREAD" \
+                -F document=@"$file" \
+                -F caption="📦 $NAME"
+            else
+              curl -s --retry 3 \
+                -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+                -F chat_id="$CHAT" \
+                -F document=@"$file" \
+                -F caption="📦 $NAME"
+            fi
+
+            sleep 2
+          done
