@@ -244,21 +244,11 @@ jobs:
         run: |
           mkdir -p telegram-files
 
-          find artifacts -type f | while read file; do
+          find artifacts -type f | while read -r file; do
             NAME=$(basename "$file")
 
             case "$NAME" in
-              # Android
-              *.apk|*.aab|
-
-              # Windows
-              *.exe|*.msi|*.zip|
-
-              # Linux
-              *.AppImage|*.deb|*.rpm|*.tar.gz|
-
-              # macOS
-              *.dmg|*.pkg)
+              *.apk|*.aab|*.exe|*.msi|*.zip|*.AppImage|*.deb|*.rpm|*.tar.gz|*.dmg|*.pkg)
 
                 # block helper / uninstall / junk
                 case "$NAME" in

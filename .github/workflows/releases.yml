@@ -236,9 +236,9 @@ jobs:
           name: electron-${{ matrix.os }}-${{ matrix.arch }}
           path: release-files/*
 
-# =====================================================
-# RELEASE UPLOAD
-# =====================================================
+  # =====================================================
+  # RELEASE UPLOAD
+  # =====================================================
   release-all:
     name: Publish Release Assets
     runs-on: ubuntu-latest
@@ -261,33 +261,19 @@ jobs:
       - name: Select release files only
         shell: bash
         run: |
+          set -e
           mkdir -p release-files
 
-          find artifacts -type f | while read file; do
+          while IFS= read -r file; do
             NAME=$(basename "$file")
 
             case "$NAME" in
-              # Android
-              *.apk|*.aab|
+              elevate.exe|uninstall.exe|Uninstall.exe)
+                echo "Skip helper: $NAME"
+                ;;
 
-              # Windows
-              *.exe|*.msi|*.zip|
-
-              # Linux
-              *.AppImage|*.deb|*.rpm|*.tar.gz|
-
-              # macOS
-              *.dmg|*.pkg)
-
-                # skip helper / junk files
-                case "$NAME" in
-                  elevate.exe|uninstall.exe|Uninstall.exe)
-                    echo "Skip helper file: $NAME"
-                    continue
-                    ;;
-                esac
-
-                cp "$file" release-files/
+              *.apk|*.aab|*.exe|*.msi|*.zip|*.AppImage|*.deb|*.rpm|*.tar.gz|*.dmg|*.pkg)
+                cp -f "$file" "release-files/$NAME"
                 echo "Accepted: $NAME"
                 ;;
 
@@ -295,7 +281,8 @@ jobs:
                 echo "Rejected: $NAME"
                 ;;
             esac
-          done
+
+          done < <(find artifacts -type f)
 
           echo "Final files:"
           ls -lah release-files
@@ -313,12 +300,18 @@ jobs:
           fi
 
       # =====================================================
+      # OPTIONAL: WAIT FOR GITHUB RELEASE CONSISTENCY
+      # =====================================================
+      - name: Stabilization delay
+        run: sleep 5
+
+      # =====================================================
       # UPLOAD SAFE FILES ONLY
       # =====================================================
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release-files/*
+          files: release-files/**
 
 # =====================================================
 # TELEGRAM NOTIFICATION + CHANGELOG
