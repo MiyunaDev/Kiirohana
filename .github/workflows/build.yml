@@ -242,35 +242,52 @@ jobs:
           CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
           THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
 
+          ALLOWED="apk aab exe AppImage deb rpm snap"
+          MAX_SIZE=$((45 * 1024 * 1024))
+
           shopt -s globstar nullglob
           COUNT=0
 
           for file in artifacts/**/*; do
-            if [[ -f "$file" ]]; then
+            [[ -f "$file" ]] || continue
 
-              NAME=$(basename "$file")
-              SIZE=$(du -h "$file" | cut -f1)
+            NAME=$(basename "$file")
+            SIZE=$(stat -c%s "$file")
 
-              echo "Sending $NAME ($SIZE)"
+            EXT="${file##*.}"
 
-              if [ -n "$THREAD" ]; then
-                curl -s --fail-with-body --retry 3 --retry-delay 5 \
-                  -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
-                  -F chat_id="$CHAT" \
-                  -F message_thread_id="$THREAD" \
-                  -F document=@"$file" \
-                  -F caption="📦 $NAME ($SIZE)"
-              else
-                curl -s --fail-with-body --retry 3 --retry-delay 5 \
-                  -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
-                  -F chat_id="$CHAT" \
-                  -F document=@"$file" \
-                  -F caption="📦 $NAME ($SIZE)"
-              fi
-
-              COUNT=$((COUNT + 1))
-              sleep 1
+            # skip non-release files
+            if [[ ! " $ALLOWED " =~ " $EXT " ]]; then
+              continue
             fi
+
+            # skip too large file (Telegram limit)
+            if [ "$SIZE" -gt "$MAX_SIZE" ]; then
+              echo "Skip too large: $NAME"
+              continue
+            fi
+
+            echo "Sending $NAME ($(numfmt --to=iec $SIZE))"
+
+            if [ -n "$THREAD" ]; then
+              curl -s --fail-with-body --retry 3 --retry-delay 5 \
+                -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+                -F chat_id="$CHAT" \
+                -F message_thread_id="$THREAD" \
+                -F document=@"$file" \
+                -F caption="📦 $NAME"
+            else
+              curl -s --fail-with-body --retry 3 --retry-delay 5 \
+                -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+                -F chat_id="$CHAT" \
+                -F document=@"$file" \
+                -F caption="📦 $NAME"
+            fi
+
+            COUNT=$((COUNT + 1))
+
+            # anti flood control
+            sleep $((RANDOM % 3 + 2))
           done
 
           echo "Sent $COUNT files"

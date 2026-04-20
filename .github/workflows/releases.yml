@@ -195,9 +195,6 @@ jobs:
         with:
           files: cordova/platforms/electron/build/**
 
-  # =====================================================
-  # TELEGRAM RELEASE NOTIFICATION
-  # =====================================================
   notify-telegram:
     name: Notify Telegram
     runs-on: ubuntu-latest
@@ -214,7 +211,28 @@ jobs:
           path: artifacts
 
       # =====================================================
-      # SEND RELEASE SUMMARY
+      # BUILD RELEASE NOTES (CHANGELOG / COMMITS)
+      # =====================================================
+      - name: Generate Release Notes
+        id: notes
+        shell: bash
+        run: |
+          echo "📜 Generating release notes..."
+
+          NOTES=$(git log -5 --pretty=format:"- %s")
+
+          if [ -f CHANGELOG.md ]; then
+            FILE_NOTES=$(cat CHANGELOG.md | head -n 30)
+            NOTES="$FILE_NOTES"
+          fi
+
+          # escape markdown for telegram safety
+          NOTES="${NOTES//$'\n'/\\n}"
+
+          echo "notes=$NOTES" >> $GITHUB_OUTPUT
+
+      # =====================================================
+      # SEND SUMMARY WITH INLINE BUTTON
       # =====================================================
       - name: Send Release Summary
         shell: bash
@@ -222,11 +240,6 @@ jobs:
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
           CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
           THREAD="${{ secrets.TELEGRAM_BOT_THREAD_RELEASE }}"
-
-          if [ -z "$BOT" ] || [ -z "$CHAT" ]; then
-            echo "Missing Telegram config"
-            exit 1
-          fi
 
           STATUS="${{ job.status }}"
           REPO="${{ github.repository }}"
@@ -241,23 +254,44 @@ jobs:
           🔖 Commit: $SHA
           📊 Status: $STATUS
 
-          🔗 [GitHub Run]($RUN_URL)"
+          📜 *Release Notes:*
+          ${{ steps.notes.outputs.notes }}
+
+          🔗 GitHub Run"
+
+          BUTTON_JSON=$(cat <<EOF
+          {
+            "inline_keyboard": [[
+              {
+                "text": "🔗 View GitHub Run",
+                "url": "$RUN_URL"
+              },
+              {
+                "text": "📦 Open Release",
+                "url": "https://github.com/$REPO/releases"
+              }
+            ]]
+          }
+          EOF
+          )
 
           if [ -n "$THREAD" ]; then
             curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
               -d chat_id="$CHAT" \
               -d message_thread_id="$THREAD" \
               -d parse_mode="Markdown" \
-              --data-urlencode text="$TEXT"
+              --data-urlencode text="$TEXT" \
+              --data-urlencode reply_markup="$BUTTON_JSON"
           else
             curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
               -d chat_id="$CHAT" \
               -d parse_mode="Markdown" \
-              --data-urlencode text="$TEXT"
+              --data-urlencode text="$TEXT" \
+              --data-urlencode reply_markup="$BUTTON_JSON"
           fi
 
       # =====================================================
-      # SEND RELEASE FILES (GROUPED)
+      # SEND ARTIFACTS (FILTER MAX 50MB)
       # =====================================================
       - name: Send Release Artifacts
         shell: bash
@@ -266,9 +300,23 @@ jobs:
           CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
           THREAD="${{ secrets.TELEGRAM_BOT_THREAD_RELEASE }}"
 
+          MAX_SIZE=$((50 * 1024 * 1024))
+
           send_file () {
             local file=$1
             local caption=$2
+
+            if [ ! -f "$file" ]; then
+              echo "⚠️ File not found: $file"
+              return
+            fi
+
+            SIZE_BYTES=$(stat -c%s "$file")
+
+            if [ "$SIZE_BYTES" -gt "$MAX_SIZE" ]; then
+              echo "⛔ SKIP (too large >50MB): $file"
+              return
+            fi
 
             if [ -n "$THREAD" ]; then
               curl -s --fail-with-body \
@@ -286,47 +334,41 @@ jobs:
             fi
           }
 
-          echo "📦 Collecting release artifacts..."
+          echo "📦 Searching STRICT release artifacts..."
 
-          APK_FILES=$(find artifacts -type f -name "*.apk")
-          AAB_FILES=$(find artifacts -type f -name "*.aab")
-          ELECTRON_FILES=$(find artifacts -type f -not -name "*.apk" -not -name "*.aab")
+          # =========================
+          # ONLY ALLOWED FILES
+          # =========================
+          APK_FILE=$(find artifacts -type f -name "*.apk" | head -n 1)
+          AAB_FILE=$(find artifacts -type f -name "*.aab" | head -n 1)
+          IPA_FILE=$(find artifacts -type f -name "*.ipa" | head -n 1)
+
+          echo "📱 APK: $APK_FILE"
+          echo "📦 AAB: $AAB_FILE"
+          echo "🍎 IPA: $IPA_FILE"
 
           # =========================
           # ANDROID APK
           # =========================
-          if [ ! -z "$APK_FILES" ]; then
-            echo "Sending APK..."
-            for file in $APK_FILES; do
-              SIZE=$(du -h "$file" | cut -f1)
-              send_file "$file" "📱 Android APK ($SIZE)"
-              sleep 1
-            done
+          if [ -n "$APK_FILE" ]; then
+            SIZE=$(du -h "$APK_FILE" | cut -f1)
+            send_file "$APK_FILE" "📱 Android APK ($SIZE)"
           fi
 
           # =========================
           # ANDROID AAB
           # =========================
-          if [ ! -z "$AAB_FILES" ]; then
-            echo "Sending AAB..."
-            for file in $AAB_FILES; do
-              SIZE=$(du -h "$file" | cut -f1)
-              send_file "$file" "📦 Android AAB ($SIZE)"
-              sleep 1
-            done
+          if [ -n "$AAB_FILE" ]; then
+            SIZE=$(du -h "$AAB_FILE" | cut -f1)
+            send_file "$AAB_FILE" "📦 Android App Bundle ($SIZE)"
           fi
 
           # =========================
-          # ELECTRON
+          # iOS IPA (OPTIONAL)
           # =========================
-          if [ ! -z "$ELECTRON_FILES" ]; then
-            echo "Sending Electron builds..."
-            for file in $ELECTRON_FILES; do
-              SIZE=$(du -h "$file" | cut -f1)
-              NAME=$(basename "$file")
-              send_file "$file" "🖥 Electron: $NAME ($SIZE)"
-              sleep 1
-            done
+          if [ -n "$IPA_FILE" ]; then
+            SIZE=$(du -h "$IPA_FILE" | cut -f1)
+            send_file "$IPA_FILE" "🍎 iOS IPA ($SIZE)"
           fi
 
-          echo "✅ Release artifacts sent"
+          echo "✅ Strict release upload finished"
