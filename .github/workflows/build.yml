@@ -188,6 +188,7 @@ jobs:
   notify-telegram:
     name: Notify Telegram
     runs-on: ubuntu-latest
+    environment: DEV
     needs:
       - build-android
       - build-electron

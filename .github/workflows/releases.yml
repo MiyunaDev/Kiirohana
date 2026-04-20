@@ -199,8 +199,9 @@ jobs:
   # TELEGRAM RELEASE NOTIFICATION
   # =====================================================
   notify-telegram:
-    name: Notify Telegram Release
+    name: Notify Telegram
     runs-on: ubuntu-latest
+    environment: DEV
     needs:
       - build-android
       - build-electron
