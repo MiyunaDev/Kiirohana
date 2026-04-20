@@ -230,11 +230,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          pattern: |
-            android-*
-            electron-*
           path: artifacts
-          merge-multiple: true
 
       # =====================================================
       # FILTER ONLY INSTALLER / PORTABLE FILES
