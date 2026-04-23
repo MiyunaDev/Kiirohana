@@ -219,9 +219,9 @@ export default function DeveloperApplicationsPage() {
 
             {app.botUser && (
               <div className="flex items-center gap-2 mt-3 text-sm opacity-80">
-                <img src={botForm.avatarPreview || app.botUser.avatar || "/default-avatar.png"} alt={app.botUser.username} className="w-8 h-8 rounded-full" />
+                <img src={botForm.avatarPreview || app.botUser.avatar || `https://api.dicebear.com/8.x/identicon/svg?seed=${app.botUser?.username}`} alt={app.botUser.username} className="w-16 h-16 rounded-full" />
                 <div className="flex-1">
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center text-lg">
                     <span>{app.botUser.displayName || app.botUser.username}</span>
                     <span className="text-xs opacity-50">{app.botUser.role}</span>
                   </div>

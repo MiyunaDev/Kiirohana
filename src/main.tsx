@@ -28,7 +28,6 @@ import UserProfilePage from './Shinobu/pages/Detail/User.tsx';
 import InstalledShinobu from './Shinobu/pages/System/Main.tsx';
 import ShinobuBootstrap from './Shinobu/pages/System/Bootsrap.tsx';
 import ShinobuLogin from './Shinobu/pages/System/Login.tsx';
-import { ShinobuProvider } from './contexts/ShinobuContext.tsx';
 import ShinobuDetail from './Shinobu/pages/Detail/Media.tsx';
 import MainLayout from './Shinobu/layout/Main.layout.tsx';
 import Landing from './Shinobu/pages/Landing/Landing.tsx';
@@ -36,11 +35,11 @@ import SearchLayout from './Shinobu/layout/Search.layout.tsx';
 import Advance from './Shinobu/pages/Browse/Advance.tsx';
 import HistoryPage from './Shinobu/pages/History/History.tsx';
 import AccountCenterPage from './Shinobu/pages/System/AccountCenter.tsx';
-import MainSetting from './Shinobu/Settings/MainSetting.tsx';
 import LibraryPage from './Shinobu/pages/Library/Library.tsx';
 import CollectionDetailPage from './Shinobu/pages/Library/CollectionDetailPage.tsx';
 import Player from './Shinobu/pages/Player/Player.tsx';
 import DeveloperApplicationsPage from './Shinobu/pages/Developer/DeveloperPortal.tsx';
+import { ShinobuProvider } from './Shinobu/contexts/ShinobuContext.tsx';
 
 const router = createHashRouter([
   {
@@ -92,7 +91,6 @@ const router = createHashRouter([
                 path: "app", Component: MainLayout, children: [
                   { path: "account-center", Component: AccountCenterPage },
                   { path: "developer-portal", Component: DeveloperApplicationsPage },
-                  { path: "settings", Component: MainSetting },
                   { path: "home", Component: Landing },
                   {
                     path: "library", children: [
