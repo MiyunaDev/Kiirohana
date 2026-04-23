@@ -20,7 +20,7 @@ env:
 jobs:
 
 # =====================================================
-# BUILD REACT
+# BUILD REACT (INTERNAL ONLY)
 # =====================================================
   build-react:
     name: Build React
@@ -34,28 +34,29 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Install root deps
-        run: npm ci
+      - run: npm ci
+      - run: npm run build
 
-      - name: Build frontend
-        run: npm run build
+      - name: Validate
+        run: test -d cordova/www
 
-      - name: Validate output
+      # jangan publish cordova-www ke release
+      - name: Pack WWW
         run: |
-          test -d cordova/www || (echo "cordova/www missing" && exit 1)
+          cd cordova
+          zip -qr ../cordova-www.zip www
 
-      - name: Upload WWW
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: cordova-www
-          path: cordova/www
-          if-no-files-found: error
+          name: _internal-www
+          path: cordova-www.zip
+          retention-days: 1
 
 # =====================================================
-# BUILD ANDROID
+# BUILD ANDROID RELEASE
 # =====================================================
   build-android:
-    name: Build Android
+    name: Build Android Release
     runs-on: ubuntu-latest
     needs: build-react
 
@@ -64,8 +65,14 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: cordova-www
-          path: cordova/www
+          name: _internal-www
+
+      - name: Restore WWW
+        run: |
+          unzip -q cordova-www.zip
+          rm -rf cordova/www
+          mkdir -p cordova
+          mv www cordova/www
 
       - uses: actions/setup-node@v4
         with:
@@ -78,87 +85,78 @@ jobs:
 
       - uses: android-actions/setup-android@v3
 
-      - name: Install Cordova
-        run: npm i -g cordova
+      - run: npm i -g cordova
 
-      - name: Install Cordova deps
-        working-directory: cordova
+      - working-directory: cordova
         run: npm ci || npm install
 
-      - name: Reset Android platform
+      - name: Version
+        id: ver
+        shell: bash
+        run: |
+          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
+          VERSION="${VERSION#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Reset Android
         working-directory: cordova
         run: |
           cordova platform rm android || true
           cordova platform add android@latest
 
+      # release oriented
       - name: Build APK + AAB
         working-directory: cordova
         run: |
-          cordova build android
           cordova build android --release
+          cordova build android
 
-      - name: Rename Android outputs
+      - name: Prepare Release Files
         shell: bash
         run: |
-          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
           mkdir -p release-files
 
-          find cordova -type f \( -name "*.apk" -o -name "*.aab" \) | while read f; do
-            EXT="${f##*.}"
-            if [ "$EXT" = "apk" ]; then
-              cp "$f" "release-files/${APP_NAME} (Android) ${VERSION}.apk"
-            fi
-            if [ "$EXT" = "aab" ]; then
-              cp "$f" "release-files/${APP_NAME} (Android Bundle) ${VERSION}.aab"
-            fi
-          done
+          APK=$(find cordova -type f -name "*.apk" | head -n1)
+          AAB=$(find cordova -type f -name "*.aab" | head -n1)
 
-      - name: Upload Android artifact
-        uses: actions/upload-artifact@v4
+          cp "$APK" "release-files/${APP_NAME} ${{ steps.ver.outputs.version }}.apk"
+          cp "$AAB" "release-files/${APP_NAME} ${{ steps.ver.outputs.version }}.aab"
+
+      - uses: actions/upload-artifact@v4
         with:
           name: android-release
           path: release-files/*
 
 # =====================================================
-# BUILD ELECTRON MULTI OS + MULTI ARCH
+# BUILD ELECTRON RELEASE
 # =====================================================
   build-electron:
     name: Electron ${{ matrix.os }}-${{ matrix.arch }}
-    runs-on: ${{ matrix.runner }}
     needs: build-react
+    runs-on: ${{ matrix.runner }}
 
     strategy:
       fail-fast: false
       matrix:
         include:
-
-          # Windows
           - os: windows
             runner: windows-latest
             arch: x64
-
           - os: windows
             runner: windows-latest
             arch: ia32
-
           - os: windows
             runner: windows-latest
             arch: arm64
-
-          # Linux
           - os: linux
             runner: ubuntu-latest
             arch: x64
-
           - os: linux
             runner: ubuntu-latest
             arch: arm64
-
           - os: linux
             runner: ubuntu-latest
             arch: armv7l
-
-          # macOS
           - os: macos
             runner: macos-latest
             arch: universal
@@ -168,8 +166,15 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: cordova-www
-          path: cordova/www
+          name: _internal-www
+
+      - name: Restore WWW
+        shell: bash
+        run: |
+          unzip -q cordova-www.zip
+          rm -rf cordova/www
+          mkdir -p cordova
+          mv www cordova/www
 
       - uses: actions/setup-node@v4
         with:
@@ -181,64 +186,76 @@ jobs:
           sudo apt update
           sudo apt install -y rpm libarchive-tools fakeroot dpkg
 
-      - name: Install Cordova
-        run: npm i -g cordova
+      - run: npm i -g cordova
 
-      - name: Install Cordova deps
-        working-directory: cordova
+      - working-directory: cordova
         run: npm ci || npm install
 
-      - name: Reset Electron platform
+      - name: Version
+        id: ver
+        shell: bash
+        run: |
+          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
+          VERSION="${VERSION#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Reset Electron
         working-directory: cordova
         run: |
           cordova platform rm electron || true
           cordova platform add electron
 
-      - name: Build Electron
+      # release build
+      - name: Build Electron Release
         working-directory: cordova
         shell: bash
         run: |
-          cordova build electron -- --${{ matrix.arch }}
+          cordova build electron --release -- --${{ matrix.arch }}
 
-      - name: Remove junk only
+      - name: Cleanup
         shell: bash
         run: |
-          find cordova -name "*.map" -type f -delete || true
-          find cordova -name ".DS_Store" -type f -delete || true
-          find cordova -name "Thumbs.db" -type f -delete || true
+          find cordova -iname "elevate.exe" -delete || true
+          find cordova -iname "uninstall.exe" -delete || true
+          find cordova -iname "*.map" -delete || true
+          find cordova -iname ".DS_Store" -delete || true
+          find cordova -iname "Thumbs.db" -delete || true
 
-      - name: Rename release files
+      - name: Prepare Release Files
         shell: bash
         run: |
-          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
           mkdir -p release-files
 
           find cordova -type f \
             \( -name "*.exe" -o -name "*.msi" -o -name "*.zip" -o \
                -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" -o \
                -name "*.tar.gz" -o -name "*.dmg" -o -name "*.pkg" \) \
-            | while read f; do
+            ! -iname "elevate.exe" \
+            ! -iname "uninstall.exe" \
+          | while read -r f; do
 
-              BASE=$(basename "$f")
-              EXT="${BASE##*.}"
+            BASE=$(basename "$f")
+            EXT="${BASE##*.}"
+            case "$BASE" in
+              *.tar.gz) EXT="tar.gz" ;;
+            esac
 
-              # tar.gz preserve extension
-              case "$BASE" in
-                *.tar.gz) EXT="tar.gz" ;;
-              esac
+            cp "$f" \
+            "release-files/${APP_NAME} (${{
+              matrix.os
+            }}-${{
+              matrix.arch
+            }}) ${{ steps.ver.outputs.version }}.${EXT}"
+          done
 
-              cp "$f" "release-files/${APP_NAME} (${{ matrix.os }}-${{ matrix.arch }}) ${VERSION}.${EXT}"
-            done
-
-      - name: Upload Electron artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: electron-${{ matrix.os }}-${{ matrix.arch }}
           path: release-files/*
 
-  # =====================================================
-  # RELEASE UPLOAD
-  # =====================================================
+# =====================================================
+# UPLOAD TO GITHUB RELEASE
+# =====================================================
   release-all:
     name: Publish Release Assets
     runs-on: ubuntu-latest
@@ -251,71 +268,39 @@ jobs:
         with:
           path: artifacts
 
-      # =====================================================
-      # FILTER ONLY FINAL INSTALLER / PORTABLE FILES
-      # =====================================================
-      - name: Select release files only
+      - name: Select final assets only
         shell: bash
         run: |
-          set -e
           mkdir -p release-files
 
-          while IFS= read -r file; do
+          find artifacts -type f | while read -r file; do
             NAME=$(basename "$file")
 
             case "$NAME" in
-              elevate.exe|uninstall.exe|Uninstall.exe)
-                echo "Skip helper: $NAME"
-                ;;
-
               *.apk|*.aab|*.exe|*.msi|*.zip|*.AppImage|*.deb|*.rpm|*.tar.gz|*.dmg|*.pkg)
-                cp -f "$file" "release-files/$NAME"
-                echo "Accepted: $NAME"
-                ;;
+                case "$NAME" in
+                  elevate.exe|uninstall.exe|Uninstall.exe)
+                    continue
+                    ;;
+                esac
 
-              *)
-                echo "Rejected: $NAME"
+                cp -f "$file" "release-files/$NAME"
                 ;;
             esac
+          done
 
-          done < <(find artifacts -type f)
+          test "$(find release-files -type f | wc -l)" -gt 0
 
-          echo "Final files:"
-          ls -lah release-files
-
-      # =====================================================
-      # FAIL IF NOTHING VALID
-      # =====================================================
-      - name: Validate release files
-        shell: bash
-        run: |
-          COUNT=$(find release-files -type f | wc -l)
-          if [ "$COUNT" -eq 0 ]; then
-            echo "No valid release files found."
-            exit 1
-          fi
-
-      # =====================================================
-      # OPTIONAL: WAIT FOR GITHUB RELEASE CONSISTENCY
-      # =====================================================
-      - name: Stabilization delay
-        run: sleep 5
-
-      # =====================================================
-      # UPLOAD SAFE FILES ONLY
-      # =====================================================
-      - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
           files: release-files/**
 
 # =====================================================
-# TELEGRAM NOTIFICATION + CHANGELOG
+# TELEGRAM
 # =====================================================
   notify-telegram:
     name: Notify Telegram
     runs-on: ubuntu-latest
-    environment: DEV
     needs: release-all
     if: always()
 
@@ -324,7 +309,27 @@ jobs:
         with:
           path: artifacts
 
-      - name: Send Release Summary
+      - name: Prepare Telegram Files
+        shell: bash
+        run: |
+          mkdir -p telegram-files
+
+          find artifacts -type f | while read -r file; do
+            NAME=$(basename "$file")
+
+            case "$NAME" in
+              *.apk|*.aab|*.exe|*.msi|*.zip|*.AppImage|*.deb|*.rpm|*.tar.gz|*.dmg|*.pkg)
+                case "$NAME" in
+                  elevate.exe|uninstall.exe|Uninstall.exe)
+                    continue
+                    ;;
+                esac
+                cp "$file" telegram-files/
+                ;;
+            esac
+          done
+
+      - name: Send Summary
         shell: bash
         run: |
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
@@ -333,19 +338,11 @@ jobs:
 
           VERSION="${{ github.event.release.tag_name || github.ref_name }}"
           URL="${{ github.event.release.html_url || format('https://github.com/{0}/releases', github.repository) }}"
-          NOTES="${{ github.event.release.body }}"
-
-          if [ -z "$NOTES" ]; then
-            NOTES="No changelog provided."
-          fi
 
           TEXT="🚀 ${APP_NAME} Released
 
           Version: $VERSION
           Repo: ${{ github.repository }}
-
-          📜 Changelog:
-          $NOTES
 
           🔗 Release:
           $URL"
@@ -361,7 +358,7 @@ jobs:
               --data-urlencode text="$TEXT"
           fi
 
-      - name: Send Release Files
+      - name: Send Files
         shell: bash
         run: |
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
@@ -369,16 +366,11 @@ jobs:
           THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
           MAX=$((45 * 1024 * 1024))
 
-          find artifacts -type f | while read file; do
-            SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
+          find telegram-files -type f | while read -r file; do
             NAME=$(basename "$file")
+            SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
 
-            if [ "$SIZE" -gt "$MAX" ]; then
-              echo "Skip large file: $NAME"
-              continue
-            fi
-
-            echo "Sending $NAME"
+            [ "$SIZE" -gt "$MAX" ] && continue
 
             if [ -n "$THREAD" ]; then
               curl -s --retry 3 \

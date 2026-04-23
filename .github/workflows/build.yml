@@ -18,7 +18,7 @@ env:
 jobs:
 
 # =====================================================
-# BUILD REACT -> cordova/www
+# BUILD REACT (TEMP ONLY / NO ARTIFACT UPLOAD)
 # =====================================================
   build-react:
     name: Build React
@@ -42,12 +42,18 @@ jobs:
         run: |
           test -d cordova/www || (echo "cordova/www missing" && exit 1)
 
-      - name: Upload WWW
+      # ZIP INTERNAL TRANSFER ONLY
+      - name: Pack WWW
+        run: |
+          cd cordova
+          zip -qr ../cordova-www.zip www
+
+      - name: Upload Internal WWW
         uses: actions/upload-artifact@v4
         with:
-          name: cordova-www
-          path: cordova/www
-          if-no-files-found: error
+          name: _internal-www
+          path: cordova-www.zip
+          retention-days: 1
 
 # =====================================================
 # BUILD ANDROID
@@ -62,8 +68,14 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: cordova-www
-          path: cordova/www
+          name: _internal-www
+
+      - name: Restore WWW
+        run: |
+          unzip -q cordova-www.zip
+          mkdir -p cordova
+          rm -rf cordova/www
+          mv www cordova/www
 
       - uses: actions/setup-node@v4
         with:
@@ -79,9 +91,19 @@ jobs:
       - name: Install Cordova
         run: npm i -g cordova
 
-      - name: Install Cordova deps
+      - name: Install deps
         working-directory: cordova
         run: npm ci || npm install
+
+      - name: Read version
+        id: ver
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./cordova/config.xml'.match ? '' : './package.json').version" 2>/dev/null || true)
+          if [ -z "$VERSION" ]; then
+            VERSION=$(grep -oPm1 "(?<=version=\")[^\"]+" cordova/config.xml || echo "0.0.0")
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Reset Android platform
         working-directory: cordova
@@ -89,28 +111,39 @@ jobs:
           cordova platform rm android || true
           cordova platform add android@latest
 
-      - name: Build APK
+      - name: Build Debug APK
         working-directory: cordova
         run: cordova build android
 
-      - name: Build AAB
+      - name: Build Release AAB
         working-directory: cordova
         run: cordova build android --release
+
+      - name: Rename Android files
+        shell: bash
+        run: |
+          mkdir -p release
+
+          APK=$(find cordova/platforms/android -name "*.apk" | head -n1)
+          AAB=$(find cordova/platforms/android -name "*.aab" | head -n1)
+
+          cp "$APK" "release/Kiirohana ${{ steps.ver.outputs.version }}.apk"
+          cp "$AAB" "release/Kiirohana ${{ steps.ver.outputs.version }}.aab"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: cordova/platforms/android/app/build/outputs/apk/debug/*.apk
+          path: release/*.apk
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: android-aab
-          path: cordova/platforms/android/app/build/outputs/bundle/release/*.aab
+          path: release/*.aab
 
 # =====================================================
-# BUILD ELECTRON MULTI OS + MULTI ARCH
+# BUILD ELECTRON
 # =====================================================
   build-electron:
     name: Electron ${{ matrix.os }}-${{ matrix.arch }}
@@ -121,8 +154,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-
-          # ---------------- Windows ----------------
           - os: windows
             runner: windows-latest
             arch: x64
@@ -135,7 +166,6 @@ jobs:
             runner: windows-latest
             arch: arm64
 
-          # ---------------- Linux ----------------
           - os: linux
             runner: ubuntu-latest
             arch: x64
@@ -148,7 +178,6 @@ jobs:
             runner: ubuntu-latest
             arch: armv7l
 
-          # ---------------- macOS ----------------
           - os: macos
             runner: macos-latest
             arch: universal
@@ -158,14 +187,21 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: cordova-www
-          path: cordova/www
+          name: _internal-www
+
+      - name: Restore WWW
+        shell: bash
+        run: |
+          unzip -q cordova-www.zip
+          mkdir -p cordova
+          rm -rf cordova/www
+          mv www cordova/www
 
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Linux package deps
+      - name: Linux deps
         if: matrix.os == 'linux'
         run: |
           sudo apt update
@@ -174,11 +210,11 @@ jobs:
       - name: Install Cordova
         run: npm i -g cordova
 
-      - name: Install Cordova deps
+      - name: Install deps
         working-directory: cordova
         run: npm ci || npm install
 
-      - name: Reset Electron platform
+      - name: Reset Electron
         working-directory: cordova
         run: |
           cordova platform rm electron || true
@@ -190,21 +226,21 @@ jobs:
         run: |
           cordova build electron -- --${{ matrix.arch }}
 
-      # SAFE CLEANUP ONLY
-      - name: Remove junk only
+      - name: Remove helper junk
         shell: bash
         run: |
-          find cordova -name "*.map" -type f -delete || true
-          find cordova -name ".DS_Store" -type f -delete || true
-          find cordova -name "Thumbs.db" -type f -delete || true
-          find cordova -name "*.tsbuildinfo" -type f -delete || true
+          find cordova -iname "elevate.exe" -delete || true
+          find cordova -iname "uninstall.exe" -delete || true
+          find cordova -iname "*.map" -delete || true
 
-      - name: Upload Electron Artifacts
+      - name: Upload Electron
         uses: actions/upload-artifact@v4
         with:
           name: electron-${{ matrix.os }}-${{ matrix.arch }}
           path: |
             cordova/**/*.exe
+            !cordova/**/elevate.exe
+            !cordova/**/uninstall.exe
             cordova/**/*.msi
             cordova/**/*.zip
             cordova/**/*.AppImage
@@ -216,12 +252,11 @@ jobs:
           if-no-files-found: warn
 
 # =====================================================
-# TELEGRAM NOTIFICATION
+# TELEGRAM
 # =====================================================
   notify-telegram:
     name: Notify Telegram
     runs-on: ubuntu-latest
-    environment: DEV
     needs:
       - build-android
       - build-electron
@@ -232,11 +267,7 @@ jobs:
         with:
           path: artifacts
 
-      # =====================================================
-      # FILTER ONLY INSTALLER / PORTABLE FILES
-      # =====================================================
-      - name: Select valid files only
-        shell: bash
+      - name: Prepare Files
         run: |
           mkdir -p telegram-files
 
@@ -245,63 +276,17 @@ jobs:
 
             case "$NAME" in
               *.apk|*.aab|*.exe|*.msi|*.zip|*.AppImage|*.deb|*.rpm|*.tar.gz|*.dmg|*.pkg)
-
-                # block helper / uninstall / junk
                 case "$NAME" in
                   elevate.exe|uninstall.exe|Uninstall.exe)
-                    echo "Skip helper: $NAME"
                     continue
                     ;;
                 esac
 
                 cp "$file" telegram-files/
-                echo "Accepted: $NAME"
-                ;;
-
-              *)
-                echo "Rejected: $NAME"
                 ;;
             esac
           done
 
-          echo "Selected files:"
-          ls -lah telegram-files || true
-
-      # =====================================================
-      # SUMMARY MESSAGE
-      # =====================================================
-      - name: Send Summary
-        shell: bash
-        run: |
-          BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
-          CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
-          THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
-
-          URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
-          TEXT="🚀 Build Finished
-
-          Repo: ${{ github.repository }}
-          Branch: ${{ github.ref_name }}
-          Commit: ${GITHUB_SHA::7}
-
-          Run:
-          $URL"
-
-          if [ -n "$THREAD" ]; then
-            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
-              -d chat_id="$CHAT" \
-              -d message_thread_id="$THREAD" \
-              --data-urlencode text="$TEXT"
-          else
-            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
-              -d chat_id="$CHAT" \
-              --data-urlencode text="$TEXT"
-          fi
-
-      # =====================================================
-      # SEND SAFE FILES ONLY
-      # =====================================================
       - name: Send Files
         shell: bash
         run: |
@@ -310,38 +295,24 @@ jobs:
           THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
           MAX=$((45 * 1024 * 1024))
 
-          COUNT=0
-
-          while IFS= read -r file; do
+          find telegram-files -type f | while read -r file; do
             NAME=$(basename "$file")
-
             SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
 
-            if [ "$SIZE" -gt "$MAX" ]; then
-              echo "Skip large file: $NAME"
-              continue
-            fi
-
-            echo "Sending $NAME"
+            [ "$SIZE" -gt "$MAX" ] && continue
 
             if [ -n "$THREAD" ]; then
-              curl -s --retry 3 \
-                -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+              curl -s -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
                 -F chat_id="$CHAT" \
                 -F message_thread_id="$THREAD" \
                 -F document=@"$file" \
                 -F caption="📦 $NAME"
             else
-              curl -s --retry 3 \
-                -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+              curl -s -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
                 -F chat_id="$CHAT" \
                 -F document=@"$file" \
                 -F caption="📦 $NAME"
             fi
 
-            COUNT=$((COUNT + 1))
             sleep 2
-
-          done < <(find telegram-files -type f)
-
-          echo "Sent $COUNT files"
+          done
