@@ -10,15 +10,19 @@
     "electron": {
         "linux": {
             "package": [
-                "snap",
-                "deb",
                 "AppImage",
+                "deb",
                 "rpm",
                 "pacman",
+                "snap",
+                "flatpak",
                 "tar.gz"
             ],
             "arch": [
-                "x64"
+                "x64",
+                "arm64",
+                "armv7l",
+                "ia32"
             ]
         }
     }
