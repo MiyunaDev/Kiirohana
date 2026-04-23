@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ServiceItem } from "../../../Shinobu/interfaces/Service";
+import { ServiceItem } from "../../../interfaces/Service";
 import ServiceLogo from "./ServiceLogo";
 import { shinobuFetch } from "../../../utils/fetchShinobu";
 

@@ -2,20 +2,20 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { motion } from "framer-motion";
-import { shinobuFetch } from "../../../utils/fetchShinobu";
-import { useShinobu } from "../../../hooks/useShinobu";
+import { shinobuFetch } from "../../utils/fetchShinobu";
+import { useShinobu } from "../../hooks/useShinobu";
 
-import Chapter from "../../../interfaces/Chapter";
-import Media from "../../../interfaces/Media";
-import MediaExternal from "../../../interfaces/MediaExternal";
-import MultiSourceTree from "../../../interfaces/MultiSourceTree";
-import Source from "../../../interfaces/Source";
-import ChapterContent from "../../../interfaces/ChapterContent";
-import Type from "../../../enums/TypeEnum";
+import Chapter from "../../interfaces/Chapter";
+import Media from "../../interfaces/Media";
+import MediaExternal from "../../interfaces/MediaExternal";
+import MultiSourceTree from "../../interfaces/MultiSourceTree";
+import Source from "../../interfaces/Source";
+import ChapterContent from "../../interfaces/ChapterContent";
+import Type from "../../enums/TypeEnum";
 import { FaArrowLeft, FaHome, FaBookmark, FaPlus, FaTimes } from "react-icons/fa";
 import { useShiNavigate } from "../../utils/shiNavigate";
-import useMediaComments from "../../../hooks/useMediaComments";
-import { CommentsSection } from "../../../components/CommentSection";
+import useMediaComments from "../../hooks/useMediaComments";
+import { CommentsSection } from "../../components/CommentSection";
 
 
 /* ================= Helper ================= */
@@ -57,7 +57,13 @@ const ChapterCard = ({
   if (!chapter.hasContent || !chapter.content?._id) {
     return (
       <div className="opacity-50 p-2">
-        Chapter {chapter.chapter.chapter} (no content)
+        {!["ANIME", "TV", "MOVIE"].includes(type) && chapter.chapter.volume && (
+          <>Volume {chapter.chapter.volume} </>
+        )}
+        {["ANIME", "TV", "MOVIE"].includes(type)
+          ? `Episode ${chapter.chapter.chapter}`
+          : `Chapter ${chapter.chapter.chapter}`}
+        (no content)
       </div>
     );
   }
@@ -69,9 +75,13 @@ const ChapterCard = ({
       transition={{ duration: 0.35 }}
     >
       <div
-        onClick={() =>
-          navigate(`/reader/${type.toLowerCase()}/${chapter.content._id}`)
-        }
+        onClick={() => {
+          if (["ANIME", "TV", "MOVIE"].includes(type)) {
+            navigate(`/player/${chapter.content._id}`);
+          } else {
+            navigate(`/reader/${type.toLowerCase()}/${chapter.content._id}`);
+          }
+        }}
         className={`relative flex flex-row items-center p-2 h-24 gap-2 group
         before:absolute before:z-10 before:left-0 before:top-0 before:min-h-full
         before:rounded-r-full before:transition-all before:duration-500
@@ -95,10 +105,12 @@ const ChapterCard = ({
             }`}
         >
           <span>
-            {chapter.chapter.volume
-              ? `Volume ${chapter.chapter.volume} `
-              : ""}
-            Chapter {chapter.chapter.chapter}
+            {!["ANIME", "TV", "MOVIE"].includes(type) && chapter.chapter.volume && (
+              <>Volume {chapter.chapter.volume} </>
+            )}
+            {["ANIME", "TV", "MOVIE"].includes(type)
+              ? `Episode ${chapter.chapter.chapter}`
+              : `Chapter ${chapter.chapter.chapter}`}
           </span>
         </div>
       </div>
@@ -152,7 +164,7 @@ const ShinobuDetail = () => {
   /* ================= Guards ================= */
 
   const currentExternal = externals.find(
-    (e) => e.source.name === selectedSource
+    (e) => e.source.code === selectedSource
   );
 
   const sortedChapters = currentExternal
@@ -286,7 +298,7 @@ const ShinobuDetail = () => {
         setExternals(res.tree.externals);
 
         if (res.tree.externals.length > 0) {
-          setSelectedSource(res.tree.externals[0].source.name);
+          setSelectedSource(res.tree.externals[0].source.code);
         }
       } catch (err) {
         console.error(err);
@@ -599,25 +611,27 @@ const ShinobuDetail = () => {
 
         {/* Right Panel */}
         <div className="relative w-full overflow-hidden p-4 gap-4">
-          {externals.length > 1 && (
-            <div className="mb-4">
-              <label className="mr-2 font-medium">Pilih Source:</label>
-              <select
-                className="bg-gray-800 text-white p-1 rounded"
-                value={selectedSource ?? ""}
-                onChange={(e) => setSelectedSource(e.target.value)}
+          <div className="flex flex-row mb-4 overflow-x-scroll">
+            {externals.map((ext) => (
+              <div
+                className={`relative flex flex-row gap-2 p-2 rounded-md ${selectedSource === ext.source.code ? "bg-[#C667F7]" : ""} ${ext.source.disable ? "opacity-70" : ""}`}
+                onClick={() => setSelectedSource(ext.source.code)}
               >
-                {externals.map((ext) => (
-                  <option
-                    key={ext.source.name}
-                    value={ext.source.name}
-                  >
-                    {ext.source.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+                <img
+                  className="aspect-[2/3] w-18 object-cover bg-gray-300 rounded-md shadow-lg"
+                  src={ext.mediaExternal?.coverImage}
+                  alt={ext.mediaExternal.title}
+                />
+                <div className="flex flex-col">
+                  <a className="text-lg font-bold">{ext.mediaExternal.title}</a>
+                  <a>{ext.source.code}</a>
+                </div>
+                {ext.source?.disable && (
+                  <span className="absolute p-2 bg-red bottom-0 right-0 text-sm">Disable</span>
+                )}
+              </div>
+            ))}
+          </div>
 
           {Object.entries(groupedByVolume).map(([volume, chapters]) => (
             <div key={volume} className="mb-3">

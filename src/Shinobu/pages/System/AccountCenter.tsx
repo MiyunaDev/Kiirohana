@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { shinobuFetch } from "../../../utils/fetchShinobu";
-import { useShinobu } from "../../../hooks/useShinobu";
-import { useLocalStorage } from "../../../hooks/useLocalStorage";
+import { shinobuFetch } from "../../utils/fetchShinobu";
+import { useShinobu } from "../../hooks/useShinobu";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 type Account = {
     id: string;

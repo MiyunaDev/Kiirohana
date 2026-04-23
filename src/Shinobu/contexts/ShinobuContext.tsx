@@ -9,7 +9,7 @@ import { shinobuFetch } from "../utils/fetchShinobu";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import type { ServiceItem } from "../interfaces/Service";
 import type { ShinobuUser } from "../interfaces/ShinobuSession";
-import { useShiNavigate } from "../Shinobu/utils/shiNavigate";
+import { useShiNavigate } from "../utils/shiNavigate";
 
 type ServicesStorage = {
   honoka: ServiceItem | null;
@@ -53,7 +53,7 @@ export const ShinobuProvider = () => {
         (s) => s.id === shinobuid
       ) ?? null
     );
-  }, [shinobuid, services.shinobu]);
+  }, [shinobuid]);
 
   /**
    * ⛔ service tidak valid → keluar

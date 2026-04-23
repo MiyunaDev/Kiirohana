@@ -1,6 +1,6 @@
 // components/LibraryCard.tsx
 import type { MediaItem } from "../interfaces/Library";
-import { ServiceItem } from "../../interfaces/Service";
+import { ServiceItem } from "../interfaces/Service";
 import { useShiNavigate } from "../utils/shiNavigate";
 
 export const MediaCard = ({ media, service }: { media: MediaItem; service: ServiceItem }) => {

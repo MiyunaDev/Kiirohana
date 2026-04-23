@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useShinobu } from "../../../hooks/useShinobu";
-import { ServiceItem } from "../../../interfaces/Service";
-import { shinobuFetch } from "../../../utils/fetchShinobu";
+import { useShinobu } from "../../hooks/useShinobu";
+import { ServiceItem } from "../../interfaces/Service";
+import { shinobuFetch } from "../../utils/fetchShinobu";
 import { useShiNavigate } from "../../utils/shiNavigate";
-import Media from "../../../interfaces/Media";
-import { Chapter } from "../../../types/Series";
+import Media from "../../interfaces/Media";
+import { Chapter } from "../../types/Series";
+import Type from "../../enums/TypeEnum";
 
 /* ===================== Types ===================== */
 
@@ -18,7 +19,7 @@ interface ApiMediaWrapper {
     coverImage?: string;
     bannerImage?: string;
     status?: "ONGOING" | "COMPLETED" | "HIATUS";
-    type: "COMIC" | "NOVEL" | "TV";
+    type: Type;
     releaseDate?: string | null;
     createdAt: string;
     updatedAt: string;
@@ -44,7 +45,7 @@ interface MangaItem {
     cover?: string;
     genres?: string[];
     description?: string | null;
-    type: "COMIC" | "NOVEL" | "TV";
+    type: Type;
 }
 
 const mapApiMediaWrapperToManga = (m: ApiMediaWrapper): MangaItem => ({

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useParams } from "react-router";
-import { shinobuFetch } from "../../../utils/fetchShinobu";
-import { useLocalStorage } from "../../../hooks/useLocalStorage";
-import ServiceLogo from "../../../components/Settings/Service/ServiceLogo";
-import type { ServiceItem } from "../../../interfaces/Service";
+import { shinobuFetch } from "../../utils/fetchShinobu";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import ServiceLogo from "../../components/Settings/Service/ServiceLogo";
+import type { ServiceItem } from "../../interfaces/Service";
 import { useShiNavigate } from "../../utils/shiNavigate";
 
 type Account = {

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { useShinobu } from "../../../hooks/useShinobu";
-import { shinobuFetch } from "../../../utils/fetchShinobu";
-import { ServiceItem } from "../../../interfaces/Service";
+import { useShinobu } from "../../hooks/useShinobu";
+import { shinobuFetch } from "../../utils/fetchShinobu";
+import { ServiceItem } from "../../interfaces/Service";
 import { Link } from "react-router";
-import Media from "../../../interfaces/Media";
-import { Chapter } from "../../../types/Series";
+import Media from "../../interfaces/Media";
+import { Chapter } from "../../types/Series";
+import Type from "../../enums/TypeEnum";
 
 /* ===================== Types ===================== */
 
@@ -18,7 +19,7 @@ interface MangaItem {
   id?: string;
   title: string;
   cover?: string;
-  type: "COMIC" | "NOVEL" | "TV";
+  type: Type;
 }
 
 /* ===================== Manga Card ===================== */

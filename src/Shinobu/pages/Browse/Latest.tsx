@@ -6,9 +6,9 @@ import {
 import { Link } from "react-router";
 
 
-import { ServiceItem } from "../../../interfaces/Service";
-import { shinobuFetch } from "../../../utils/fetchShinobu";
-import { useShinobu } from "../../../hooks/useShinobu";
+import { ServiceItem } from "../../interfaces/Service";
+import { shinobuFetch } from "../../utils/fetchShinobu";
+import { useShinobu } from "../../hooks/useShinobu";
 
 /* ===================== Types ===================== */
 
@@ -98,6 +98,7 @@ const MangaListPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   /* ===== Fetch ===== */
@@ -120,9 +121,12 @@ const MangaListPage = () => {
       });
 
       const mapped = res.result.map(mapApiMediaWrapperToManga);
+      setData(prev =>
+        targetPage === 1 ? mapped : [...prev, ...mapped]
+      );
 
-      setData(prev => [...prev, ...mapped]);
-      setHasMore(res.result.length > 5);
+      setHasMore(res.result.length > 0);
+      
     } catch {
       setError("Gagal memuat data");
     } finally {
@@ -130,36 +134,36 @@ const MangaListPage = () => {
     }
   };
 
-  /* ===== Initial Load / Reset on Service or Filter Change ===== */
+
+  /* ===== Initial Load / Reset ===== */
   useEffect(() => {
     if (!service) return;
 
     setData([]);
+    setPage(1);
     setHasMore(true);
 
     fetchLatest(1);
   }, [service]);
 
-  // Hapus fetchLatest dari setPage
+  /* ===== Fetch on Page Change ===== */
+  useEffect(() => {
+    if (page === 1) return;
+    fetchLatest(page);
+  }, [page]);
+
+  /* ===== Infinite Scroll (observer hanya naikkan page) ===== */
   const handleNextPage = () => {
     if (!loading && hasMore) {
       setPage(prev => prev + 1);
     }
   };
 
-  // Panggil fetchLatest setiap page berubah
-  useEffect(() => {
-    if (page === 1) return; // 1 sudah di-fetch pada initial load
-    fetchLatest(page);
-  }, [page]);
-
-
-  /* ===== Infinite Scroll ===== */
   useEffect(() => {
     if (!loadMoreRef.current) return;
 
     const observer = new IntersectionObserver(
-      (entries) => {
+      entries => {
         if (entries[0].isIntersecting) {
           handleNextPage();
         }
@@ -169,8 +173,7 @@ const MangaListPage = () => {
 
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [loadMoreRef.current, loading, hasMore, service]);
-
+  }, [loading, hasMore]);
   /* ===== Render ===== */
   return (
     <>

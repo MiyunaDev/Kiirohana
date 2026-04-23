@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useBookmarks, useCollections } from "../../hooks/useLibrary";
 import { MediaCard, CollectionCard } from "../../components/LibraryCard";
-import { useShinobu } from "../../../hooks/useShinobu";
+import { useShinobu } from "../../hooks/useShinobu";
 
 const LibraryPage = () => {
   const [tab, setTab] = useState<"bookmarks" | "collections">("bookmarks");

@@ -3,8 +3,8 @@ import { useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { MediaCard } from "../../components/LibraryCard";
 import type { CollectionItem } from "../../interfaces/Library";
-import { shinobuFetch } from "../../../utils/fetchShinobu";
-import { useShinobu } from "../../../hooks/useShinobu";
+import { shinobuFetch } from "../../utils/fetchShinobu";
+import { useShinobu } from "../../hooks/useShinobu";
 import { useShiNavigate } from "../../utils/shiNavigate";
 import { FaArrowLeft } from "react-icons/fa6";
 

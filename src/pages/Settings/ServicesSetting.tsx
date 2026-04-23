@@ -4,8 +4,8 @@ import { v4 as uuid } from "uuid";
 
 import SettingMenu from "../../components/Settings/SettingMenu";
 import ServiceCard from "../../components/Settings/Service/ServiceCard";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
-import type { ServiceItem } from "../../interfaces/Service";
+import { useLocalStorage } from "../../Shinobu/hooks/useLocalStorage";
+import type { ServiceItem } from "../../Shinobu/interfaces/Service";
 
 type ServiceKind = "honoka" | "shinobu";
 

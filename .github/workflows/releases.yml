@@ -8,214 +8,392 @@ on:
     types: [published]
   workflow_dispatch:
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+  JAVA_VERSION: "21"
+  APP_NAME: "Kiirohana"
+
 jobs:
+
+# =====================================================
+# BUILD REACT
+# =====================================================
   build-react:
+    name: Build React
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.3.0
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
-      - name: Install dependencies (Root / React)
-        run: npm install
+      - name: Install root deps
+        run: npm ci
 
-      - name: Build React → cordova/www
+      - name: Build frontend
         run: npm run build
 
-      - name: Upload Cordova WWW
-        uses: actions/upload-artifact@v4.6.2
+      - name: Validate output
+        run: |
+          test -d cordova/www || (echo "cordova/www missing" && exit 1)
+
+      - name: Upload WWW
+        uses: actions/upload-artifact@v4
         with:
           name: cordova-www
           path: cordova/www
+          if-no-files-found: error
 
+# =====================================================
+# BUILD ANDROID
+# =====================================================
   build-android:
+    name: Build Android
     runs-on: ubuntu-latest
     needs: build-react
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.2.2
-        
-      - name: Download Cordova WWW
-        uses: actions/download-artifact@v4.1.8
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
         with:
           name: cordova-www
           path: cordova/www
-      
-      - name: Setup Java
-        uses: actions/setup-java@v4.7.1
-        with:
-          distribution: 'temurin'
-          java-version: '21'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.3.0
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3.2.2
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - uses: android-actions/setup-android@v3
 
       - name: Install Cordova
-        run: npm install -g cordova
-      
-      - name: Prepare Android
+        run: npm i -g cordova
+
+      - name: Install Cordova deps
+        working-directory: cordova
+        run: npm ci || npm install
+
+      - name: Reset Android platform
+        working-directory: cordova
         run: |
+          cordova platform rm android || true
           cordova platform add android@latest
-          npm install
-        working-directory: ./cordova
 
-      - name: Build APK
-        run: cordova build android
-        working-directory: ./cordova
+      - name: Build APK + AAB
+        working-directory: cordova
+        run: |
+          cordova build android
+          cordova build android --release
 
-      - name: Upload APK to GitHub Release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: Rename Android outputs
+        shell: bash
+        run: |
+          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
+          mkdir -p release-files
+
+          find cordova -type f \( -name "*.apk" -o -name "*.aab" \) | while read f; do
+            EXT="${f##*.}"
+            if [ "$EXT" = "apk" ]; then
+              cp "$f" "release-files/${APP_NAME} (Android) ${VERSION}.apk"
+            fi
+            if [ "$EXT" = "aab" ]; then
+              cp "$f" "release-files/${APP_NAME} (Android Bundle) ${VERSION}.aab"
+            fi
+          done
+
+      - name: Upload Android artifact
+        uses: actions/upload-artifact@v4
         with:
-          files: cordova/platforms/android/app/build/outputs/apk/debug/*.apk
+          name: android-release
+          path: release-files/*
 
-  build-electron-linux:
+# =====================================================
+# BUILD ELECTRON MULTI OS + MULTI ARCH
+# =====================================================
+  build-electron:
+    name: Electron ${{ matrix.os }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    needs: build-react
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+
+          # Windows
+          - os: windows
+            runner: windows-latest
+            arch: x64
+
+          - os: windows
+            runner: windows-latest
+            arch: ia32
+
+          - os: windows
+            runner: windows-latest
+            arch: arm64
+
+          # Linux
+          - os: linux
+            runner: ubuntu-latest
+            arch: x64
+
+          - os: linux
+            runner: ubuntu-latest
+            arch: arm64
+
+          - os: linux
+            runner: ubuntu-latest
+            arch: armv7l
+
+          # macOS
+          - os: macos
+            runner: macos-latest
+            arch: universal
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: cordova-www
+          path: cordova/www
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Linux deps
+        if: matrix.os == 'linux'
+        run: |
+          sudo apt update
+          sudo apt install -y rpm libarchive-tools fakeroot dpkg
+
+      - name: Install Cordova
+        run: npm i -g cordova
+
+      - name: Install Cordova deps
+        working-directory: cordova
+        run: npm ci || npm install
+
+      - name: Reset Electron platform
+        working-directory: cordova
+        run: |
+          cordova platform rm electron || true
+          cordova platform add electron
+
+      - name: Build Electron
+        working-directory: cordova
+        shell: bash
+        run: |
+          cordova build electron -- --${{ matrix.arch }}
+
+      - name: Remove junk only
+        shell: bash
+        run: |
+          find cordova -name "*.map" -type f -delete || true
+          find cordova -name ".DS_Store" -type f -delete || true
+          find cordova -name "Thumbs.db" -type f -delete || true
+
+      - name: Rename release files
+        shell: bash
+        run: |
+          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
+          mkdir -p release-files
+
+          find cordova -type f \
+            \( -name "*.exe" -o -name "*.msi" -o -name "*.zip" -o \
+               -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" -o \
+               -name "*.tar.gz" -o -name "*.dmg" -o -name "*.pkg" \) \
+            | while read f; do
+
+              BASE=$(basename "$f")
+              EXT="${BASE##*.}"
+
+              # tar.gz preserve extension
+              case "$BASE" in
+                *.tar.gz) EXT="tar.gz" ;;
+              esac
+
+              cp "$f" "release-files/${APP_NAME} (${{ matrix.os }}-${{ matrix.arch }}) ${VERSION}.${EXT}"
+            done
+
+      - name: Upload Electron artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-${{ matrix.os }}-${{ matrix.arch }}
+          path: release-files/*
+
+  # =====================================================
+  # RELEASE UPLOAD
+  # =====================================================
+  release-all:
+    name: Publish Release Assets
     runs-on: ubuntu-latest
-    needs: build-react
+    needs:
+      - build-android
+      - build-electron
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.2.2
-        
-      - name: Download Cordova WWW
-        uses: actions/download-artifact@v4.1.8
+      - uses: actions/download-artifact@v4
         with:
-          name: cordova-www
-          path: cordova/www
+          path: artifacts
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.3.0
-        with:
-          node-version: '18'
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13' 
-
-      - name: Add Repository
-        run: sudo add-apt-repository universe && sudo apt update
-
-      - name: Install Linux build tools
-        run: sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm libarchive-tools snapd
-
-      - name: Setup Snapcraft
+      # =====================================================
+      # FILTER ONLY FINAL INSTALLER / PORTABLE FILES
+      # =====================================================
+      - name: Select release files only
+        shell: bash
         run: |
-          sudo snap install snapcraft --classic
-          sudo snap install multipass --beta --classic
+          set -e
+          mkdir -p release-files
 
-      - name: Install Cordova
-        run: npm install -g cordova
-        working-directory: ./cordova
+          while IFS= read -r file; do
+            NAME=$(basename "$file")
 
-      - name: Prepare Electron
+            case "$NAME" in
+              elevate.exe|uninstall.exe|Uninstall.exe)
+                echo "Skip helper: $NAME"
+                ;;
+
+              *.apk|*.aab|*.exe|*.msi|*.zip|*.AppImage|*.deb|*.rpm|*.tar.gz|*.dmg|*.pkg)
+                cp -f "$file" "release-files/$NAME"
+                echo "Accepted: $NAME"
+                ;;
+
+              *)
+                echo "Rejected: $NAME"
+                ;;
+            esac
+
+          done < <(find artifacts -type f)
+
+          echo "Final files:"
+          ls -lah release-files
+
+      # =====================================================
+      # FAIL IF NOTHING VALID
+      # =====================================================
+      - name: Validate release files
+        shell: bash
         run: |
-          cordova platform add electron
-          npm install
-        working-directory: ./cordova
+          COUNT=$(find release-files -type f | wc -l)
+          if [ "$COUNT" -eq 0 ]; then
+            echo "No valid release files found."
+            exit 1
+          fi
 
-      - name: Build Electron (Linux)
-        run: npm run build
-        working-directory: ./cordova
+      # =====================================================
+      # OPTIONAL: WAIT FOR GITHUB RELEASE CONSISTENCY
+      # =====================================================
+      - name: Stabilization delay
+        run: sleep 5
 
-      - name: Upload Linux Artifacts to GitHub Release
+      # =====================================================
+      # UPLOAD SAFE FILES ONLY
+      # =====================================================
+      - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          files: |
-            cordova/platforms/electron/build/*.deb
-            cordova/platforms/electron/build/*.AppImage
-            cordova/platforms/electron/build/*.snap
-            cordova/platforms/electron/build/*.rpm
-            cordova/platforms/electron/build/*.pacman
-            cordova/platforms/electron/build/*.tar.gz
+          files: release-files/**
 
-  build-electron-windows:
-    runs-on: windows-latest
-    needs: build-react
+# =====================================================
+# TELEGRAM NOTIFICATION + CHANGELOG
+# =====================================================
+  notify-telegram:
+    name: Notify Telegram
+    runs-on: ubuntu-latest
+    environment: DEV
+    needs: release-all
+    if: always()
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.2.2
-        
-      - name: Download Cordova WWW
-        uses: actions/download-artifact@v4.1.8
+      - uses: actions/download-artifact@v4
         with:
-          name: cordova-www
-          path: cordova/www
+          path: artifacts
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.3.0
-        with:
-          node-version: '18'
-
-      - name: Install Cordova
-        run: npm install -g cordova
-        working-directory: ./cordova
-
-      - name: Prepare Electron
+      - name: Send Release Summary
+        shell: bash
         run: |
-          cordova platform add electron
-          npm install
-        working-directory: ./cordova
+          BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
+          CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
+          THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
 
-      - name: Build Electron (Windows)
-        run: npm run build
-        working-directory: ./cordova
+          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
+          URL="${{ github.event.release.html_url || format('https://github.com/{0}/releases', github.repository) }}"
+          NOTES="${{ github.event.release.body }}"
 
-      - name: Upload Windows Artifacts to GitHub Release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          files: |
-            cordova/platforms/electron/build/*.exe
-            cordova/platforms/electron/build/*.msi
-  build-electron-macos:
-    runs-on: macos-latest
-    needs: build-react
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.2.2
-        
-      - name: Download Cordova WWW
-        uses: actions/download-artifact@v4.1.8
-        with:
-          name: cordova-www
-          path: cordova/www
+          if [ -z "$NOTES" ]; then
+            NOTES="No changelog provided."
+          fi
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.3.0
-        with:
-          node-version: '18'
+          TEXT="🚀 ${APP_NAME} Released
 
-      - name: Install Cordova
-        run: npm install -g cordova
-        working-directory: ./cordova
+          Version: $VERSION
+          Repo: ${{ github.repository }}
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./cordova
+          📜 Changelog:
+          $NOTES
 
-      - name: Add Electron platform
-        run: cordova platform add electron
-        working-directory: ./cordova
+          🔗 Release:
+          $URL"
 
-      - name: Build Electron for macOS
-        run: npm run build
-        working-directory: ./cordova
+          if [ -n "$THREAD" ]; then
+            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+              -d chat_id="$CHAT" \
+              -d message_thread_id="$THREAD" \
+              --data-urlencode text="$TEXT"
+          else
+            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+              -d chat_id="$CHAT" \
+              --data-urlencode text="$TEXT"
+          fi
 
-      - name: Upload macOS Artifacts
-        uses: actions/upload-artifact@v4.6.2
-        with:
-          name: electron-macos
-          path: |
-            cordova/platforms/electron/build/*.dmg
+      - name: Send Release Files
+        shell: bash
+        run: |
+          BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
+          CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
+          THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
+          MAX=$((45 * 1024 * 1024))
+
+          find artifacts -type f | while read file; do
+            SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
+            NAME=$(basename "$file")
+
+            if [ "$SIZE" -gt "$MAX" ]; then
+              echo "Skip large file: $NAME"
+              continue
+            fi
+
+            echo "Sending $NAME"
+
+            if [ -n "$THREAD" ]; then
+              curl -s --retry 3 \
+                -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+                -F chat_id="$CHAT" \
+                -F message_thread_id="$THREAD" \
+                -F document=@"$file" \
+                -F caption="📦 $NAME"
+            else
+              curl -s --retry 3 \
+                -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+                -F chat_id="$CHAT" \
+                -F document=@"$file" \
+                -F caption="📦 $NAME"
+            fi
+
+            sleep 2
+          done

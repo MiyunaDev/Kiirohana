@@ -2,7 +2,7 @@
 import { FaBook, FaHistory, FaSearch, FaCog, FaHome } from 'react-icons/fa';
 import { Outlet, useLocation } from 'react-router';
 import { useShiNavigate } from '../utils/shiNavigate';
-import { useShinobu } from '../../hooks/useShinobu';
+import { useShinobu } from '../hooks/useShinobu';
 
 const navItems = [
     { to: "/app/search/latest", icon: <FaSearch size={18} />, label: "Browse" },
@@ -17,7 +17,7 @@ export default function MainLayout() {
     const isActive = (path: string) => location.pathname.startsWith(`/shinobu/${service?.id}/${[path.slice(1)]}`);
     const navigate = useShiNavigate(service?.id)
     return (
-        <div className="flex flex-col w-full h-full min-h-screen">
+        <div className="flex flex-col w-full h-full min-h-screen text-white">
             {/* Main Content */}
             <main className="flex-1 overflow-auto p-4">
                 <Outlet />
