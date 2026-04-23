@@ -14,9 +14,7 @@
                 "dmg",
                 "pkg"
             ],
-            "arch": [
-                "x64"
-            ]
+            "arch": ["universal"]
         }
     }
 }

@@ -164,7 +164,7 @@ const ShinobuDetail = () => {
   /* ================= Guards ================= */
 
   const currentExternal = externals.find(
-    (e) => e.source.name === selectedSource
+    (e) => e.source.code === selectedSource
   );
 
   const sortedChapters = currentExternal
@@ -298,7 +298,7 @@ const ShinobuDetail = () => {
         setExternals(res.tree.externals);
 
         if (res.tree.externals.length > 0) {
-          setSelectedSource(res.tree.externals[0].source.name);
+          setSelectedSource(res.tree.externals[0].source.code);
         }
       } catch (err) {
         console.error(err);
@@ -611,25 +611,27 @@ const ShinobuDetail = () => {
 
         {/* Right Panel */}
         <div className="relative w-full overflow-hidden p-4 gap-4">
-          {externals.length > 1 && (
-            <div className="mb-4">
-              <label className="mr-2 font-medium">Pilih Source:</label>
-              <select
-                className="bg-gray-800 text-white p-1 rounded"
-                value={selectedSource ?? ""}
-                onChange={(e) => setSelectedSource(e.target.value)}
+          <div className="flex flex-row mb-4 overflow-x-scroll">
+            {externals.map((ext) => (
+              <div
+                className={`relative flex flex-row gap-2 p-2 rounded-md ${selectedSource === ext.source.code ? "bg-[#C667F7]" : ""} ${ext.source.disable ? "opacity-70" : ""}`}
+                onClick={() => setSelectedSource(ext.source.code)}
               >
-                {externals.map((ext) => (
-                  <option
-                    key={ext.source.name}
-                    value={ext.source.name}
-                  >
-                    {ext.source.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+                <img
+                  className="aspect-[2/3] w-18 object-cover bg-gray-300 rounded-md shadow-lg"
+                  src={ext.mediaExternal?.coverImage}
+                  alt={ext.mediaExternal.title}
+                />
+                <div className="flex flex-col">
+                  <a className="text-lg font-bold">{ext.mediaExternal.title}</a>
+                  <a>{ext.source.code}</a>
+                </div>
+                {ext.source?.disable && (
+                  <span className="absolute p-2 bg-red bottom-0 right-0 text-sm">Disable</span>
+                )}
+              </div>
+            ))}
+          </div>
 
           {Object.entries(groupedByVolume).map(([volume, chapters]) => (
             <div key={volume} className="mb-3">
