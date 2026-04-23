@@ -2,231 +2,346 @@ name: Build Cordova Android & Electron
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+  JAVA_VERSION: "21"
+
 jobs:
+
+# =====================================================
+# BUILD REACT -> cordova/www
+# =====================================================
   build-react:
+    name: Build React
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.3.0
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
-      - name: Install dependencies (Root / React)
-        run: npm install
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Build React → cordova/www
+      - name: Build frontend
         run: npm run build
 
-      - name: Upload Cordova WWW
-        uses: actions/upload-artifact@v4.6.2
+      - name: Validate output
+        run: |
+          test -d cordova/www || (echo "cordova/www missing" && exit 1)
+
+      - name: Upload WWW
+        uses: actions/upload-artifact@v4
         with:
           name: cordova-www
           path: cordova/www
+          if-no-files-found: error
 
+# =====================================================
+# BUILD ANDROID
+# =====================================================
   build-android:
+    name: Build Android
     runs-on: ubuntu-latest
     needs: build-react
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.2.2
 
-      - name: Download Cordova WWW
-        uses: actions/download-artifact@v4.1.8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
         with:
           name: cordova-www
           path: cordova/www
-      
-      - name: Setup Java
-        uses: actions/setup-java@v4.7.1
-        with:
-          distribution: 'temurin'
-          java-version: '21'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.3.0
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3.2.2
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - uses: android-actions/setup-android@v3
 
       - name: Install Cordova
-        run: npm install -g cordova
-      
-      - name: Prepare Android
+        run: npm i -g cordova
+
+      - name: Install Cordova deps
+        working-directory: cordova
+        run: npm ci || npm install
+
+      - name: Reset Android platform
+        working-directory: cordova
         run: |
+          cordova platform rm android || true
           cordova platform add android@latest
-          npm install
-        working-directory: ./cordova
 
-      - name: Build APK (Debug)
+      - name: Build APK
+        working-directory: cordova
         run: cordova build android
-        working-directory: ./cordova
 
-      - name: Build AAB (Release)
+      - name: Build AAB
+        working-directory: cordova
         run: cordova build android --release
-        working-directory: ./cordova
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v4
         with:
           name: android-apk
           path: cordova/platforms/android/app/build/outputs/apk/debug/*.apk
-      
+
       - name: Upload AAB
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v4
         with:
           name: android-aab
           path: cordova/platforms/android/app/build/outputs/bundle/release/*.aab
 
-  build-electron-linux:
+# =====================================================
+# BUILD ELECTRON MULTI OS + MULTI ARCH
+# =====================================================
+  build-electron:
+    name: Electron ${{ matrix.os }}-${{ matrix.arch }}
+    needs: build-react
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+
+          # ---------------- Windows ----------------
+          - os: windows
+            runner: windows-latest
+            arch: x64
+
+          - os: windows
+            runner: windows-latest
+            arch: ia32
+
+          - os: windows
+            runner: windows-latest
+            arch: arm64
+
+          # ---------------- Linux ----------------
+          - os: linux
+            runner: ubuntu-latest
+            arch: x64
+
+          - os: linux
+            runner: ubuntu-latest
+            arch: arm64
+
+          - os: linux
+            runner: ubuntu-latest
+            arch: armv7l
+
+          # ---------------- macOS ----------------
+          - os: macos
+            runner: macos-latest
+            arch: universal
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: cordova-www
+          path: cordova/www
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Linux package deps
+        if: matrix.os == 'linux'
+        run: |
+          sudo apt update
+          sudo apt install -y rpm libarchive-tools fakeroot dpkg
+
+      - name: Install Cordova
+        run: npm i -g cordova
+
+      - name: Install Cordova deps
+        working-directory: cordova
+        run: npm ci || npm install
+
+      - name: Reset Electron platform
+        working-directory: cordova
+        run: |
+          cordova platform rm electron || true
+          cordova platform add electron
+
+      - name: Build Electron
+        working-directory: cordova
+        shell: bash
+        run: |
+          cordova build electron -- --${{ matrix.arch }}
+
+      # SAFE CLEANUP ONLY
+      - name: Remove junk only
+        shell: bash
+        run: |
+          find cordova -name "*.map" -type f -delete || true
+          find cordova -name ".DS_Store" -type f -delete || true
+          find cordova -name "Thumbs.db" -type f -delete || true
+          find cordova -name "*.tsbuildinfo" -type f -delete || true
+
+      - name: Upload Electron Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-${{ matrix.os }}-${{ matrix.arch }}
+          path: |
+            cordova/**/*.exe
+            cordova/**/*.msi
+            cordova/**/*.zip
+            cordova/**/*.AppImage
+            cordova/**/*.deb
+            cordova/**/*.rpm
+            cordova/**/*.tar.gz
+            cordova/**/*.dmg
+            cordova/**/*.pkg
+          if-no-files-found: warn
+
+# =====================================================
+# TELEGRAM NOTIFICATION
+# =====================================================
+  notify-telegram:
+    name: Notify Telegram
     runs-on: ubuntu-latest
-    needs: build-react
+    environment: DEV
+    needs:
+      - build-android
+      - build-electron
+    if: always()
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.2.2
-        
-      - name: Download Cordova WWW
-        uses: actions/download-artifact@v4.1.8
+      - uses: actions/download-artifact@v4
         with:
-          name: cordova-www
-          path: cordova/www
+          path: artifacts
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.3.0
-        with:
-          node-version: '18'
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13' 
-
-      - name: Add Repository
-        run: sudo add-apt-repository universe && sudo apt update
-
-      - name: Install Linux build tools
-        run: sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm libarchive-tools snapd
-
-      - name: Setup Snapcraft
+      # =====================================================
+      # FILTER ONLY INSTALLER / PORTABLE FILES
+      # =====================================================
+      - name: Select valid files only
+        shell: bash
         run: |
-          sudo snap install snapcraft --classic
-          sudo snap install multipass --beta --classic
+          mkdir -p telegram-files
 
-      - name: Install Cordova
-        run: npm install -g cordova
-        working-directory: ./cordova
+          find artifacts -type f | while read -r file; do
+            NAME=$(basename "$file")
 
-      - name: Prepare Electron
+            case "$NAME" in
+              *.apk|*.aab|*.exe|*.msi|*.zip|*.AppImage|*.deb|*.rpm|*.tar.gz|*.dmg|*.pkg)
+
+                # block helper / uninstall / junk
+                case "$NAME" in
+                  elevate.exe|uninstall.exe|Uninstall.exe)
+                    echo "Skip helper: $NAME"
+                    continue
+                    ;;
+                esac
+
+                cp "$file" telegram-files/
+                echo "Accepted: $NAME"
+                ;;
+
+              *)
+                echo "Rejected: $NAME"
+                ;;
+            esac
+          done
+
+          echo "Selected files:"
+          ls -lah telegram-files || true
+
+      # =====================================================
+      # SUMMARY MESSAGE
+      # =====================================================
+      - name: Send Summary
+        shell: bash
         run: |
-          cordova platform add electron
-          npm install
-        working-directory: ./cordova
+          BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
+          CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
+          THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
 
-      - name: Build Electron (Linux)
-        run: npm run build
-        working-directory: ./cordova
+          URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-      - name: Upload Linux Artifacts
-        uses: actions/upload-artifact@v4.6.2
-        with:
-          name: electron-linux
-          path: |
-            cordova/platforms/electron/build/*.deb
-            cordova/platforms/electron/build/*.AppImage
-            cordova/platforms/electron/build/*.snap
-            cordova/platforms/electron/build/*.rpm
-            cordova/platforms/electron/build/*.pacman
-            cordova/platforms/electron/build/*.tar.gz
+          TEXT="🚀 Build Finished
 
-  build-electron-windows:
-    runs-on: windows-latest
-    needs: build-react
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.2.2
-        
-      - name: Download Cordova WWW
-        uses: actions/download-artifact@v4.1.8
-        with:
-          name: cordova-www
-          path: cordova/www
+          Repo: ${{ github.repository }}
+          Branch: ${{ github.ref_name }}
+          Commit: ${GITHUB_SHA::7}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.3.0
-        with:
-          node-version: '18'
+          Run:
+          $URL"
 
-      - name: Install Cordova
-        run: npm install -g cordova
-        working-directory: ./cordova
+          if [ -n "$THREAD" ]; then
+            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+              -d chat_id="$CHAT" \
+              -d message_thread_id="$THREAD" \
+              --data-urlencode text="$TEXT"
+          else
+            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+              -d chat_id="$CHAT" \
+              --data-urlencode text="$TEXT"
+          fi
 
-      - name: Prepare Electron
+      # =====================================================
+      # SEND SAFE FILES ONLY
+      # =====================================================
+      - name: Send Files
+        shell: bash
         run: |
-          cordova platform add electron
-          npm install
-        working-directory: ./cordova
+          BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
+          CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
+          THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
+          MAX=$((45 * 1024 * 1024))
 
-      - name: Build Electron (Windows)
-        run: npm run build
-        working-directory: ./cordova
+          COUNT=0
 
-      - name: Upload Windows Artifacts
-        uses: actions/upload-artifact@v4.6.2
-        with:
-          name: electron-windows
-          path: |
-            cordova/platforms/electron/build/*.exe
-            cordova/platforms/electron/build/*.msi
-            cordova/platforms/electron/build/*.tar.gz
+          while IFS= read -r file; do
+            NAME=$(basename "$file")
 
-  build-electron-macos:
-    runs-on: macos-latest
-    needs: build-react
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.2.2
-        
-      - name: Download Cordova WWW
-        uses: actions/download-artifact@v4.1.8
-        with:
-          name: cordova-www
-          path: cordova/www
+            SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.3.0
-        with:
-          node-version: '18'
+            if [ "$SIZE" -gt "$MAX" ]; then
+              echo "Skip large file: $NAME"
+              continue
+            fi
 
-      - name: Install Cordova
-        run: npm install -g cordova
-        working-directory: ./cordova
+            echo "Sending $NAME"
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./cordova
+            if [ -n "$THREAD" ]; then
+              curl -s --retry 3 \
+                -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+                -F chat_id="$CHAT" \
+                -F message_thread_id="$THREAD" \
+                -F document=@"$file" \
+                -F caption="📦 $NAME"
+            else
+              curl -s --retry 3 \
+                -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+                -F chat_id="$CHAT" \
+                -F document=@"$file" \
+                -F caption="📦 $NAME"
+            fi
 
-      - name: Add Electron platform
-        run: cordova platform add electron
-        working-directory: ./cordova
+            COUNT=$((COUNT + 1))
+            sleep 2
 
-      - name: Build Electron for macOS
-        run: npm run build
-        working-directory: ./cordova
+          done < <(find telegram-files -type f)
 
-      - name: Upload macOS Artifacts
-        uses: actions/upload-artifact@v4.6.2
-        with:
-          name: electron-macos
-          path: |
-            cordova/platforms/electron/build/*.dmg
-            cordova/platforms/electron/build/*.app
-            cordova/platforms/electron/build/*.pkg
-            cordova/platforms/electron/build/*.tar.gz
+          echo "Sent $COUNT files"

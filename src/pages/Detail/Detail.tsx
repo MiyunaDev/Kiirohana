@@ -1,102 +1,18 @@
 import { useEffect, useState } from "react"
-import { Link, useSearchParams } from 'react-router';
-import { Chapter, SeriesEnum, SeriesType } from "./../../types/Series.ts"
+import { useSearchParams } from 'react-router';
 import { motion } from "framer-motion";
 
-const library: SeriesType[] = []
-
-const ChapterCard = ({
-    chapter,
-    type,
-    detail
-}: {
-    chapter: Chapter;
-    type?: "novel" | "comic";
-    detail: SeriesType
-}) => {
-    const [preview, setPreview] = useState<string>();
-    const [destination, setDestination] = useState<string>()
-
-    useEffect(() => {
-        const slc = chapter.content
-            .filter(
-                (co) =>
-                    typeof co === "string" || (typeof co === "object" && co.url)
-            )
-            .map((content) =>
-                typeof content === "string" ? content : content.url
-            ) as string[];
-
-        let previewUrl: string | undefined;
-
-        if (type === "novel") {
-            previewUrl = slc[0];
-        } else {
-            if (slc.length === 1) {
-                previewUrl = slc[0];
-            } else if (slc.length < 3) {
-                previewUrl = slc[slc.length - 1];
-            } else {
-                let page = Math.floor(slc.length * 0.05);
-                if (page < 2) page = 2;
-                previewUrl = slc[page];
-            }
-        }
-
-        setPreview(previewUrl);
-
-        if (type === "comic") {
-            setDestination(`/detail/reader/comic?title=${encodeURIComponent(detail.title)}&chapterid=${encodeURIComponent(chapter._id)}`)
-        } else if (type === "novel") {
-            setDestination(`/detail/reader/novel?title=${encodeURIComponent(detail.title)}&chapterid=${encodeURIComponent(chapter._id)}`)
-        }
-
-    }, [chapter, type]);
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
-            whileHover={{ scale: 1.015 }}
-            whileTap={{ scale: 0.98 }}
-        >
-            <Link to={destination as string} className="relative flex flex-row items-center p-2 h-24 gap-2 group before:absolute before:z-10 before:left-0 before:top-0
-        before:min-h-full before:rounded-r-full before:transition-all before:duration-500
-        hover:shadow active:shadow hover:shadow-[#C667F7] active:shadow-[#C667F7]
-        before:w-0 hover:before:w-screen active:before:w-screen before:bg-[#C667F7] overflow-hidden rounded-r-xl">
-                {preview && (
-                    <div className={`relative z-10 w-15 aspect-[3/4] ${type === "novel" ? "group-hover:after:to-[rgba(198,103,247,0.7)] group-active:after:to-[rgba(198,103,247,0.7)] after:absolute after:inset-0 after:bg-gradient-to-r after:from-[rgba(0,0,0,0.2)] after:to-[rgba(0,0,0,1)] transition-all duration-500" : ""}`}>
-                        <img
-                            className="w-full h-full object-cover object-top"
-                            src={preview}
-                            alt="Chapter preview"
-                        />
-                    </div>
-
-                )}
-                <div className={`flex z-10 flex-col ${type === "novel" ? "absolute left-10" : ""}`}>
-                    <a>
-                        {chapter.volume !== 0 ? `Volume ${chapter.volume} ` : ""}
-                        Chapter {chapter.chapter}
-                    </a>
-                </div>
-            </Link>
-        </motion.div>
-    );
-};
-
+const library: [] = []
 
 const Detail = () => {
     const [searchParams] = useSearchParams();
 
-    const [detail, setDetail] = useState<SeriesType | null>(null);
+    const [detail, setDetail] = useState<any>(null);
 
     useEffect(() => {
         const title = searchParams.get('title');
 
-        const info: SeriesType = library.find(x => x.title === title) as SeriesType;
+        const info: any = library.find((x: any) => x.title === title);
         setDetail(info);
     }, [searchParams.toString()]);
 
@@ -158,7 +74,7 @@ const Detail = () => {
 
                         className="p-2 flex flex-row overflow-y-auto items-center"
                     >
-                        {detail?.genres?.map((gen) =>
+                        {detail?.genres?.map((gen: any) =>
                             <div
                                 className="py-2 px-3 border-2 border-[#C667F7] rounded-lg m-1"
                             >
@@ -169,18 +85,6 @@ const Detail = () => {
                 </div>
 
                 <div className="relative w-full overflow-hidden p-4 gap-2">
-                    {detail?.chapters.sort((a, b) => {
-                        if (a.volume === b.volume) {
-                            return a.chapter - b.chapter;
-                        }
-                        return a.volume - b.volume;
-                    }).map((ch) => {
-                        const isNovel = detail.type === SeriesEnum.LightNovel || detail.type === SeriesEnum.WebNovel;
-                        const isComic = detail.type === SeriesEnum.Manga || detail.type === SeriesEnum.Manhwa || detail.type === SeriesEnum.Manhua;
-                        const type = isComic ? "comic" : isNovel ? "novel" : undefined;
-
-                        return <ChapterCard key={ch._id} chapter={ch} type={type} detail={detail} />;
-                    })}
                 </div>
             </div>
         </motion.div>
