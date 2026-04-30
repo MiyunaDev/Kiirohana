@@ -1,36 +1,54 @@
 # Kiirohana
 
-## About
+## 🌼 Introduction
 
-Kiirohana name is meaning yellow flower in japanese. This app feature is track your activity (reading and watching) series. You can track activity for Reading comic, novel or watch anime, movie and anything.
+**Kiirohana** is a personal activity tracker application designed to help users organize and monitor their entertainment progress in one place.  
+The name **Kiirohana (黄色花)** comes from Japanese, which means **Yellow Flower** symbolizing growth, consistency, and progress.
 
-[#] You must read
+> [!WARNING]  
+> This app in development. So don't download this app for now
 
-> [!WARNING]\
-> This app is need honoka backend. Check [Miyuna Website](https://miyunadev.github.io/) for more information
+This application allows users to track various activities such as:
 
-## 👩‍💻 Development & Build
+- 📚 Reading manga, comics, novels, or books  
+- 📺 Watching anime, movies, TV series, or videos  
+- 📝 Managing progress history and personal activity logs  
+- 🎯 Keeping track of what has been completed or still ongoing  
 
-1. Initialize
+Kiirohana was created as an experimental side project under the Miyuna ecosystem.
+
+---
+
+## 🎓 Purpose of This Project
+
+Kiirohana is **not intended as a commercial or production-ready platform**.
+
+This project was built primarily for:
+
+- Learning modern application development workflows  
+- Exploring cross-platform technologies  
+- Testing architecture ideas and UI concepts  
+- Practicing backend & frontend integration  
+- Internal experimentation within the team  
+- Personal sandbox project for trying new features and ideas  
+
+In short, **Kiirohana is a learning playground and prototype project** created by the developer/team to improve skills, test concepts, and gain experience.
+
+---
+
+## ⚠️ Important Notice
+
+> [!WARNING]  
+> This application requires **Honoka Backend** to run properly.  
+> Please visit the official Miyuna website for more information:  
+> https://miyunadev.github.io/
+
+---
+
+## 🚀 Development & Build
+
+### 1. Initialize Project
+
 ```sh
 npm run init
 ```
-
-2. Supported Platform
-
-In this version is supported
-
-- Android
-- IOS
-- Windows
-- Linux
-- Mac
-
-2. Testing
-
-Testing option now have only 2 option. With desktop and with android
-
-| Platform | execution |
-|---|---|
-| Android | `npm run dev:android` |
-| Electron (Windows, Mac, Linux) | `npm run dev:desktop` |
