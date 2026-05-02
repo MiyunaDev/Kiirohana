@@ -39,7 +39,7 @@ In short, **Kiirohana is a learning playground and prototype project** created b
 ## ⚠️ Important Notice
 
 > [!WARNING]  
-> This application requires **Honoka Backend** to run properly.  
+> This application requires **Honoka Backend** to run properly as Personal Tracker and **Shinobu Backend** to run properly as Personal Access Reader.  
 > Please visit the official Miyuna website for more information:  
 > https://miyunadev.github.io/
 
@@ -51,4 +51,10 @@ In short, **Kiirohana is a learning playground and prototype project** created b
 
 ```sh
 npm run init
+```
+
+### 2. Install Apache Cordova
+
+```sh
+npm i -g cordova
 ```
