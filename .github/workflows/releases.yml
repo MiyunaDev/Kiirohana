@@ -14,7 +14,7 @@ concurrency:
 
 env:
   NODE_VERSION: "24"
-  JAVA_VERSION: "21"
+  JAVA_VERSION: "17"
   APP_NAME: "Kiirohana"
 
 jobs:

@@ -1,21 +1,61 @@
 import Flag from 'react-world-flags'
 import getFlag from '../../utils/getFlag'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import LanguageEnum from '../../enums/LanguageEnum'
 import { Link } from 'react-router'
-// import { library } from '../../../demo'
 
 const Library = () => {
-    const [libraries, _] = useState<Array<any>>([])
+    const [libraries, setLibraries] = useState<Array<any>>([])
+
+    useEffect(() => {
+        const fetchLibraries = async () => {
+            try {
+                const response = await fetch('http://localhost:5225/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: `
+                            {
+                                medias {
+                                    id
+                                    title
+                                    type
+                                    genre
+                                    releaseYear
+                                    thumbnail
+                                    description
+                                }
+                            }
+                        `
+                    })
+                })
+
+                const result = await response.json()
+
+                const formatted = result.data.medias.map((item: any) => ({
+                    ...item,
+                    cover: item.thumbnail
+                }))
+
+                setLibraries(formatted)
+            } catch (error) {
+                console.error(error)
+            }
+        }
+
+        fetchLibraries()
+    }, [])
 
     return (
-        <div className="w-full h-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 max-w-screen-xl mx-auto px-2">
+        <div className="w-full h-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 max-w-7xl mx-auto px-2">
             {libraries.map((detail: any) => (
                 <Link
                     to={`/detail/?title=${encodeURIComponent(detail.title)}`}
                     key={detail.title}
-                    className="flex flex-col w-full min-w-[120px] max-w-[180px] mx-auto"
+                    className="flex flex-col w-full min-w-30 max-w-45 mx-auto"
                 >
                     <div className="relative w-full">
                         {/* Karena tidak ada data bahasa langsung, gunakan countryOfOrigin */}
@@ -29,12 +69,12 @@ const Library = () => {
                         </p>
 
                         <img
-                            className="w-full aspect-[2/3] sm:aspect-[3/4] object-cover bg-gray-300 rounded-r-xl"
+                            className="w-full aspect-2/3 sm:aspect-3/4 object-cover bg-gray-300 rounded-r-xl"
                             src={detail.cover}
                             alt={detail.title}
                         />
 
-                        <a className='absolute text-sm p-2 bottom-0 text-center left-0 w-full bg-gradient-to-t from-[rgba(0,0,0,0.8)] to-[rgba(0,0,0,0.0)]'>
+                        <a className='absolute text-sm p-2 bottom-0 text-center left-0 w-full bg-linear-to-t from-[rgba(0,0,0,0.8)] to-[rgba(0,0,0,0.0)]'>
                             Anilist
                         </a>
                     </div>
