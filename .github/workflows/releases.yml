@@ -309,25 +309,40 @@ jobs:
         with:
           path: artifacts
 
-      - name: Prepare Telegram Files
+      - name: Prepare Files
         shell: bash
         run: |
           mkdir -p telegram-files
 
-          find artifacts -type f | while read -r file; do
+          find artifacts -type f \( \
+            -iname "*.apk" -o \
+            -iname "*.aab" -o \
+            -iname "*.exe" -o \
+            -iname "*.msi" -o \
+            -iname "*.zip" -o \
+            -iname "*.appimage" -o \
+            -iname "*.deb" -o \
+            -iname "*.rpm" -o \
+            -iname "*.tar.gz" -o \
+            -iname "*.dmg" -o \
+            -iname "*.pkg" \
+          \) | while read -r file; do
+
             NAME=$(basename "$file")
 
             case "$NAME" in
-              *.apk|*.aab|*.exe|*.msi|*.zip|*.AppImage|*.deb|*.rpm|*.tar.gz|*.dmg|*.pkg)
-                case "$NAME" in
-                  elevate.exe|uninstall.exe|Uninstall.exe)
-                    continue
-                    ;;
-                esac
-                cp "$file" telegram-files/
+              elevate.exe|uninstall.exe|Uninstall.exe)
+                continue
                 ;;
             esac
+
+            echo "COPY: $file"
+
+            cp "$file" telegram-files/
           done
+
+          echo "=== TELEGRAM FILES ==="
+          ls -lah telegram-files
 
       - name: Send Summary
         shell: bash
