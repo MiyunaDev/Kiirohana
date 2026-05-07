@@ -280,6 +280,35 @@ jobs:
         with:
           path: artifacts
 
+      - name: Send Summary
+        shell: bash
+        run: |
+          BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
+          CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
+          THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
+
+          URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          TEXT="🚀 Build Finished
+
+          Repo: ${{ github.repository }}
+          Branch: ${{ github.ref_name }}
+          Commit: ${GITHUB_SHA::7}
+
+          Run:
+          $URL"
+
+          if [ -n "$THREAD" ]; then
+            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+              -d chat_id="$CHAT" \
+              -d message_thread_id="$THREAD" \
+              --data-urlencode text="$TEXT"
+          else
+            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+              -d chat_id="$CHAT" \
+              --data-urlencode text="$TEXT"
+          fi
+
       - name: Prepare Files
         shell: bash
         run: |
