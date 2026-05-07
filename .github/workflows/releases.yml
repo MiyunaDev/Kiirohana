@@ -13,122 +13,149 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "22"
+  NODE_VERSION: "24"
   JAVA_VERSION: "21"
   APP_NAME: "Kiirohana"
 
 jobs:
 
 # =====================================================
-# BUILD REACT (INTERNAL ONLY)
+# BUILD REACT (TEMP ONLY / NO ARTIFACT UPLOAD)
 # =====================================================
   build-react:
     name: Build React
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - run: npm ci
-      - run: npm run build
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Validate
-        run: test -d cordova/www
+      - name: Build frontend
+        run: npm run build
 
-      # jangan publish cordova-www ke release
+      - name: Validate output
+        run: |
+          test -d cordova/www || (echo "cordova/www missing" && exit 1)
+
+      # ZIP INTERNAL TRANSFER ONLY
       - name: Pack WWW
         run: |
           cd cordova
           zip -qr ../cordova-www.zip www
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload Internal WWW
+        uses: actions/upload-artifact@v7
         with:
           name: _internal-www
           path: cordova-www.zip
           retention-days: 1
 
 # =====================================================
-# BUILD ANDROID RELEASE
+# BUILD ANDROID
 # =====================================================
   build-android:
-    name: Build Android Release
+    name: Build Android
     runs-on: ubuntu-latest
     needs: build-react
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: _internal-www
 
       - name: Restore WWW
         run: |
           unzip -q cordova-www.zip
-          rm -rf cordova/www
           mkdir -p cordova
+          rm -rf cordova/www
           mv www cordova/www
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
-      - uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v4
 
-      - run: npm i -g cordova
+      - name: Install Cordova
+        run: npm i -g cordova
 
-      - working-directory: cordova
+      - name: Install deps
+        working-directory: cordova
         run: npm ci || npm install
 
-      - name: Version
+      - name: Read version
         id: ver
         shell: bash
         run: |
-          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
-          VERSION="${VERSION#v}"
+          VERSION=$(sed -n 's/.*<widget[^>]*version="\([^"]*\)".*/\1/p' cordova/config.xml | head -n1)
+
+          if [ -z "$VERSION" ]; then
+            VERSION="0.0.0"
+          fi
+
+          echo "Detected version: $VERSION"
+
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Reset Android
+      - name: Reset Android platform
         working-directory: cordova
         run: |
           cordova platform rm android || true
           cordova platform add android@latest
 
-      # release oriented
-      - name: Build APK + AAB
+      - name: Build Debug APK
         working-directory: cordova
-        run: |
-          cordova build android --release
-          cordova build android
+        run: cordova build android
 
-      - name: Prepare Release Files
+      - name: Build Release AAB
+        working-directory: cordova
+        run: cordova build android --release
+
+      - name: Rename Android files
         shell: bash
         run: |
-          mkdir -p release-files
+          mkdir -p release
 
-          APK=$(find cordova -type f -name "*.apk" | head -n1)
-          AAB=$(find cordova -type f -name "*.aab" | head -n1)
+          APK=$(find cordova/platforms/android/app/build/outputs/apk/debug -name "*.apk" | head -n1)
 
-          cp "$APK" "release-files/${APP_NAME} ${{ steps.ver.outputs.version }}.apk"
-          cp "$AAB" "release-files/${APP_NAME} ${{ steps.ver.outputs.version }}.aab"
+          AAB=$(find cordova/platforms/android/app/build/outputs/bundle -name "*.aab" | head -n1)
 
-      - uses: actions/upload-artifact@v4
+          echo "APK=$APK"
+          echo "AAB=$AAB"
+
+          cp "$APK" "release/Kiirohana-${{ steps.ver.outputs.version }}.apk"
+          cp "$AAB" "release/Kiirohana-${{ steps.ver.outputs.version }}.aab"
+
+          ls -lah release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v7
         with:
-          name: android-release
-          path: release-files/*
+          name: android-apk
+          path: release/*.apk
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v7
+        with:
+          name: android-aab
+          path: release/*.aab
 
 # =====================================================
-# BUILD ELECTRON RELEASE
+# BUILD ELECTRON
 # =====================================================
   build-electron:
     name: Electron ${{ matrix.os }}-${{ matrix.arch }}
@@ -142,29 +169,35 @@ jobs:
           - os: windows
             runner: windows-latest
             arch: x64
+
           - os: windows
             runner: windows-latest
             arch: ia32
+
           - os: windows
             runner: windows-latest
             arch: arm64
+
           - os: linux
             runner: ubuntu-latest
             arch: x64
+
           - os: linux
             runner: ubuntu-latest
             arch: arm64
+
           - os: linux
             runner: ubuntu-latest
             arch: armv7l
+
           - os: macos
             runner: macos-latest
             arch: universal
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: _internal-www
 
@@ -172,11 +205,11 @@ jobs:
         shell: bash
         run: |
           unzip -q cordova-www.zip
-          rm -rf cordova/www
           mkdir -p cordova
+          rm -rf cordova/www
           mv www cordova/www
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -186,18 +219,12 @@ jobs:
           sudo apt update
           sudo apt install -y rpm libarchive-tools fakeroot dpkg
 
-      - run: npm i -g cordova
+      - name: Install Cordova
+        run: npm i -g cordova
 
-      - working-directory: cordova
+      - name: Install deps
+        working-directory: cordova
         run: npm ci || npm install
-
-      - name: Version
-        id: ver
-        shell: bash
-        run: |
-          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
-          VERSION="${VERSION#v}"
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Reset Electron
         working-directory: cordova
@@ -205,53 +232,36 @@ jobs:
           cordova platform rm electron || true
           cordova platform add electron
 
-      # release build
-      - name: Build Electron Release
+      - name: Build Electron
         working-directory: cordova
         shell: bash
         run: |
-          cordova build electron --release -- --${{ matrix.arch }}
+          cordova build electron -- --${{ matrix.arch }}
 
-      - name: Cleanup
+      - name: Remove helper junk
         shell: bash
         run: |
           find cordova -iname "elevate.exe" -delete || true
           find cordova -iname "uninstall.exe" -delete || true
           find cordova -iname "*.map" -delete || true
-          find cordova -iname ".DS_Store" -delete || true
-          find cordova -iname "Thumbs.db" -delete || true
 
-      - name: Prepare Release Files
-        shell: bash
-        run: |
-          mkdir -p release-files
-
-          find cordova -type f \
-            \( -name "*.exe" -o -name "*.msi" -o -name "*.zip" -o \
-               -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" -o \
-               -name "*.tar.gz" -o -name "*.dmg" -o -name "*.pkg" \) \
-            ! -iname "elevate.exe" \
-            ! -iname "uninstall.exe" \
-          | while read -r f; do
-
-            BASE=$(basename "$f")
-            EXT="${BASE##*.}"
-            case "$BASE" in
-              *.tar.gz) EXT="tar.gz" ;;
-            esac
-
-            cp "$f" \
-            "release-files/${APP_NAME} (${{
-              matrix.os
-            }}-${{
-              matrix.arch
-            }}) ${{ steps.ver.outputs.version }}.${EXT}"
-          done
-
-      - uses: actions/upload-artifact@v4
+      - name: Upload Electron
+        uses: actions/upload-artifact@v7
         with:
           name: electron-${{ matrix.os }}-${{ matrix.arch }}
-          path: release-files/*
+          path: |
+            cordova/**/*.exe
+            !cordova/**/elevate.exe
+            !cordova/**/uninstall.exe
+            cordova/**/*.msi
+            cordova/**/*.zip
+            cordova/**/*.AppImage
+            cordova/**/*.deb
+            cordova/**/*.rpm
+            cordova/**/*.tar.gz
+            cordova/**/*.dmg
+            cordova/**/*.pkg
+          if-no-files-found: warn
 
 # =====================================================
 # UPLOAD TO GITHUB RELEASE
@@ -264,7 +274,7 @@ jobs:
       - build-electron
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: artifacts
 
@@ -276,24 +286,36 @@ jobs:
           find artifacts -type f | while read -r file; do
             NAME=$(basename "$file")
 
-            case "$NAME" in
-              *.apk|*.aab|*.exe|*.msi|*.zip|*.AppImage|*.deb|*.rpm|*.tar.gz|*.dmg|*.pkg)
-                case "$NAME" in
-                  elevate.exe|uninstall.exe|Uninstall.exe)
-                    continue
-                    ;;
-                esac
+          find artifacts -type f \( \
+            -iname "*.apk" -o \
+            -iname "*.aab" -o \
+            -iname "*.exe" -o \
+            -iname "*.msi" -o \
+            -iname "*.zip" -o \
+            -iname "*.appimage" -o \
+            -iname "*.deb" -o \
+            -iname "*.rpm" -o \
+            -iname "*.tar.gz" -o \
+            -iname "*.dmg" -o \
+            -iname "*.pkg" \
+          \) | while read -r file; do
+
+                echo "COPY: $file"
 
                 cp -f "$file" "release-files/$NAME"
                 ;;
             esac
           done
 
+          echo "=== RELEASE FILES ==="
+          ls -lah release-files
+
           test "$(find release-files -type f | wc -l)" -gt 0
 
       - uses: softprops/action-gh-release@v2
         with:
-          files: release-files/**
+          files: |
+            release-files/*
 
 # =====================================================
 # TELEGRAM
@@ -301,11 +323,14 @@ jobs:
   notify-telegram:
     name: Notify Telegram
     runs-on: ubuntu-latest
+    environment: DEV
     needs: release-all
-    if: always()
+    if: |
+      success() &&
+      github.event_name != 'pull_request'
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: artifacts
 

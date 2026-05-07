@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "22"
+  NODE_VERSION: "24"
   JAVA_VERSION: "21"
 
 jobs:
@@ -86,7 +86,7 @@ jobs:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
-      - uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v4
 
       - name: Install Cordova
         run: npm i -g cordova
@@ -128,11 +128,17 @@ jobs:
         run: |
           mkdir -p release
 
-          APK=$(find cordova/platforms/android -name "*.apk" | head -n1)
-          AAB=$(find cordova/platforms/android -name "*.aab" | head -n1)
+          APK=$(find cordova/platforms/android/app/build/outputs/apk/debug -name "*.apk" | head -n1)
 
-          cp "$APK" "release/Kiirohana ${{ steps.ver.outputs.version }}.apk"
-          cp "$AAB" "release/Kiirohana ${{ steps.ver.outputs.version }}.aab"
+          AAB=$(find cordova/platforms/android/app/build/outputs/bundle -name "*.aab" | head -n1)
+
+          echo "APK=$APK"
+          echo "AAB=$AAB"
+
+          cp "$APK" "release/Kiirohana-${{ steps.ver.outputs.version }}.apk"
+          cp "$AAB" "release/Kiirohana-${{ steps.ver.outputs.version }}.aab"
+
+          ls -lah release
 
       - name: Upload APK
         uses: actions/upload-artifact@v7
@@ -265,7 +271,9 @@ jobs:
     needs:
       - build-android
       - build-electron
-    if: always()
+    if: |
+      success() &&
+      github.event_name != 'pull_request'
 
     steps:
       - uses: actions/download-artifact@v8
