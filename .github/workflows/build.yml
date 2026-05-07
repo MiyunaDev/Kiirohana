@@ -230,11 +230,11 @@ jobs:
           cordova platform rm electron || true
           cordova platform add electron
 
-      - name: Build Electron
+      - name: Build Electron Release
         working-directory: cordova
         shell: bash
         run: |
-          cordova build electron -- --${{ matrix.arch }}
+          cordova build electron --release -- --${{ matrix.arch }} --publish never
 
       - name: Remove helper junk
         shell: bash
