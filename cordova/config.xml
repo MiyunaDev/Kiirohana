@@ -41,13 +41,6 @@
         <icon src="res/android/mipmap-xhdpi/icon.png" density="xhdpi"/>
         <icon src="res/android/mipmap-xxhdpi/icon.png" density="xxhdpi"/>
         <icon src="res/android/mipmap-xxxhdpi/icon.png" density="xxxhdpi"/>
-
-        <edit-config
-            file="app/src/main/AndroidManifest.xml"
-            mode="merge"
-            target="/manifest/application">
-            <application android:usesCleartextTraffic="true"/>
-        </edit-config>
     </platform>
 
     <platform name="electron">
