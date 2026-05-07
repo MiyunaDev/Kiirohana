@@ -1,35 +1,59 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="com.miyunadev.kiirohana" version="0.0.5" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>Kiirohana</name>
-  <description>Kiirohana Cordova Application</description>
-  <author email="dev@cordova.apache.org" href="https://cordova.apache.org">&#xD;
-    Miyuna Dev&#xD;
-  </author>
-  <content src="index.html"/>
-  <preference name="scheme" value="app"/>
-  <preference name="hostname" value="app.local"/>
-  <access origin="*"/>
-  <allow-navigation href="http://*/*"/>
-  <allow-navigation href="https://*/*"/>
-  <allow-navigation href="app://*/*"/>
-  <allow-intent href="http://*/*"/>
-  <allow-intent href="tel:*"/>
-  <allow-intent href="mailto:*"/>
-  <platform name="android">
-    <icon src="res/android/mipmap-mdpi/icon.png" density="mdpi"/>
-    <icon src="res/android/mipmap-hdpi/icon.png" density="hdpi"/>
-    <icon src="res/android/mipmap-xhdpi/icon.png" density="xhdpi"/>
-    <icon src="res/android/mipmap-xxhdpi/icon.png" density="xxhdpi"/>
-    <icon src="res/android/mipmap-xxxhdpi/icon.png" density="xxxhdpi"/>
-    <edit-config
-      file="app/src/main/AndroidManifest.xml"
-      mode="merge"
-      target="/manifest/application">
-      <preference name="android-usesCleartextTraffic" value="true"/>
-    </edit-config>
-  </platform>
-  <platform name="electron">
-    <preference name="ElectronSettingsFilePath" value="res/electron/settings.json"/>
-  </platform>
-  <icon src="res/playstore.png"/>
+<widget
+    id="com.miyunadev.kiirohana"
+    version="0.0.5"
+    xmlns="http://www.w3.org/ns/widgets"
+    xmlns:cdv="http://cordova.apache.org/ns/1.0">
+
+    <name>Kiirohana</name>
+
+    <description>
+        Kiirohana Cordova Application
+    </description>
+
+    <author
+        email="dev@cordova.apache.org"
+        href="https://cordova.apache.org">
+        Miyuna Dev
+    </author>
+
+    <content src="index.html"/>
+
+    <preference name="scheme" value="kiirohana"/>
+    <preference name="hostname" value="localhost"/>
+
+    <access origin="*"/>
+
+    <allow-navigation href="http://*/*"/>
+    <allow-navigation href="https://*/*"/>
+    <allow-navigation href="kiirohana://*/*"/>
+
+    <allow-intent href="http://*/*"/>
+    <allow-intent href="https://*/*"/>
+    <allow-intent href="tel:*"/>
+    <allow-intent href="mailto:*"/>
+
+    <icon src="res/icon.png"/>
+
+    <platform name="android">
+        <icon src="res/android/mipmap-mdpi/icon.png" density="mdpi"/>
+        <icon src="res/android/mipmap-hdpi/icon.png" density="hdpi"/>
+        <icon src="res/android/mipmap-xhdpi/icon.png" density="xhdpi"/>
+        <icon src="res/android/mipmap-xxhdpi/icon.png" density="xxhdpi"/>
+        <icon src="res/android/mipmap-xxxhdpi/icon.png" density="xxxhdpi"/>
+
+        <edit-config
+            file="app/src/main/AndroidManifest.xml"
+            mode="merge"
+            target="/manifest/application">
+            <application android:usesCleartextTraffic="true"/>
+        </edit-config>
+    </platform>
+
+    <platform name="electron">
+        <preference
+            name="ElectronSettingsFilePath"
+            value="res/electron/settings.json"/>
+        <icon src="res/electron/icon.png"/>
+    </platform>
 </widget>
