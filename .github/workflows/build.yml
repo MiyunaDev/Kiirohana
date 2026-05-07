@@ -86,7 +86,7 @@ jobs:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
-      - uses: android-actions/setup-android@v4
+      - uses: android-actions/setup-android@v3
 
       - name: Install Cordova
         run: npm i -g cordova
