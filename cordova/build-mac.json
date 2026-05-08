@@ -8,13 +8,15 @@
         "**/*"
     ],
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-    "mac": {
-        "target": [
-            "dmg",
-            "pkg",
-            "tar.gz"
-        ],
-        "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-        "icon": "res/electron/icon.icns"
+    "build": {
+        "mac": {
+            "target": [
+                "dmg",
+                "pkg",
+                "tar.gz"
+            ],
+            "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+            "icon": "res/electron/icon.icns"
+        }
     }
 }

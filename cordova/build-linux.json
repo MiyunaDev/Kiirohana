@@ -1,41 +1,23 @@
 {
-  "appId": "com.miyunadev.kiirohana",
-  "productName": "Kiirohana",
-
-  "directories": {
-    "output": "release"
-  },
-
-  "files": [
-    "**/*"
-  ],
-
-  "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-
-  "linux": {
-    "target": [
-      "AppImage",
-      "deb",
-      "rpm",
-      "tar.gz"
+    "appId": "com.miyunadev.kiirohana",
+    "productName": "Kiirohana",
+    "directories": {
+        "output": "release"
+    },
+    "files": [
+        "**/*"
     ],
-    "category": "Network",
-    "icon": "res/electron/icon.png"
-  },
-
-  "win": {
-    "target": [
-      "nsis",
-      "portable"
-    ],
-    "icon": "res/electron/icon.png"
-  },
-
-  "mac": {
-    "target": [
-      "dmg",
-      "zip"
-    ],
-    "icon": "res/electron/icon.png"
-  }
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "build": {
+        "linux": {
+            "target": [
+                "AppImage",
+                "deb",
+                "rpm",
+                "tar.gz"
+            ],
+            "category": "Network",
+            "icon": "res/electron/icon.png"
+        }
+    }
 }

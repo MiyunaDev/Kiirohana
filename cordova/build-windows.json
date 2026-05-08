@@ -8,14 +8,16 @@
         "**/*"
     ],
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-    "win": {
-        "target": [
-            "nsis",
-            "portable",
-            "zip",
-            "tar.gz"
-        ],
-        "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-        "icon": "res/electron/icon.ico"
+    "build": {
+        "win": {
+            "target": [
+                "nsis",
+                "portable",
+                "zip",
+                "tar.gz"
+            ],
+            "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+            "icon": "res/electron/icon.ico"
+        }
     }
 }
