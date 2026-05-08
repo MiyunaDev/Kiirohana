@@ -15,7 +15,6 @@ concurrency:
 env:
   NODE_VERSION: "24"
   JAVA_VERSION: "23"
-  APP_NAME: "Kiirohana"
 
 jobs:
 
@@ -283,9 +282,6 @@ jobs:
         run: |
           mkdir -p release-files
 
-          find artifacts -type f | while read -r file; do
-            NAME=$(basename "$file")
-
           find artifacts -type f \( \
             -iname "*.apk" -o \
             -iname "*.aab" -o \
@@ -300,11 +296,18 @@ jobs:
             -iname "*.pkg" \
           \) | while read -r file; do
 
-                echo "COPY: $file"
+            NAME=$(basename "$file")
 
-                cp -f "$file" "release-files/$NAME"
+            case "$NAME" in
+              elevate.exe|uninstall.exe|Uninstall.exe)
+                continue
                 ;;
             esac
+
+            echo "COPY: $file"
+
+            cp -f "$file" "release-files/$NAME"
+
           done
 
           echo "=== RELEASE FILES ==="
@@ -379,7 +382,7 @@ jobs:
           VERSION="${{ github.event.release.tag_name || github.ref_name }}"
           URL="${{ github.event.release.html_url || format('https://github.com/{0}/releases', github.repository) }}"
 
-          TEXT="🚀 ${APP_NAME} Released
+          TEXT="🚀 ${{ github.event.repository.name }} Released
 
           Version: $VERSION
           Repo: ${{ github.repository }}
