@@ -7,7 +7,7 @@
     "files": [
         "**/*"
     ],
-    "electron": {
+    "build": {
         "linux": {
             "package": [
                 "AppImage",
@@ -16,16 +16,6 @@
                 "pacman",
                 "tar.gz"
             ],
-            "arch": [
-                "x64",
-                "arm64",
-                "armv7l",
-                "ia32"
-            ]
-        }
-    },
-    "build": {
-        "win": {
             "icon": "res/electron/icon.png"
         }
     }

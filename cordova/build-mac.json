@@ -7,18 +7,13 @@
     "files": [
         "**/*"
     ],
-    "electron": {
-        "win": {
+    "build": {
+        "mac": {
             "package": [
                 "dmg",
                 "pkg",
                 "tar.gz"
             ],
-            "arch": ["universal"]
-        }
-    },
-    "build": {
-        "mac": {
             "icon": "res/electron/icon.icns"
         }
     }

@@ -7,7 +7,7 @@
     "files": [
         "**/*"
     ],
-    "electron": {
+    "build": {
         "win": {
             "target": [
                 "nsis",
@@ -15,15 +15,6 @@
                 "zip",
                 "tar.gz"
             ],
-            "arch": [
-                "x64",
-                "ia32",
-                "arm64"
-            ]
-        }
-    },
-    "build": {
-        "win": {
             "icon": "res/electron/icon.ico"
         }
     }
