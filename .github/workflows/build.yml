@@ -305,9 +305,12 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           path: artifacts
-          pattern: |
-            android-*
-            electron-*
+          pattern: "android-*"
+          
+      - uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+          pattern: "electron-*"
 
       - name: Send Summary
         shell: bash

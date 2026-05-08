@@ -301,9 +301,12 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           path: artifacts
-          pattern: |
-            android-*
-            electron-*
+          pattern: "android-*"
+          
+      - uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+          pattern: "electron-*"
 
       - name: Select final assets only
         shell: bash
@@ -362,9 +365,12 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           path: artifacts
-          pattern: |
-            android-*
-            electron-*
+          pattern: "android-*"
+          
+      - uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+          pattern: "electron-*"
 
       - name: Prepare Files
         shell: bash
