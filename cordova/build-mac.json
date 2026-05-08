@@ -2,20 +2,19 @@
     "appId": "com.miyunadev.kiirohana",
     "productName": "Kiirohana",
     "directories": {
-        "output": "build/mac"
+        "output": "release"
     },
     "files": [
         "**/*"
     ],
-    "build": {
-        "mac": {
-            "target": [
-                "dmg",
-                "pkg",
-                "tar.gz"
-            ],
-            "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-            "icon": "res/electron/icon.icns"
-        }
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "mac": {
+        "target": [
+            "dmg",
+            "pkg",
+            "tar.gz"
+        ],
+        "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+        "icon": "res/electron/icon.icns"
     }
 }

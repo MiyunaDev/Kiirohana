@@ -123,23 +123,6 @@ jobs:
         working-directory: cordova
         run: cordova build android --release
 
-      - name: Rename Android files
-        shell: bash
-        run: |
-          mkdir -p release
-
-          APK=$(find cordova/platforms/android/app/build/outputs/apk/debug -name "*.apk" | head -n1)
-
-          AAB=$(find cordova/platforms/android/app/build/outputs/bundle -name "*.aab" | head -n1)
-
-          echo "APK=$APK"
-          echo "AAB=$AAB"
-
-          cp "$APK" "release/Kiirohana-${{ steps.ver.outputs.version }}.apk"
-          cp "$AAB" "release/Kiirohana-${{ steps.ver.outputs.version }}.aab"
-
-          ls -lah release
-
       - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
@@ -179,6 +162,11 @@ jobs:
           - os: linux
             runner: ubuntu-latest
             arch: x64
+
+          - os: linux
+            runner: ubuntu-latest
+            arch: ia32
+
 
           - os: linux
             runner: ubuntu-latest
@@ -243,29 +231,22 @@ jobs:
           find cordova -iname "uninstall.exe" -delete || true
           find cordova -iname "*.map" -delete || true
 
-      - name: Rename Electron Outputs
+      - name: Collect Electron Outputs
         shell: bash
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-
           mkdir -p release
 
           while IFS= read -r file; do
             NAME=$(basename "$file")
-            EXT="${NAME##*.}"
 
-            NEW_NAME="Kiirohana-${VERSION}-${{ matrix.os }}-${{ matrix.arch }}-${NAME}"
+            echo "COPY: $NAME"
 
-            echo "COPY:"
-            echo "$NAME"
-            echo "->"
-            echo "$NEW_NAME"
-
-            cp "$file" "release/$NEW_NAME"
+            cp "$file" "release/$NAME"
 
           done < <(
             find cordova/platforms/electron/build -type f \( \
-              -name "*.exe" -o \
+              -name "*Setup*.exe" -o \
+              -name "*Portable*.exe" -o \
               -name "*.msi" -o \
               -name "*.AppImage" -o \
               -name "*.deb" -o \
@@ -306,7 +287,7 @@ jobs:
         with:
           path: artifacts
           pattern: "android-*"
-          
+
       - uses: actions/download-artifact@v8
         with:
           path: artifacts
@@ -321,24 +302,73 @@ jobs:
 
           URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-          TEXT="🚀 Build Finished
+          mkdir -p summary
 
-          Repo: ${{ github.repository }}
-          Branch: ${{ github.ref_name }}
-          Commit: ${GITHUB_SHA::7}
+          SUMMARY_FILE="summary/message.txt"
 
-          Run:
-          $URL"
+          echo "🚀 BUILD SUCCESS" > "$SUMMARY_FILE"
+          echo "" >> "$SUMMARY_FILE"
+
+          echo "📦 Repository" >> "$SUMMARY_FILE"
+          echo "${{ github.repository }}" >> "$SUMMARY_FILE"
+          echo "" >> "$SUMMARY_FILE"
+
+          echo "🌿 Branch" >> "$SUMMARY_FILE"
+          echo "${{ github.ref_name }}" >> "$SUMMARY_FILE"
+          echo "" >> "$SUMMARY_FILE"
+
+          echo "🔖 Commit" >> "$SUMMARY_FILE"
+          echo "${GITHUB_SHA::7}" >> "$SUMMARY_FILE"
+          echo "" >> "$SUMMARY_FILE"
+
+          echo "🖥 Runner" >> "$SUMMARY_FILE"
+          echo "${{ runner.os }}" >> "$SUMMARY_FILE"
+          echo "" >> "$SUMMARY_FILE"
+
+          echo "🔗 Workflow Run" >> "$SUMMARY_FILE"
+          echo "$URL" >> "$SUMMARY_FILE"
+          echo "" >> "$SUMMARY_FILE"
+
+          echo "==============================" >> "$SUMMARY_FILE"
+          echo "📁 GENERATED FILES" >> "$SUMMARY_FILE"
+          echo "==============================" >> "$SUMMARY_FILE"
+          echo "" >> "$SUMMARY_FILE"
+
+          COUNT=0
+
+          while IFS= read -r file; do
+            NAME=$(basename "$file")
+
+            SIZE=$(du -h "$file" | cut -f1)
+
+            REL=$(echo "$file" | sed 's#artifacts/##g')
+
+            echo "• $REL" >> "$SUMMARY_FILE"
+            echo "  Size: $SIZE" >> "$SUMMARY_FILE"
+            echo "" >> "$SUMMARY_FILE"
+
+            COUNT=$((COUNT + 1))
+
+          done < <(find artifacts -type f | sort)
+
+          echo "==============================" >> "$SUMMARY_FILE"
+          echo "📊 TOTAL FILES: $COUNT" >> "$SUMMARY_FILE"
+          echo "==============================" >> "$SUMMARY_FILE"
+
+          echo "===== TELEGRAM SUMMARY ====="
+          cat "$SUMMARY_FILE"
 
           if [ -n "$THREAD" ]; then
-            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+            curl --fail -s -X POST \
+              "https://api.telegram.org/bot$BOT/sendMessage" \
               -d chat_id="$CHAT" \
               -d message_thread_id="$THREAD" \
-              --data-urlencode text="$TEXT"
+              --data-urlencode text@"$SUMMARY_FILE"
           else
-            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+            curl --fail -s -X POST \
+              "https://api.telegram.org/bot$BOT/sendMessage" \
               -d chat_id="$CHAT" \
-              --data-urlencode text="$TEXT"
+              --data-urlencode text@"$SUMMARY_FILE"
           fi
 
       - name: Prepare Files

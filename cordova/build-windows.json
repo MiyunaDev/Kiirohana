@@ -2,21 +2,20 @@
     "appId": "com.miyunadev.kiirohana",
     "productName": "Kiirohana",
     "directories": {
-        "output": "build/windows"
+        "output": "release"
     },
     "files": [
         "**/*"
     ],
-    "build": {
-        "win": {
-            "target": [
-                "nsis",
-                "portable",
-                "zip",
-                "tar.gz"
-            ],
-            "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-            "icon": "res/electron/icon.ico"
-        }
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "win": {
+        "target": [
+            "nsis",
+            "portable",
+            "zip",
+            "tar.gz"
+        ],
+        "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+        "icon": "res/electron/icon.ico"
     }
 }

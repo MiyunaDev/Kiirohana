@@ -124,23 +124,6 @@ jobs:
         working-directory: cordova
         run: cordova build android --release
 
-      - name: Rename Android files
-        shell: bash
-        run: |
-          mkdir -p release
-
-          APK=$(find cordova/platforms/android/app/build/outputs/apk/debug -name "*.apk" | head -n1)
-
-          AAB=$(find cordova/platforms/android/app/build/outputs/bundle -name "*.aab" | head -n1)
-
-          echo "APK=$APK"
-          echo "AAB=$AAB"
-
-          cp "$APK" "release/Kiirohana-${{ steps.ver.outputs.version }}.apk"
-          cp "$AAB" "release/Kiirohana-${{ steps.ver.outputs.version }}.aab"
-
-          ls -lah release
-
       - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
@@ -180,6 +163,10 @@ jobs:
           - os: linux
             runner: ubuntu-latest
             arch: x64
+          
+          - os: linux
+            runner: ubuntu-latest
+            arch: ia32
 
           - os: linux
             runner: ubuntu-latest
@@ -244,28 +231,22 @@ jobs:
           find cordova -iname "uninstall.exe" -delete || true
           find cordova -iname "*.map" -delete || true
 
-      - name: Rename Electron Outputs
+      - name: Collect Electron Outputs
         shell: bash
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-
           mkdir -p release
 
           while IFS= read -r file; do
             NAME=$(basename "$file")
 
-            NEW_NAME="Kiirohana-${VERSION}-${{ matrix.os }}-${{ matrix.arch }}-${NAME}"
+            echo "COPY: $NAME"
 
-            echo "COPY:"
-            echo "$NAME"
-            echo "->"
-            echo "$NEW_NAME"
-
-            cp "$file" "release/$NEW_NAME"
+            cp "$file" "release/$NAME"
 
           done < <(
             find cordova/platforms/electron/build -type f \( \
-              -name "*.exe" -o \
+              -name "*Setup*.exe" -o \
+              -name "*Portable*.exe" -o \
               -name "*.msi" -o \
               -name "*.AppImage" -o \
               -name "*.deb" -o \
@@ -411,7 +392,7 @@ jobs:
         run: |
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
           CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
-          THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
+          THREAD="${{ secrets.TELEGRAM_BOT_THREAD_RELEASE }}"
 
           VERSION="${{ github.event.release.tag_name || github.ref_name }}"
           URL="${{ github.event.release.html_url || format('https://github.com/{0}/releases', github.repository) }}"
