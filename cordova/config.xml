@@ -25,11 +25,9 @@
     <access origin="*"/>
 
     <allow-navigation href="http://*/*"/>
-    <allow-navigation href="https://*/*"/>
     <allow-navigation href="kiirohana://*/*"/>
 
     <allow-intent href="http://*/*"/>
-    <allow-intent href="https://*/*"/>
     <allow-intent href="tel:*"/>
     <allow-intent href="mailto:*"/>
 
@@ -47,6 +45,6 @@
         <preference
             name="ElectronSettingsFilePath"
             value="res/electron/settings.json"/>
-        <icon src="res/electron/icon.png"/>
+        <icon src="res/pwa/Logo Kiirohana-512.png"/>
     </platform>
 </widget>
