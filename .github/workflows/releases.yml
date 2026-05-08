@@ -361,7 +361,6 @@ jobs:
             case "$NAME" in
               elevate.exe|uninstall.exe|Uninstall.exe)
                 continue
-                ;;
             esac
 
             echo "COPY: $file"
