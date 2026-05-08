@@ -7,9 +7,9 @@
     "files": [
         "**/*"
     ],
-    "electron": {
+    "build": {
         "win": {
-            "package": [
+            "target": [
                 "nsis",
                 "msi",
                 "portable",

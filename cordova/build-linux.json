@@ -9,13 +9,14 @@
     ],
     "build": {
         "linux": {
-            "package": [
+            "target": [
                 "AppImage",
                 "deb",
                 "rpm",
                 "pacman",
                 "tar.gz"
             ],
+            "category": "Network",
             "icon": "res/electron/icon.png"
         }
     }

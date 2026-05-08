@@ -9,7 +9,7 @@
     ],
     "build": {
         "mac": {
-            "package": [
+            "target": [
                 "dmg",
                 "pkg",
                 "tar.gz"
