@@ -31,14 +31,14 @@
     <allow-intent href="tel:*"/>
     <allow-intent href="mailto:*"/>
 
-    <icon src="res/icon.png"/>
+    <icon src="res/playstore.png"/>
 
     <platform name="android">
-        <icon src="res/android/mipmap-mdpi/icon.png" density="mdpi"/>
-        <icon src="res/android/mipmap-hdpi/icon.png" density="hdpi"/>
-        <icon src="res/android/mipmap-xhdpi/icon.png" density="xhdpi"/>
-        <icon src="res/android/mipmap-xxhdpi/icon.png" density="xxhdpi"/>
-        <icon src="res/android/mipmap-xxxhdpi/icon.png" density="xxxhdpi"/>
+        <icon src="res/android/mipmap-mdpi/ic_launcher.png" density="mdpi"/>
+        <icon src="res/android/mipmap-hdpi/ic_launcher.png" density="hdpi"/>
+        <icon src="res/android/mipmap-xhdpi/ic_launcher.png" density="xhdpi"/>
+        <icon src="res/android/mipmap-xxhdpi/ic_launcher.png" density="xxhdpi"/>
+        <icon src="res/android/mipmap-xxxhdpi/ic_launcher.png" density="xxxhdpi"/>
     </platform>
 
     <platform name="electron">
