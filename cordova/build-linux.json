@@ -14,8 +14,6 @@
                 "deb",
                 "rpm",
                 "pacman",
-                "snap",
-                "flatpak",
                 "tar.gz"
             ],
             "arch": [
@@ -24,6 +22,11 @@
                 "armv7l",
                 "ia32"
             ]
+        }
+    },
+    "build": {
+        "win": {
+            "icon": "res/electron/icon.png"
         }
     }
 }

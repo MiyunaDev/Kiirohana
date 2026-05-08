@@ -10,11 +10,16 @@
     "electron": {
         "win": {
             "package": [
-                "app",
                 "dmg",
-                "pkg"
+                "pkg",
+                "tar.gz"
             ],
             "arch": ["universal"]
+        }
+    },
+    "build": {
+        "mac": {
+            "icon": "res/electron/icon.icns"
         }
     }
 }

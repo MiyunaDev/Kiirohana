@@ -9,10 +9,10 @@
     ],
     "electron": {
         "win": {
-            "package": [
+            "target": [
                 "nsis",
-                "msi",
                 "portable",
+                "zip",
                 "tar.gz"
             ],
             "arch": [
@@ -20,6 +20,11 @@
                 "ia32",
                 "arm64"
             ]
+        }
+    },
+    "build": {
+        "win": {
+            "icon": "res/electron/icon.ico"
         }
     }
 }

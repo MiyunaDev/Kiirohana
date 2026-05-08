@@ -45,6 +45,11 @@
         <preference
             name="ElectronSettingsFilePath"
             value="res/electron/settings.json"/>
-        <icon src="res/pwa/Logo Kiirohana-512.png"/>
+
+        <preference
+            name="ElectronBrowserWindowIcon"
+            value="res/pwa/Logo Kiirohana-96.png"/>
+
+        <icon src="res/electron/icon.png"/>
     </platform>
 </widget>
