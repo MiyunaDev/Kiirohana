@@ -15,6 +15,7 @@
                 "zip",
                 "tar.gz"
             ],
+            "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
             "icon": "res/electron/icon.ico"
         }
     }

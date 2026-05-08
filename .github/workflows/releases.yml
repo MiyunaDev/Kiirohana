@@ -244,22 +244,47 @@ jobs:
           find cordova -iname "uninstall.exe" -delete || true
           find cordova -iname "*.map" -delete || true
 
+      - name: Rename Electron Outputs
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+
+          mkdir -p release
+
+          while IFS= read -r file; do
+            NAME=$(basename "$file")
+
+            NEW_NAME="Kiirohana-${VERSION}-${{ matrix.os }}-${{ matrix.arch }}-${NAME}"
+
+            echo "COPY:"
+            echo "$NAME"
+            echo "->"
+            echo "$NEW_NAME"
+
+            cp "$file" "release/$NEW_NAME"
+
+          done < <(
+            find cordova/platforms/electron/build -type f \( \
+              -name "*.exe" -o \
+              -name "*.msi" -o \
+              -name "*.AppImage" -o \
+              -name "*.deb" -o \
+              -name "*.rpm" -o \
+              -name "*.tar.gz" -o \
+              -name "*.dmg" -o \
+              -name "*.pkg" -o \
+              -name "*.zip" \
+            \)
+          )
+
+          echo "=== RELEASE FILES ==="
+          ls -lah release
+
       - name: Upload Electron
         uses: actions/upload-artifact@v7
         with:
           name: electron-${{ matrix.os }}-${{ matrix.arch }}
-          path: |
-            cordova/**/*.exe
-            !cordova/**/elevate.exe
-            !cordova/**/uninstall.exe
-            cordova/**/*.msi
-            cordova/**/*.zip
-            cordova/**/*.AppImage
-            cordova/**/*.deb
-            cordova/**/*.rpm
-            cordova/**/*.tar.gz
-            cordova/**/*.dmg
-            cordova/**/*.pkg
+          path: release/*
           if-no-files-found: warn
 
 # =====================================================
@@ -276,39 +301,40 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           path: artifacts
+          pattern: |
+            android-*
+            electron-*
 
       - name: Select final assets only
         shell: bash
         run: |
           mkdir -p release-files
 
-          find artifacts -type f \( \
-            -iname "*.apk" -o \
-            -iname "*.aab" -o \
-            -iname "*.exe" -o \
-            -iname "*.msi" -o \
-            -iname "*.zip" -o \
-            -iname "*.appimage" -o \
-            -iname "*.deb" -o \
-            -iname "*.rpm" -o \
-            -iname "*.tar.gz" -o \
-            -iname "*.dmg" -o \
-            -iname "*.pkg" \
-          \) | while read -r file; do
-
+          while IFS= read -r file; do
             NAME=$(basename "$file")
 
             case "$NAME" in
-              elevate.exe|uninstall.exe|Uninstall.exe)
-                continue
+              *.apk|\
+              *.aab|\
+              *.exe|\
+              *.msi|\
+              *.zip|\
+              *.AppImage|\
+              *.deb|\
+              *.rpm|\
+              *.tar.gz|\
+              *.dmg|\
+              *.pkg)
+
+                REL=$(echo "$file" | sed 's#artifacts/##g' | tr '/' '_')
+
+                echo "COPY: $REL"
+
+                cp "$file" "release-files/$REL"
                 ;;
             esac
 
-            echo "COPY: $file"
-
-            cp -f "$file" "release-files/$NAME"
-
-          done
+          done < <(find artifacts -type f)
 
           echo "=== RELEASE FILES ==="
           ls -lah release-files
@@ -336,37 +362,40 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           path: artifacts
+          pattern: |
+            android-*
+            electron-*
 
       - name: Prepare Files
         shell: bash
         run: |
           mkdir -p telegram-files
 
-          find artifacts -type f \( \
-            -iname "*.apk" -o \
-            -iname "*.aab" -o \
-            -iname "*.exe" -o \
-            -iname "*.msi" -o \
-            -iname "*.zip" -o \
-            -iname "*.appimage" -o \
-            -iname "*.deb" -o \
-            -iname "*.rpm" -o \
-            -iname "*.tar.gz" -o \
-            -iname "*.dmg" -o \
-            -iname "*.pkg" \
-          \) | while read -r file; do
-
+          while IFS= read -r file; do
             NAME=$(basename "$file")
 
             case "$NAME" in
-              elevate.exe|uninstall.exe|Uninstall.exe)
-                continue
+              *.apk|\
+              *.aab|\
+              *.exe|\
+              *.msi|\
+              *.zip|\
+              *.AppImage|\
+              *.deb|\
+              *.rpm|\
+              *.tar.gz|\
+              *.dmg|\
+              *.pkg)
+
+                REL=$(echo "$file" | sed 's#artifacts/##g' | tr '/' '_')
+
+                echo "COPY: $REL"
+
+                cp "$file" "telegram-files/$REL"
+                ;;
             esac
 
-            echo "COPY: $file"
-
-            cp "$file" telegram-files/
-          done
+          done < <(find artifacts -type f)
 
           echo "=== TELEGRAM FILES ==="
           ls -lah telegram-files
@@ -381,24 +410,68 @@ jobs:
           VERSION="${{ github.event.release.tag_name || github.ref_name }}"
           URL="${{ github.event.release.html_url || format('https://github.com/{0}/releases', github.repository) }}"
 
-          TEXT="🚀 ${{ github.event.repository.name }} Released
+          REPO="${{ github.event.repository.name }}"
+          OWNER="${{ github.repository_owner }}"
+          SHA="${GITHUB_SHA::7}"
 
-          Version: $VERSION
-          Repo: ${{ github.repository }}
+          APK_COUNT=$(find artifacts -type f -iname "*.apk" | wc -l)
+          AAB_COUNT=$(find artifacts -type f -iname "*.aab" | wc -l)
 
-          🔗 Release:
-          $URL"
+          EXE_COUNT=$(find artifacts -type f -iname "*.exe" | wc -l)
+          MSI_COUNT=$(find artifacts -type f -iname "*.msi" | wc -l)
+
+          APPIMAGE_COUNT=$(find artifacts -type f -iname "*.AppImage" | wc -l)
+          DEB_COUNT=$(find artifacts -type f -iname "*.deb" | wc -l)
+          RPM_COUNT=$(find artifacts -type f -iname "*.rpm" | wc -l)
+
+          DMG_COUNT=$(find artifacts -type f -iname "*.dmg" | wc -l)
+          PKG_COUNT=$(find artifacts -type f -iname "*.pkg" | wc -l)
+
+          TOTAL=$(find artifacts -type f | wc -l)
+
+          TEXT="🚀 <b>${REPO}</b> New Release Published
+
+          🏷 <b>Version:</b> ${VERSION}
+          👤 <b>Owner:</b> ${OWNER}
+          🔖 <b>Commit:</b> ${SHA}
+
+          📦 <b>Build Artifacts</b>
+          • Android APK: ${APK_COUNT}
+          • Android AAB: ${AAB_COUNT}
+
+          • Windows EXE: ${EXE_COUNT}
+          • Windows MSI: ${MSI_COUNT}
+
+          • Linux AppImage: ${APPIMAGE_COUNT}
+          • Linux DEB: ${DEB_COUNT}
+          • Linux RPM: ${RPM_COUNT}
+
+          • macOS DMG: ${DMG_COUNT}
+          • macOS PKG: ${PKG_COUNT}
+
+          📁 <b>Total Files:</b> ${TOTAL}
+
+          🔗 <b>GitHub Release</b>
+          ${URL}"
 
           if [ -n "$THREAD" ]; then
-            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+            RESP=$(curl --fail --retry 5 --retry-delay 3 \
+              -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
               -d chat_id="$CHAT" \
               -d message_thread_id="$THREAD" \
-              --data-urlencode text="$TEXT"
+              -d parse_mode="HTML" \
+              --data-urlencode text="$TEXT")
           else
-            curl -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
+            RESP=$(curl --fail --retry 5 --retry-delay 3 \
+              -s -X POST "https://api.telegram.org/bot$BOT/sendMessage" \
               -d chat_id="$CHAT" \
-              --data-urlencode text="$TEXT"
+              -d parse_mode="HTML" \
+              --data-urlencode text="$TEXT")
           fi
+
+          echo "$RESP"
+
+          echo "$RESP" | grep '"ok":true' >/dev/null || exit 1
 
       - name: Send Files
         shell: bash
@@ -406,28 +479,39 @@ jobs:
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
           CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
           THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
+
           MAX=$((45 * 1024 * 1024))
 
-          find telegram-files -type f | while read -r file; do
+          while IFS= read -r file; do
             NAME=$(basename "$file")
             SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
 
-            [ "$SIZE" -gt "$MAX" ] && continue
+            if [ "$SIZE" -gt "$MAX" ]; then
+              echo "SKIP TOO LARGE: $NAME"
+              continue
+            fi
+
+            echo "UPLOAD: $NAME"
 
             if [ -n "$THREAD" ]; then
-              curl -s --retry 3 \
-                -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+              RESP=$(curl --fail --retry 5 --retry-delay 3 \
+                -s -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
                 -F chat_id="$CHAT" \
                 -F message_thread_id="$THREAD" \
                 -F document=@"$file" \
-                -F caption="📦 $NAME"
+                -F caption="📦 $NAME")
             else
-              curl -s --retry 3 \
-                -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+              RESP=$(curl --fail --retry 5 --retry-delay 3 \
+                -s -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
                 -F chat_id="$CHAT" \
                 -F document=@"$file" \
-                -F caption="📦 $NAME"
+                -F caption="📦 $NAME")
             fi
 
+            echo "$RESP"
+
+            echo "$RESP" | grep '"ok":true' >/dev/null || exit 1
+
             sleep 2
-          done
+
+          done < <(find telegram-files -type f)

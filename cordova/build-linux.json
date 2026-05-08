@@ -16,6 +16,7 @@
                 "pacman",
                 "tar.gz"
             ],
+            "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
             "category": "Network",
             "icon": "res/electron/icon.png"
         }

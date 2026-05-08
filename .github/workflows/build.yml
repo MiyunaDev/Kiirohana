@@ -229,7 +229,7 @@ jobs:
         run: |
           cordova platform rm electron || true
           cordova platform add electron
-
+      
       - name: Build Electron Release
         working-directory: cordova
         shell: bash
@@ -243,22 +243,48 @@ jobs:
           find cordova -iname "uninstall.exe" -delete || true
           find cordova -iname "*.map" -delete || true
 
+      - name: Rename Electron Outputs
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+
+          mkdir -p release
+
+          while IFS= read -r file; do
+            NAME=$(basename "$file")
+            EXT="${NAME##*.}"
+
+            NEW_NAME="Kiirohana-${VERSION}-${{ matrix.os }}-${{ matrix.arch }}-${NAME}"
+
+            echo "COPY:"
+            echo "$NAME"
+            echo "->"
+            echo "$NEW_NAME"
+
+            cp "$file" "release/$NEW_NAME"
+
+          done < <(
+            find cordova/platforms/electron/build -type f \( \
+              -name "*.exe" -o \
+              -name "*.msi" -o \
+              -name "*.AppImage" -o \
+              -name "*.deb" -o \
+              -name "*.rpm" -o \
+              -name "*.tar.gz" -o \
+              -name "*.dmg" -o \
+              -name "*.pkg" -o \
+              -name "*.zip" \
+            \)
+          )
+
+          echo "=== RELEASE FILES ==="
+          ls -lah release
+
       - name: Upload Electron
         uses: actions/upload-artifact@v7
         with:
           name: electron-${{ matrix.os }}-${{ matrix.arch }}
-          path: |
-            cordova/**/*.exe
-            !cordova/**/elevate.exe
-            !cordova/**/uninstall.exe
-            cordova/**/*.msi
-            cordova/**/*.zip
-            cordova/**/*.AppImage
-            cordova/**/*.deb
-            cordova/**/*.rpm
-            cordova/**/*.tar.gz
-            cordova/**/*.dmg
-            cordova/**/*.pkg
+          path: release/*
           if-no-files-found: warn
 
 # =====================================================
@@ -279,6 +305,9 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           path: artifacts
+          pattern: |
+            android-*
+            electron-*
 
       - name: Send Summary
         shell: bash
@@ -314,25 +343,31 @@ jobs:
         run: |
           mkdir -p telegram-files
 
-          find artifacts -type f | while read -r file; do
+          while IFS= read -r file; do
             NAME=$(basename "$file")
 
             case "$NAME" in
               *.apk|\
               *.aab|\
-              *Setup*.exe|\
+              *.exe|\
+              *.msi|\
               *.AppImage|\
-              *.dmg|\
-              *.pkg|\
               *.deb|\
               *.rpm|\
-              *-mac.zip)
+              *.tar.gz|\
+              *.dmg|\
+              *.pkg|\
+              *.zip)
 
-                echo "COPY: $file"
-                cp "$file" telegram-files/
+                REL=$(echo "$file" | sed 's#artifacts/##g' | tr '/' '_')
+
+                echo "COPY: $REL"
+
+                cp "$file" "telegram-files/$REL"
                 ;;
             esac
-          done
+
+          done < <(find artifacts -type f)
 
           echo "=== TELEGRAM FILES ==="
           ls -lah telegram-files
@@ -343,26 +378,39 @@ jobs:
           BOT="${{ secrets.TELEGRAM_BOT_TOKEN }}"
           CHAT="${{ secrets.TELEGRAM_BOT_CHANNEL }}"
           THREAD="${{ secrets.TELEGRAM_BOT_THREAD_BETA }}"
+
           MAX=$((45 * 1024 * 1024))
 
-          find telegram-files -type f | while read -r file; do
+          while IFS= read -r file; do
             NAME=$(basename "$file")
             SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
 
-            [ "$SIZE" -gt "$MAX" ] && continue
+            if [ "$SIZE" -gt "$MAX" ]; then
+              echo "SKIP TOO LARGE: $NAME"
+              continue
+            fi
+
+            echo "UPLOAD: $NAME"
 
             if [ -n "$THREAD" ]; then
-              curl -s -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+              RESP=$(curl --fail --retry 5 --retry-delay 3 \
+                -s -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
                 -F chat_id="$CHAT" \
                 -F message_thread_id="$THREAD" \
                 -F document=@"$file" \
-                -F caption="📦 $NAME"
+                -F caption="📦 $NAME")
             else
-              curl -s -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
+              RESP=$(curl --fail --retry 5 --retry-delay 3 \
+                -s -X POST "https://api.telegram.org/bot$BOT/sendDocument" \
                 -F chat_id="$CHAT" \
                 -F document=@"$file" \
-                -F caption="📦 $NAME"
+                -F caption="📦 $NAME")
             fi
 
+            echo "$RESP"
+
+            echo "$RESP" | grep '"ok":true' >/dev/null || exit 1
+
             sleep 2
-          done
+
+          done < <(find telegram-files -type f)
