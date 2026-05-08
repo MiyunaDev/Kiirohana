@@ -99,7 +99,7 @@ jobs:
         id: ver
         shell: bash
         run: |
-          VERSION=$(sed -n 's/.*<widget[^>]*version="\([^"]*\)".*/\1/p' cordova/config.xml | head -n1)
+          VERSION=$(node -p "require('./package.json').version")
 
           if [ -z "$VERSION" ]; then
             VERSION="0.0.0"
