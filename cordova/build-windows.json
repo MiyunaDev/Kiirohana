@@ -17,7 +17,7 @@
                 "tar.gz"
             ],
             "arch": [
-                "x64", "ia32", "arm64", "armv7l", "universal"
+                "x64", "ia32", "arm64", "armv7l"
             ],
             "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
             "icon": "res/electron/icon.ico"

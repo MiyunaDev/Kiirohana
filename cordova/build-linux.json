@@ -17,7 +17,7 @@
                 "tar.gz"
             ],
             "arch": [
-                "x64", "ia32", "arm64", "armv7l", "universal"
+                "x64", "ia32", "arm64", "armv7l"
             ],
             "category": "Network",
             "icon": "res/electron/icon.png"

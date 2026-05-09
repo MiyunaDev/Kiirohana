@@ -2,22 +2,10 @@
     "appId": "com.miyunadev.kiirohana",
     "productName": "Kiirohana",
     "directories": {
-        "output": "build/windows"
+        "output": "release"
     },
     "files": [
         "**/*"
     ],
-    "build": {
-        "win": {
-            "target": [
-                "nsis",
-                "msi",
-                "portable",
-                "tar.gz"
-            ],
-            "arch": [
-                "x64"
-            ]
-        }
-    }
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
 }
