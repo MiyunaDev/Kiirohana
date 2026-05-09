@@ -8,7 +8,7 @@
         "**/*"
     ],
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-    "build": {
+    "electron": {
         "linux": {
             "target": [
                 "AppImage",
