@@ -16,6 +16,9 @@
                 "rpm",
                 "tar.gz"
             ],
+            "arch": [
+                "x64", "ia32", "arm64", "armv7l", "universal"
+            ],
             "category": "Network",
             "icon": "res/electron/icon.png"
         }

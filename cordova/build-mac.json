@@ -15,6 +15,9 @@
                 "pkg",
                 "tar.gz"
             ],
+            "arch": [
+                "x64", "ia32", "arm64", "armv7l", "universal"
+            ],
             "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
             "icon": "res/electron/icon.icns"
         }
