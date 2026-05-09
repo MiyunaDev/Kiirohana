@@ -141,7 +141,7 @@ jobs:
 # BUILD ELECTRON
 # =====================================================
   build-electron:
-    name: Electron ${{ matrix.os }}-${{ matrix.arch }}
+    name: Electron ${{ matrix.os }}
     needs: build-react
     runs-on: ${{ matrix.runner }}
 
@@ -151,36 +151,10 @@ jobs:
         include:
           - os: windows
             runner: windows-latest
-            arch: x64
-
-          - os: windows
-            runner: windows-latest
-            arch: ia32
-
-          - os: windows
-            runner: windows-latest
-            arch: arm64
-
           - os: linux
             runner: ubuntu-latest
-            arch: x64
-
-          - os: linux
-            runner: ubuntu-latest
-            arch: ia32
-
-
-          - os: linux
-            runner: ubuntu-latest
-            arch: arm64
-
-          - os: linux
-            runner: ubuntu-latest
-            arch: armv7l
-
           - os: macos
             runner: macos-latest
-            arch: universal
 
     steps:
       - uses: actions/checkout@v5
@@ -266,7 +240,7 @@ jobs:
       - name: Upload Electron
         uses: actions/upload-artifact@v7
         with:
-          name: electron-${{ matrix.os }}-${{ matrix.arch }}
+          name: electron-${{ matrix.os }}
           path: release/*
           if-no-files-found: warn
 
