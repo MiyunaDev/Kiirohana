@@ -128,13 +128,15 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: android-apk
-          path: release/*.apk
+          path: cordova/platforms/android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: warn
 
       - name: Upload AAB
         uses: actions/upload-artifact@v7
         with:
           name: android-aab
-          path: release/*.aab
+          path: cordova/platforms/android/app/build/outputs/bundle/release/*.aab
+          if-no-files-found: warn
 
 # =====================================================
 # BUILD ELECTRON
@@ -163,10 +165,11 @@ jobs:
           - os: linux
             runner: ubuntu-latest
             arch: x64
-          
+
           - os: linux
             runner: ubuntu-latest
             arch: ia32
+
 
           - os: linux
             runner: ubuntu-latest
@@ -217,12 +220,12 @@ jobs:
         run: |
           cordova platform rm electron || true
           cordova platform add electron
-
+      
       - name: Build Electron Release
         working-directory: cordova
         shell: bash
         run: |
-          cordova build electron --release -- --${{ matrix.arch }} --publish never
+           npm run build
 
       - name: Remove helper junk
         shell: bash
