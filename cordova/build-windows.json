@@ -10,7 +10,7 @@
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "electron": {
         "win": {
-            "target": [
+            "package": [
                 "nsis",
                 "portable",
                 "zip",

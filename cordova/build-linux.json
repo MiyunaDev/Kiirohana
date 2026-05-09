@@ -10,7 +10,7 @@
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "electron": {
         "linux": {
-            "target": [
+            "package": [
                 "AppImage",
                 "deb",
                 "rpm",
