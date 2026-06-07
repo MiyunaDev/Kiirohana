@@ -35,7 +35,7 @@ const Settings = () => {
 
           <SettingMenu icon={<FaUserGear />} name="Account" path="/app/settings/account/" />
           <SettingMenu icon={<FaUserGroup />} name="Profiles" path="/app/settings/profiles/" />
-          <SettingMenu icon={<FaBell />} name="Notification" path="" />
+          <SettingMenu icon={<FaBell />} name="Notification" path="/app/settings/notification/" />
           <SettingMenu icon={<FaKey />} name="Login And Session" />
         </div>
 
