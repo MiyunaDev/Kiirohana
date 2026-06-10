@@ -1,14 +1,16 @@
-import { FaBook, FaHistory, FaSearch, FaCog } from 'react-icons/fa';
+import { FaHome, FaBook, FaComments, FaPlay, FaCog } from 'react-icons/fa';
 import { Link, Outlet, useLocation } from 'react-router';
-import ChangelogModal from "../components/ChangelogModal"
+import ChangelogModal from "../components/ChangelogModal";
 
 import { version } from "./../../package.json";
 import { useEffect, useState } from 'react';
 
+// Menyesuaikan item navigasi dengan kebutuhan Medsos, Tracker, dan Messenger
 const navItems = [
-    { to: "/app/library", icon: <FaBook size={18} />, label: "Library" },
-    { to: "/app/history", icon: <FaHistory size={18} />, label: "History" },
-    { to: "/app/browse", icon: <FaSearch size={18} />, label: "Browse" },
+    { to: "/app/library", icon: <FaBook size={18} />, label: "Media" },
+    { to: "/app/messages", icon: <FaComments size={18} />, label: "Chat" }, 
+    { to: "/app/home", icon: <FaHome size={18} />, label: "Home" }, 
+    { to: "/app/browse", icon: <FaPlay size={18} />, label: "Social" },
     { to: "/app/settings", icon: <FaCog size={18} />, label: "Settings" },
 ];
 
@@ -49,12 +51,12 @@ const NavigativeLayout = () => {
                 Kiirohana
             </div>
 
-
             <main className="flex-1 overflow-auto p-4">
                 <Outlet />
             </main>
 
-            <div className="h-[60px] bg-[#404040] rounded-t-4xl text-white sticky bottom-0 z-90 grid grid-cols-4">
+            {/* Mengubah grid-cols-4 menjadi grid-cols-5 untuk menampung seluruh navigasi baru */}
+            <div className="h-[60px] bg-[#404040] rounded-t-4xl text-white sticky bottom-0 z-90 grid grid-cols-5">
                 {navItems.map(({ to, icon, label }) => {
                     const active = isActive(to);
 
@@ -62,14 +64,14 @@ const NavigativeLayout = () => {
                         <Link
                             key={to}
                             to={to}
-                            className={`transition-all duration-300 flex flex-col items-center justify-center gap-2 
+                            className={`transition-all duration-300 flex flex-col items-center justify-center gap-1 
         ${active ? "border-b-4 border-b-[#C667F7] text-[#C667F7]" : "text-white"}`}
                         >
                             <div className={`transition-all duration-300 ` + (active ? "text-xl text-[#C667F7]" : "text-xl text-white")}>
                                 {icon}
                             </div>
 
-                            {active ? <span className="text-xs font-semibold">
+                            {active ? <span className="text-[10px] font-semibold truncate max-w-full px-1">
                                 {label}
                             </span> : null}
                         </Link>
@@ -80,4 +82,4 @@ const NavigativeLayout = () => {
     );
 }
 
-export default NavigativeLayout
+export default NavigativeLayout;
