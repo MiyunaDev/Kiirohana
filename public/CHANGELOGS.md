@@ -13,7 +13,7 @@
 **Application Features & Modules**
 
 * **Shinobu Module:** Completed all core features for the Shinobu system, including the Reader function, Account Change system, and internal Toast notifications.
-* **Interaction & Community Systems:** Implemented a full Comment system for the comic reader and a User Level system with level badges integrated into profiles and landing pages.
+* **Interaction & Community Systems:** Implemented a full Comment system for the comic reader and a User Level system with level badges integrated into accounts and landing pages.
 * **Collection Management:** Launched Library, Bookmark, and Collection features for enhanced user reading list management.
 * **Advanced Search:** Implemented a functional Advanced Search system and added a chapter search feature within the Comic Reader.
 

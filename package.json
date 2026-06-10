@@ -1,6 +1,6 @@
 {
   "name": "kiirohana",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "Tracking your activity",
   "type": "module",
   "scripts": {
@@ -17,13 +17,8 @@
     "@tailwindcss/vite": "^4.2.2",
     "@use-gesture/react": "^10.3.1",
     "axios": "^1.10.0",
-    "axios-cookiejar-support": "^6.0.3",
-    "cheerio": "^1.1.0",
     "cli-color": "^2.0.4",
-    "clsx": "^2.1.1",
     "concurrently": "^9.1.2",
-    "framer-motion": "^12.29.2",
-    "localforage": "^1.10.0",
     "lottie-react": "^2.4.1",
     "path": "^0.12.7",
     "react": "^19.0.0",
@@ -34,6 +29,7 @@
     "react-router": "^7.5.2",
     "react-world-flags": "^1.6.0",
     "remark-gfm": "^4.0.1",
+    "soriya": "github:MiyunaDev/soriya",
     "tough-cookie": "^5.1.2",
     "uuid": "^14.0.0",
     "xml2js": "^0.6.2"
