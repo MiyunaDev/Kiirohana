@@ -1,4 +1,4 @@
-name: Build Cordova Android & Electron
+name: Build Cordova, Electron & Web Docker
 
 on:
   push:
@@ -13,27 +13,33 @@ concurrency:
 
 env:
   NODE_VERSION: "24"
-  JAVA_VERSION: "23"
+  PNPM_VERSION: "11"
+  JAVA_VERSION: "17" # Wajib 17 agar Gradle Android di Cordova tidak crash
 
 jobs:
 
 # =====================================================
-# BUILD REACT (TEMP ONLY / NO ARTIFACT UPLOAD)
+# BUILD REACT (BASE WWW)
 # =====================================================
   build-react:
     name: Build React
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v6
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build frontend
         run: pnpm run build
@@ -42,31 +48,35 @@ jobs:
         run: |
           test -d cordova/www || (echo "cordova/www missing" && exit 1)
 
-      # ZIP INTERNAL TRANSFER ONLY
       - name: Pack WWW
         run: |
           cd cordova
           zip -qr ../cordova-www.zip www
 
       - name: Upload Internal WWW
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: _internal-www
           path: cordova-www.zip
           retention-days: 1
 
 # =====================================================
-# BUILD ANDROID
+# BUILD WEB (DOCKER IMAGE & PUSH TO REGISTRY)
 # =====================================================
-  build-android:
-    name: Build Android
+  build-web:
+    name: Build Web Docker & Push
     runs-on: ubuntu-latest
     needs: build-react
 
-    steps:
-      - uses: actions/checkout@v5
+    # [!WARNING] Make sure if you clone or make fork for this repo and want to keep GH Actions Workflow. Change this
+    env:
+      REGISTRY: ${{ secrets.REGISTRY }}
+      IMAGE_NAME: kiirohana-web-app
 
-      - uses: actions/download-artifact@v8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
         with:
           name: _internal-www
 
@@ -77,37 +87,77 @@ jobs:
           rm -rf cordova/www
           mv www cordova/www
 
-      - uses: actions/setup-node@v6
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          config-inline: |
+            [registry."${{ env.REGISTRY }}"]
+              http = true
+              insecure = true
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.web
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+# =====================================================
+# BUILD ANDROID
+# =====================================================
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+    needs: build-react
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: _internal-www
+
+      - name: Restore WWW
+        run: |
+          unzip -q cordova-www.zip
+          mkdir -p cordova
+          rm -rf cordova/www
+          mv www cordova/www
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
-      - uses: android-actions/setup-android@v4
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Install Cordova
-        run: npm i -g cordova
+        run: pnpm install -g cordova
 
       - name: Install deps
         working-directory: cordova
-        run: npm ci || npm install
-
-      - name: Read version
-        id: ver
-        shell: bash
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-
-          if [ -z "$VERSION" ]; then
-            VERSION="0.0.0"
-          fi
-
-          echo "Detected version: $VERSION"
-
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+        run: pnpm install
 
       - name: Reset Android platform
         working-directory: cordova
@@ -124,14 +174,14 @@ jobs:
         run: cordova build android --release
 
       - name: Upload APK
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: android-apk
           path: cordova/platforms/android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: warn
 
       - name: Upload AAB
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: android-aab
           path: cordova/platforms/android/app/build/outputs/bundle/release/*.aab
@@ -157,9 +207,9 @@ jobs:
             runner: macos-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@v4
         with:
           name: _internal-www
 
@@ -171,7 +221,12 @@ jobs:
           rm -rf cordova/www
           mv www cordova/www
 
-      - uses: actions/setup-node@v6
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -182,11 +237,11 @@ jobs:
           sudo apt install -y rpm libarchive-tools fakeroot dpkg
 
       - name: Install Cordova
-        run: npm i -g cordova
+        run: pnpm install -g cordova
 
       - name: Install deps
         working-directory: cordova
-        run: npm ci || npm install
+        run: pnpm install
 
       - name: Reset Electron
         working-directory: cordova
@@ -197,48 +252,27 @@ jobs:
       - name: Build Electron Release
         working-directory: cordova
         shell: bash
-        run: |
-           pnpm run build
-
-      - name: Remove helper junk
-        shell: bash
-        run: |
-          find cordova -iname "elevate.exe" -delete || true
-          find cordova -iname "uninstall.exe" -delete || true
-          find cordova -iname "*.map" -delete || true
+        run: pnpm run build
 
       - name: Collect Electron Outputs
         shell: bash
         run: |
           mkdir -p release
-
           while IFS= read -r file; do
             NAME=$(basename "$file")
-
-            echo "COPY: $NAME"
-
             cp "$file" "release/$NAME"
-
           done < <(
             find cordova/platforms/electron/build -type f \( \
               -name "*Setup*.exe" -o \
-              -name "*Portable*.exe" -o \
-              -name "*.msi" -o \
               -name "*.AppImage" -o \
               -name "*.deb" -o \
-              -name "*.rpm" -o \
-              -name "*.tar.gz" -o \
               -name "*.dmg" -o \
-              -name "*.pkg" -o \
               -name "*.zip" \
             \)
           )
 
-          echo "=== RELEASE FILES ==="
-          ls -lah release
-
       - name: Upload Electron
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: electron-${{ matrix.os }}
           path: release/*
