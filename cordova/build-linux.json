@@ -14,7 +14,8 @@
                 "AppImage",
                 "deb",
                 "rpm",
-                "tar.gz"
+                "tar.gz",
+                "tar.xz"
             ],
             "arch": [
                 "x64", "ia32", "arm64", "armv7l"

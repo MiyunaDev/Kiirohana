@@ -36,7 +36,7 @@ jobs:
         run: npm ci
 
       - name: Build frontend
-        run: npm run build
+        run: pnpm run build
 
       - name: Validate output
         run: |
@@ -198,7 +198,7 @@ jobs:
         working-directory: cordova
         shell: bash
         run: |
-           npm run build
+           pnpm run build
 
       - name: Remove helper junk
         shell: bash

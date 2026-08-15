@@ -42,19 +42,3 @@ In short, **Kiirohana is a learning playground and prototype project** created b
 > This application requires **Honoka Backend** to run properly as Personal Tracker and **Shinobu Backend** to run properly as Personal Access Reader.  
 > Please visit the official Miyuna website for more information:  
 > https://miyunadev.github.io/
-
----
-
-## 🚀 Development & Build
-
-### 1. Initialize Project
-
-```sh
-npm run init
-```
-
-### 2. Install Apache Cordova
-
-```sh
-npm i -g cordova
-```

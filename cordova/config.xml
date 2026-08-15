@@ -19,6 +19,8 @@
 
     <content src="index.html"/>
 
+    <preference name="SplashScreen" value="none" />
+
     <preference name="scheme" value="kiirohana"/>
     <preference name="hostname" value="localhost"/>
 
