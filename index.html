@@ -5,21 +5,48 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kiirohana</title>
+
+    <!-- Content-Security-Policy yang lebih aman dan dalam satu baris -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="
-        default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
-        connect-src *;
-        img-src * data: blob:;
-        style-src * 'unsafe-inline';
-        script-src * 'unsafe-inline' 'unsafe-eval';
-      "
+      content="default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; connect-src 'self' https:; font-src 'self' https:; object-src 'none'; base-uri 'self';"
     />
-    <script type="text/javascript" src="cordova.js"></script>
-    <!-- <script src="cordova.js"></script> -->
+
+    <!-- Cordova (hanya diperlukan jika berjalan di perangkat) -->
+    <script src="cordova.js"></script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+
+<!-- ABAIKAN, INI CUMA REMINDER: 
+NOTE :
+1. Evaluasi kebutuhan unsafe-inline / unsafe-eval untuk production
+2. Tambahkan frame-src untuk mendukung iframe player
+3. Tambahkan exception connect-src untuk dev API
+4. Pertimbangkan form-action dan upgrade-insecure-requests -->
+
+<!-- PERTIMBANGAN BUAT GANTI KE FINAL 
+
+Rekomendasi CSP Final
+<meta
+  http-equiv="Content-Security-Policy"
+  content="
+    default-src 'self' https:;
+    script-src 'self' 'unsafe-inline' https:;
+    style-src 'self' 'unsafe-inline' https:;
+    img-src 'self' data: https:;
+    connect-src 'self' https: http://localhost:5225;
+    font-src 'self' https:;
+    frame-src 'self' https:;
+    form-action 'self';
+    object-src 'none';
+    base-uri 'self';
+    upgrade-insecure-requests;
+  "
+/>
+Catatan:
+- upgrade-insecure-requests akan otomatis meng-upgrade http: ke https:
+- http://localhost:5225 hanya untuk development, hapus di production -->

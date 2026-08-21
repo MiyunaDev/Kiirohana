@@ -17,6 +17,7 @@ import History from './pages/History/History.tsx';
 import Settings from './pages/Settings/Settings.tsx';
 import ServicesSetting from './pages/Settings/ServicesSetting.tsx';
 import NotFound from './pages/Error/NotFound.tsx';
+import { ErrorBoundary } from './pages/Error/ErrorBoundary';
 
 const router = createHashRouter([
   {
@@ -54,7 +55,9 @@ createRoot(document.getElementById('root')!).render(
   <>
     <Toaster />
     <StrictMode>
-      <RouterProvider router={router} />
+      <ErrorBoundary>
+        <RouterProvider router={router} />
+      </ErrorBoundary>
     </StrictMode>
   </>,
 )

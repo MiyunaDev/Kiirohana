@@ -136,7 +136,7 @@ export default function YouTubeStyleVideoPlayer({
   useEffect(() => {
     if (!videoRef.current) return;
     videoRef.current.src = src;
-    videoRef.current.play();
+    videoRef.current.play(); // mana handlenya njir
     setPlaying(true);
   }, [src]);
 

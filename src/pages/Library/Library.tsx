@@ -10,6 +10,7 @@ const Library = () => {
 
     useEffect(() => {
         const fetchLibraries = async () => {
+            // non production URL
             try {
                 const response = await fetch('http://localhost:5225/graphql', {
                     method: 'POST',
@@ -42,7 +43,7 @@ const Library = () => {
 
                 setLibraries(formatted)
             } catch (error) {
-                console.error(error)
+                console.error("Gagal mengambil data library:", error)
             }
         }
 

@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+
+/* DEFAULT FONT  */
 @font-face {
   font-family: 'Poppins';
   src: url('/fonts/Poppins/Poppins-Regular.ttf') format('truetype');
@@ -21,6 +23,11 @@
   font-weight: 700;
   font-style: italic;
 }
+
+
+/* CUSTOM FONT, FOR RECOMENDATION  */
+
+
 
 :root {
   font-family: 'Poppins', sans-serif;
